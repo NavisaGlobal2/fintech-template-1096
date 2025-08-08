@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="md:col-span-2 space-y-6">
             <Logo />
             <p className="text-muted-foreground max-w-xs">
-              Modern task management for teams that value clarity, focus, and results.
+              Connecting African students and professionals with credible education financing options worldwide.
             </p>
             <div className="flex items-center gap-4">
               <a href="#" className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
@@ -32,7 +32,7 @@ const Footer = () => {
               </a>
               <a href="#" className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2c.313-1.732.467-3.482.46-5.33a29.005 29.005 0 00-.46-5.33z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2c.313-1.732.467-3.482.46-5.33a29.005 29.005 0 00-.46-5.33z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </a>
@@ -40,45 +40,45 @@ const Footer = () => {
           </div>
           
           <div className="space-y-4">
-            <h4 className="font-medium text-lg text-foreground">Product</h4>
+            <h4 className="font-medium text-lg text-foreground">Platform</h4>
             <ul className="space-y-3">
-              <li><a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Integrations</a></li>
-              <li><a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Updates</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Roadmap</a></li>
+              <li><a href="#loan-matcher" className="text-muted-foreground hover:text-foreground transition-colors">Loan Matcher</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Lender Partners</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Credit Guidance</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Application Tracking</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Mobile App</a></li>
             </ul>
           </div>
           
           <div className="space-y-4">
-            <h4 className="font-medium text-lg text-foreground">Company</h4>
+            <h4 className="font-medium text-lg text-foreground">Education</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">About</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Blog</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Careers</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Press</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Contact</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Study Abroad Guide</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Scholarship Database</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">University Rankings</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Visa Information</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Career Guidance</a></li>
             </ul>
           </div>
           
           <div className="space-y-4">
-            <h4 className="font-medium text-lg text-foreground">Resources</h4>
+            <h4 className="font-medium text-lg text-foreground">Support</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Documentation</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Guides & Tutorials</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">API Reference</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Community</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Financial Advisors</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Application Support</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Community Forum</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Contact Us</a></li>
             </ul>
           </div>
         </div>
         
         <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center text-muted-foreground text-sm">
-          <div>© 2025 Cosmos Tasks. All rights reserved.</div>
+          <div>© 2025 TechScale. All rights reserved.</div>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-            <a href="#" className="hover:text-foreground transition-colors">Cookies</a>
+            <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-foreground transition-colors">Cookie Policy</a>
           </div>
         </div>
       </div>
