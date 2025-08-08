@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LoanOption, UserProfile } from '@/types/techscale';
-import { CheckCircle, AlertCircle, XCircle, Clock, DollarSign, Users, Calendar } from 'lucide-react';
+import { CheckCircle, AlertCircle, XCircle, Clock, DollarSign, Users, Calendar, ExternalLink, Info } from 'lucide-react';
 
 interface LoanResultsProps {
   loans: LoanOption[];
@@ -69,6 +69,20 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
+  };
+
+  const handleLearnMore = (lender: string) => {
+    // In a real app, this would redirect to the lender's page
+    console.log(`Learning more about ${lender}`);
+    alert(`Redirecting to ${lender}'s detailed information page...`);
+  };
+
+  const handleApplyNow = (lender: string, tier: string) => {
+    if (tier === 'red') return;
+    
+    // In a real app, this would redirect to the application process
+    console.log(`Applying to ${lender}`);
+    alert(`Redirecting to ${lender}'s application process...`);
   };
 
   return (
@@ -177,17 +191,25 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
 
               {/* Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Info className="h-3 w-3" />
                   Match score based on your profile
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleLearnMore(loan.lenderName)}
+                    className="flex items-center gap-1"
+                  >
+                    <ExternalLink className="h-3 w-3" />
                     Learn More
                   </Button>
                   <Button 
                     size="sm"
                     className={loan.eligibilityTier === 'green' ? 'bg-green-600 hover:bg-green-700' : ''}
                     disabled={loan.eligibilityTier === 'red'}
+                    onClick={() => handleApplyNow(loan.lenderName, loan.eligibilityTier)}
                   >
                     {loan.eligibilityTier === 'red' ? 'Not Eligible' : 'Apply Now'}
                   </Button>

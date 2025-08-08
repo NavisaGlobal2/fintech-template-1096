@@ -11,6 +11,13 @@ const TechScaleHero = () => {
     }
   };
 
+  const scrollToHowItWorks = () => {
+    const howItWorksElement = document.getElementById('how-it-works');
+    if (howItWorksElement) {
+      howItWorksElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative w-full py-20 px-6 md:px-12 bg-background">
       {/* Background effects */}
@@ -71,7 +78,11 @@ const TechScaleHero = () => {
           >
             Find My Loan Options
           </Button>
-          <Button variant="outline" className="border-border text-foreground hover:bg-muted text-base h-12 px-8">
+          <Button 
+            variant="outline" 
+            className="border-border text-foreground hover:bg-muted text-base h-12 px-8"
+            onClick={scrollToHowItWorks}
+          >
             Learn More
           </Button>
         </div>

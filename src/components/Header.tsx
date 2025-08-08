@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
-import { Menu, X, GraduationCap, Calculator, Users, Sun, Moon } from 'lucide-react';
+import { Menu, X, Calculator, BookOpen, Users, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Switch } from '@/components/ui/switch';
@@ -30,6 +30,13 @@ const Header = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setMobileMenuOpen(false);
+  };
+
+  const handleGetStarted = () => {
+    const loanMatcherElement = document.getElementById('loan-matcher');
+    if (loanMatcherElement) {
+      loanMatcherElement.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const toggleMobileMenu = () => {
@@ -77,7 +84,7 @@ const Header = () => {
                 )}
                 onClick={handleNavClick('how-it-works')}
               >
-                <GraduationCap size={16} className="inline-block mr-1.5" /> How It Works
+                <BookOpen size={16} className="inline-block mr-1.5" /> How It Works
               </ToggleGroupItem>
               <ToggleGroupItem 
                 value="success-stories" 
@@ -97,33 +104,30 @@ const Header = () => {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-20 left-4 right-4 bg-background/95 backdrop-blur-md py-4 px-6 border border-border rounded-2xl shadow-lg z-50">
             <div className="flex flex-col gap-4">
-              <a 
-                href="#loan-matcher" 
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
+              <button 
+                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
                   activePage === 'loan-matcher' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={handleNavClick('loan-matcher')}
               >
                 <Calculator size={16} className="inline-block mr-1.5" /> Loan Matcher
-              </a>
-              <a 
-                href="#how-it-works" 
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
+              </button>
+              <button 
+                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
                   activePage === 'how-it-works' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={handleNavClick('how-it-works')}
               >
-                <GraduationCap size={16} className="inline-block mr-1.5" /> How It Works
-              </a>
-              <a 
-                href="#success-stories" 
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                <BookOpen size={16} className="inline-block mr-1.5" /> How It Works
+              </button>
+              <button 
+                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
                   activePage === 'success-stories' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={handleNavClick('success-stories')}
               >
                 <Users size={16} className="inline-block mr-1.5" /> Success Stories
-              </a>
+              </button>
               
               {/* Theme toggle for mobile */}
               <div className="flex items-center justify-between px-3 py-2">
@@ -154,7 +158,13 @@ const Header = () => {
             <Sun size={18} className={`${!isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
           </div>
           <div className="rounded-2xl">
-            <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:bg-muted">Get Started</Button>
+            <Button 
+              variant="ghost" 
+              className="text-muted-foreground hover:text-foreground hover:bg-muted"
+              onClick={handleGetStarted}
+            >
+              Get Started
+            </Button>
           </div>
         </div>
       </header>
