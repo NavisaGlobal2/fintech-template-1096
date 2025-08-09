@@ -1,25 +1,25 @@
 
+import { Toggle } from '@/components/ui/toggle';
 import { Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const ThemeSwitcher = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <Button
-      variant="ghost"
+    <Toggle
+      pressed={theme === 'light'}
+      onPressedChange={toggleTheme}
       size="sm"
-      onClick={toggleTheme}
       className="w-9 h-9 p-0"
+      aria-label="Toggle theme"
     >
       {theme === 'dark' ? (
-        <Sun className="h-4 w-4" />
-      ) : (
         <Moon className="h-4 w-4" />
+      ) : (
+        <Sun className="h-4 w-4" />
       )}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+    </Toggle>
   );
 };
 
