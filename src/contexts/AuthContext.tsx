@@ -20,22 +20,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider: Setting up auth state');
-    
     // Get initial session
     const getSession = async () => {
       try {
-        console.log('AuthProvider: Getting initial session');
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('AuthProvider: Error getting session:', error);
+          console.error('Error getting session:', error);
         } else {
-          console.log('AuthProvider: Initial session:', session);
           setSession(session);
           setUser(session?.user ?? null);
         }
       } catch (error) {
-        console.error('AuthProvider: Session fetch error:', error);
+        console.error('Session fetch error:', error);
       } finally {
         setLoading(false);
       }
@@ -46,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('AuthProvider: Auth state changed:', event, session);
+        console.log('Auth state changed:', event, session);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -54,14 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     return () => {
-      console.log('AuthProvider: Cleaning up subscription');
       subscription.unsubscribe();
     };
   }, []);
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
-      console.log('AuthProvider: Attempting sign up for:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -73,38 +67,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
       
-      console.log('AuthProvider: Sign up result:', { data, error });
+      console.log('Sign up result:', { data, error });
       return { error };
     } catch (error) {
-      console.error('AuthProvider: Sign up error:', error);
+      console.error('Sign up error:', error);
       return { error };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('AuthProvider: Attempting sign in for:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      console.log('AuthProvider: Sign in result:', { data, error });
+      console.log('Sign in result:', { data, error });
       return { error };
     } catch (error) {
-      console.error('AuthProvider: Sign in error:', error);
+      console.error('Sign in error:', error);
       return { error };
     }
   };
 
   const signOut = async () => {
     try {
-      console.log('AuthProvider: Attempting sign out');
       const { error } = await supabase.auth.signOut();
-      console.log('AuthProvider: Sign out result:', { error });
       return { error };
     } catch (error) {
-      console.error('AuthProvider: Sign out error:', error);
+      console.error('Sign out error:', error);
       return { error };
     }
   };
@@ -117,8 +108,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signOut,
   };
-
-  console.log('AuthProvider: Rendering with value:', { user: !!user, session: !!session, loading });
 
   return (
     <AuthContext.Provider value={value}>
