@@ -29,16 +29,16 @@ const LoanMatcher = () => {
   };
 
   return (
-    <section id="loan-matcher" className="w-full py-20 px-6 md:px-12 bg-muted/30">
+    <section id="loan-matcher" className="w-full py-20 px-6 md:px-12 bg-background">
       <div className="max-w-6xl mx-auto">
         {!userProfile ? (
           <div className="space-y-8">
             <div className="text-center space-y-4">
               <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
-                Find Your Perfect Loan Match
+                Find Your Perfect Financing Match
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Tell us about your education goals and financial situation to get personalized loan recommendations
+                Tell us about your education goals and career plans to get personalized financing recommendations tailored to your journey
               </p>
             </div>
             <UserIntakeForm onSubmit={handleFormSubmit} isLoading={isLoading} />
@@ -48,10 +48,10 @@ const LoanMatcher = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl md:text-3xl font-medium tracking-tighter text-foreground">
-                  Your Loan Recommendations
+                  Your Personalized Financing Options
                 </h2>
                 <p className="text-muted-foreground">
-                  Based on your profile, we found {matchedLoans.length} matching options
+                  Based on your profile, we found {matchedLoans.length} matching options from trusted partners
                 </p>
               </div>
               <button
