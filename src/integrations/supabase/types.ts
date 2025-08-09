@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      loan_applications: {
+        Row: {
+          application_data: Json | null
+          created_at: string | null
+          id: string
+          lender_name: string
+          loan_option_id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          application_data?: Json | null
+          created_at?: string | null
+          id?: string
+          lender_name: string
+          loan_option_id: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          application_data?: Json | null
+          created_at?: string | null
+          id?: string
+          lender_name?: string
+          loan_option_id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       payslip_audit_logs: {
         Row: {
           action: string
@@ -126,6 +159,36 @@ export type Database = {
           pay_period_start?: string
           pdf_url?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
