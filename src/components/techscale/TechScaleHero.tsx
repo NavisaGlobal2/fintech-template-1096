@@ -37,12 +37,12 @@ const TechScaleHero = () => {
 
         {/* Main heading */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tighter text-balance text-foreground">
-          Smart <span className="text-primary">Financial Access</span> for Your Education Journey
+          Finance Your <span className="text-primary">Global Future</span>
         </h1>
 
         {/* Subheading */}
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto text-balance">
-          Get personalized study-abroad and upskilling loan recommendations tailored for African students and professionals. Connect with credible lenders and unlock your potential.
+          From Africa to the world — secure study abroad and career growth financing designed for your journey.
         </p>
 
         {/* Feature highlights */}
@@ -52,21 +52,21 @@ const TechScaleHero = () => {
               <GraduationCap className="h-6 w-6 text-primary" />
             </div>
             <h3 className="font-medium text-foreground">Study Abroad Loans</h3>
-            <p className="text-sm text-muted-foreground text-center">Access financing for international education at top universities worldwide</p>
+            <p className="text-sm text-muted-foreground text-center">Co-signer-free options from trusted global lenders</p>
           </div>
           <div className="flex flex-col items-center space-y-3 p-4">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <TrendingUp className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="font-medium text-foreground">Upskilling Finance</h3>
-            <p className="text-sm text-muted-foreground text-center">Fund professional development and career advancement programs</p>
+            <h3 className="font-medium text-foreground">Career Microloans</h3>
+            <p className="text-sm text-muted-foreground text-center">£500–£7,500 for upskilling and certifications</p>
           </div>
           <div className="flex flex-col items-center space-y-3 p-4">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <MapPin className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="font-medium text-foreground">Africa-Focused</h3>
-            <p className="text-sm text-muted-foreground text-center">Designed specifically for African students and professionals</p>
+            <h3 className="font-medium text-foreground">Sponsor Match</h3>
+            <p className="text-sm text-muted-foreground text-center">Connect with diaspora donors, alumni, and NGOs</p>
           </div>
         </div>
 
@@ -76,7 +76,7 @@ const TechScaleHero = () => {
             onClick={scrollToMatcher}
             className="bg-primary text-primary-foreground hover:bg-primary/90 text-base h-12 px-8"
           >
-            Find My Loan Options
+            Check Your Eligibility →
           </Button>
           <Button 
             variant="outline" 

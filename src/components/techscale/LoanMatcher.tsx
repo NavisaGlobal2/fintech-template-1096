@@ -35,10 +35,10 @@ const LoanMatcher = () => {
           <div className="space-y-8">
             <div className="text-center space-y-4">
               <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
-                Find Your Perfect Loan Match
+                Check Your Eligibility
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Tell us about your education goals and financial situation to get personalized loan recommendations
+                Tell us about your education goals and financial situation to get personalized financing recommendations
               </p>
             </div>
             <UserIntakeForm onSubmit={handleFormSubmit} isLoading={isLoading} />
@@ -48,7 +48,7 @@ const LoanMatcher = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl md:text-3xl font-medium tracking-tighter text-foreground">
-                  Your Loan Recommendations
+                  Your Financing Options
                 </h2>
                 <p className="text-muted-foreground">
                   Based on your profile, we found {matchedLoans.length} matching options
