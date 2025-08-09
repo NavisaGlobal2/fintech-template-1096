@@ -11,13 +11,13 @@ const ThemeSwitcher = () => {
       pressed={theme === 'light'}
       onPressedChange={toggleTheme}
       size="sm"
-      className="w-9 h-9 p-0"
+      className="w-8 h-8 sm:w-9 sm:h-9 p-0 shrink-0"
       aria-label="Toggle theme"
     >
       {theme === 'dark' ? (
-        <Moon className="h-4 w-4" />
+        <Sun className="h-3 w-3 sm:h-4 sm:w-4" />
       ) : (
-        <Sun className="h-4 w-4" />
+        <Moon className="h-3 w-3 sm:h-4 sm:w-4" />
       )}
     </Toggle>
   );
