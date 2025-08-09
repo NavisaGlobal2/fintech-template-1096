@@ -20,68 +20,71 @@ const Header = () => {
   return (
     <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <TechScaleLogo />
+        <div className="flex justify-between items-center h-14 sm:h-16">
+          <div className="flex-shrink-0">
+            <TechScaleLogo />
+          </div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             <button
               onClick={() => scrollToSection('how-it-works')}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               How It Works
             </button>
             <button
               onClick={() => scrollToSection('loan-matcher')}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Get Started
             </button>
             <button
               onClick={() => scrollToSection('success-stories')}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Success Stories
             </button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <ThemeSwitcher />
               <AuthButton />
             </div>
           </nav>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2">
             <ThemeSwitcher />
             <AuthButton />
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2"
             >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-background border-t border-border">
+          <div className="lg:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-background border-t border-border">
               <button
                 onClick={() => scrollToSection('how-it-works')}
-                className="block w-full text-left px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="block w-full text-left px-3 py-3 text-base text-muted-foreground hover:text-foreground transition-colors"
               >
                 How It Works
               </button>
               <button
                 onClick={() => scrollToSection('loan-matcher')}
-                className="block w-full text-left px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="block w-full text-left px-3 py-3 text-base text-muted-foreground hover:text-foreground transition-colors"
               >
                 Get Started
               </button>
               <button
                 onClick={() => scrollToSection('success-stories')}
-                className="block w-full text-left px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="block w-full text-left px-3 py-3 text-base text-muted-foreground hover:text-foreground transition-colors"
               >
                 Success Stories
               </button>
