@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import Logo from './Logo';
+import TechScaleLogo from './techscale/TechScaleLogo';
 import { Menu, X, Calculator, BookOpen, Users, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -51,7 +51,7 @@ const Header = () => {
     <div className="sticky top-0 z-50 pt-8 px-4">
       <header className="w-full max-w-7xl mx-auto py-3 px-6 md:px-8 flex items-center justify-between">
         <div className="p-3">
-          <Logo />
+          <TechScaleLogo />
         </div>
         
         {/* Mobile menu button */}

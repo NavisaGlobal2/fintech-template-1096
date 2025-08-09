@@ -1,8 +1,10 @@
 
 import TechScaleHero from '@/components/techscale/TechScaleHero';
 import LoanMatcher from '@/components/techscale/LoanMatcher';
+import StatsSection from '@/components/techscale/StatsSection';
+import FAQSection from '@/components/techscale/FAQSection';
+import TechScaleFooter from '@/components/techscale/TechScaleFooter';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 const TechScale = () => {
   return (
@@ -28,6 +30,8 @@ const TechScale = () => {
         </section>
 
         <LoanMatcher />
+        
+        <StatsSection />
         
         {/* How It Works Section */}
         <section id="how-it-works" className="w-full py-20 px-6 md:px-12 bg-background">
@@ -290,6 +294,8 @@ const TechScale = () => {
           </div>
         </section>
 
+        <FAQSection />
+
         {/* Final CTA Section */}
         <section className="w-full py-20 px-6 md:px-12 bg-primary">
           <div className="max-w-6xl mx-auto text-center space-y-8">
@@ -330,7 +336,7 @@ const TechScale = () => {
           </div>
         </section>
       </main>
-      <Footer />
+      <TechScaleFooter />
     </div>
   );
 };
