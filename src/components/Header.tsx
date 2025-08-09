@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import TechScaleLogo from "@/components/techscale/TechScaleLogo";
 import AuthButton from "@/components/AuthButton";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,11 +43,15 @@ const Header = () => {
             >
               Success Stories
             </button>
-            <AuthButton />
+            <div className="flex items-center gap-2">
+              <ThemeSwitcher />
+              <AuthButton />
+            </div>
           </nav>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
+            <ThemeSwitcher />
             <AuthButton />
             <Button
               variant="ghost"
