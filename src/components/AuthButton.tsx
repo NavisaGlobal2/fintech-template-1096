@@ -1,42 +1,51 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User } from 'lucide-react';
 
-const AuthButton = () => {
+const AuthButton: React.FC = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (!error) {
+      navigate('/');
+    }
+  };
+
   if (loading) {
-    return <div className="w-20 h-10 bg-muted animate-pulse rounded-md"></div>;
+    return (
+      <Button variant="ghost" size="sm" disabled>
+        Loading...
+      </Button>
+    );
   }
 
   if (user) {
     return (
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <User className="h-4 w-4" />
-          <span>{user.email}</span>
+          <span className="hidden sm:inline">
+            {user.user_metadata?.first_name || user.email}
+          </span>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => signOut()}
-          className="flex items-center gap-1"
-        >
+        <Button variant="ghost" size="sm" onClick={handleSignOut}>
           <LogOut className="h-4 w-4" />
-          Sign Out
+          <span className="hidden sm:inline ml-2">Sign Out</span>
         </Button>
       </div>
     );
   }
 
   return (
-    <Button
+    <Button 
+      variant="default" 
+      size="sm" 
       onClick={() => navigate('/auth')}
-      size="sm"
     >
       Sign In
     </Button>

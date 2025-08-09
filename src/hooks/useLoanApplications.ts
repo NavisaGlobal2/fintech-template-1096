@@ -16,8 +16,9 @@ export const useLoanApplications = () => {
     setLoading(true);
     
     try {
+      // Convert the application data to a JSON-serializable format
       const applicationData = {
-        userProfile,
+        userProfile: JSON.parse(JSON.stringify(userProfile)),
         loanDetails: {
           aprRange: loanOption.aprRange,
           maxAmount: loanOption.maxAmount,
@@ -33,7 +34,7 @@ export const useLoanApplications = () => {
           user_id: userId,
           loan_option_id: loanOption.id,
           lender_name: loanOption.lenderName,
-          application_data: applicationData,
+          application_data: applicationData as any, // Cast to any to satisfy JSON type
           status: 'pending'
         })
         .select()
@@ -48,6 +49,7 @@ export const useLoanApplications = () => {
 
       return { data, error: null };
     } catch (error: any) {
+      console.error('Application submission error:', error);
       toast({
         title: "Application Failed",
         description: error.message || "Failed to submit your application. Please try again.",
@@ -60,13 +62,19 @@ export const useLoanApplications = () => {
   };
 
   const getUserApplications = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('loan_applications')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('loan_applications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
 
-    return { data, error };
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Error fetching applications:', error);
+      return { data: null, error };
+    }
   };
 
   return {

@@ -79,20 +79,29 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
 
   const handleLearnMore = (lender: string) => {
     console.log(`Learning more about ${lender}`);
-    alert(`Redirecting to ${lender}'s detailed information page...`);
+    // For demo purposes, just show an alert
+    alert(`More information about ${lender} would be displayed here.`);
   };
 
   const handleApplyNow = async (loan: LoanOption) => {
-    if (loan.eligibilityTier === 'red') return;
+    console.log('Apply Now clicked for:', loan.lenderName);
+    
+    if (loan.eligibilityTier === 'red') {
+      console.log('User not eligible for this loan');
+      return;
+    }
     
     // Check if user is authenticated
     if (!user) {
+      console.log('User not authenticated, redirecting to auth');
       navigate('/auth');
       return;
     }
 
+    console.log('Submitting application for user:', user.id);
     // Submit the loan application
-    await submitApplication(loan, userProfile, user.id);
+    const result = await submitApplication(loan, userProfile, user.id);
+    console.log('Application result:', result);
   };
 
   return (
