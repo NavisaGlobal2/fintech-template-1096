@@ -1,98 +1,174 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
-import TechScaleLogo from "@/components/techscale/TechScaleLogo";
-import AuthButton from "@/components/AuthButton";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import TechScaleLogo from './techscale/TechScaleLogo';
+import { Menu, X, Calculator, BookOpen, Users, Sun, Moon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Switch } from '@/components/ui/switch';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
+  const [activePage, setActivePage] = useState('loan-matcher');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('light-mode');
+      document.documentElement.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      document.documentElement.classList.add('light-mode');
+    }
+  }, [isDarkMode]);
+  
+  const handleNavClick = (page: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setActivePage(page);
+    const element = document.getElementById(page);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-    setIsMenuOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const handleGetStarted = () => {
+    const loanMatcherElement = document.getElementById('loan-matcher');
+    if (loanMatcherElement) {
+      loanMatcherElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-14 sm:h-16">
-          <div className="flex-shrink-0">
-            <TechScaleLogo />
-          </div>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-            <button
-              onClick={() => scrollToSection('how-it-works')}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              How It Works
-            </button>
-            <button
-              onClick={() => scrollToSection('loan-matcher')}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Get Started
-            </button>
-            <button
-              onClick={() => scrollToSection('success-stories')}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Success Stories
-            </button>
-            <div className="flex items-center gap-3">
-              <ThemeSwitcher />
-              <AuthButton />
-            </div>
-          </nav>
-
-          {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center gap-2">
-            <ThemeSwitcher />
-            <AuthButton />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2"
-            >
-              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </Button>
-          </div>
+    <div className="sticky top-0 z-50 pt-8 px-4">
+      <header className="w-full max-w-7xl mx-auto py-3 px-6 md:px-8 flex items-center justify-between">
+        <div className="p-3">
+          <TechScaleLogo />
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="lg:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-background border-t border-border">
-              <button
-                onClick={() => scrollToSection('how-it-works')}
-                className="block w-full text-left px-3 py-3 text-base text-muted-foreground hover:text-foreground transition-colors"
+        
+        {/* Mobile menu button */}
+        <button 
+          className="md:hidden p-3 rounded-2xl text-muted-foreground hover:text-foreground"
+          onClick={toggleMobileMenu}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+        
+        {/* Desktop navigation */}
+        <nav className="hidden md:flex items-center absolute left-1/2 transform -translate-x-1/2">
+          <div className="rounded-full px-1 py-1 backdrop-blur-md bg-background/80 border border-border shadow-lg">
+            <ToggleGroup type="single" value={activePage} onValueChange={(value) => value && setActivePage(value)}>
+              <ToggleGroupItem 
+                value="loan-matcher"
+                className={cn(
+                  "px-4 py-2 rounded-full transition-colors relative",
+                  activePage === 'loan-matcher' ? 'text-accent-foreground bg-accent' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
+                onClick={handleNavClick('loan-matcher')}
               >
-                How It Works
-              </button>
-              <button
-                onClick={() => scrollToSection('loan-matcher')}
-                className="block w-full text-left px-3 py-3 text-base text-muted-foreground hover:text-foreground transition-colors"
+                <Calculator size={16} className="inline-block mr-1.5" /> Loan Matcher
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="how-it-works" 
+                className={cn(
+                  "px-4 py-2 rounded-full transition-colors relative",
+                  activePage === 'how-it-works' ? 'text-accent-foreground bg-accent' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
+                onClick={handleNavClick('how-it-works')}
               >
-                Get Started
-              </button>
-              <button
-                onClick={() => scrollToSection('success-stories')}
-                className="block w-full text-left px-3 py-3 text-base text-muted-foreground hover:text-foreground transition-colors"
+                <BookOpen size={16} className="inline-block mr-1.5" /> How It Works
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="success-stories" 
+                className={cn(
+                  "px-4 py-2 rounded-full transition-colors relative",
+                  activePage === 'success-stories' ? 'text-accent-foreground bg-accent' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
+                onClick={handleNavClick('success-stories')}
               >
-                Success Stories
+                <Users size={16} className="inline-block mr-1.5" /> Success Stories
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        </nav>
+        
+        {/* Mobile navigation */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-20 left-4 right-4 bg-background/95 backdrop-blur-md py-4 px-6 border border-border rounded-2xl shadow-lg z-50">
+            <div className="flex flex-col gap-4">
+              <button 
+                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                  activePage === 'loan-matcher' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+                onClick={handleNavClick('loan-matcher')}
+              >
+                <Calculator size={16} className="inline-block mr-1.5" /> Loan Matcher
               </button>
+              <button 
+                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                  activePage === 'how-it-works' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+                onClick={handleNavClick('how-it-works')}
+              >
+                <BookOpen size={16} className="inline-block mr-1.5" /> How It Works
+              </button>
+              <button 
+                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                  activePage === 'success-stories' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+                onClick={handleNavClick('success-stories')}
+              >
+                <Users size={16} className="inline-block mr-1.5" /> Success Stories
+              </button>
+              
+              {/* Theme toggle for mobile */}
+              <div className="flex items-center justify-between px-3 py-2">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <div className="flex items-center gap-2">
+                  <Moon size={16} className={`${isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <Switch 
+                    checked={!isDarkMode} 
+                    onCheckedChange={toggleTheme} 
+                    className="data-[state=checked]:bg-primary"
+                  />
+                  <Sun size={16} className={`${!isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
+                </div>
+              </div>
             </div>
           </div>
         )}
-      </div>
-    </header>
+        
+        <div className="hidden md:flex items-center gap-4">
+          {/* Theme toggle for desktop */}
+          <div className="flex items-center gap-2 rounded-full px-3 py-2">
+            <Moon size={18} className={`${isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
+            <Switch 
+              checked={!isDarkMode} 
+              onCheckedChange={toggleTheme} 
+              className="data-[state=checked]:bg-primary"
+            />
+            <Sun size={18} className={`${!isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
+          </div>
+          <div className="rounded-2xl">
+            <Button 
+              variant="ghost" 
+              className="text-muted-foreground hover:text-foreground hover:bg-muted"
+              onClick={handleGetStarted}
+            >
+              Get Started
+            </Button>
+          </div>
+        </div>
+      </header>
+    </div>
   );
 };
 

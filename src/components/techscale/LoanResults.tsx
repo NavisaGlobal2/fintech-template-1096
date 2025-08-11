@@ -5,9 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LoanOption, UserProfile } from '@/types/techscale';
 import { CheckCircle, AlertCircle, XCircle, Clock, DollarSign, Users, Calendar, ExternalLink, Info } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLoanApplications } from '@/hooks/useLoanApplications';
-import { useNavigate } from 'react-router-dom';
 
 interface LoanResultsProps {
   loans: LoanOption[];
@@ -16,9 +13,6 @@ interface LoanResultsProps {
 
 const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
   const [sortBy, setSortBy] = useState<'relevance' | 'rate' | 'amount'>('relevance');
-  const { user } = useAuth();
-  const { submitApplication, loading } = useLoanApplications();
-  const navigate = useNavigate();
 
   const sortedLoans = [...loans].sort((a, b) => {
     if (sortBy === 'relevance') {
@@ -78,30 +72,17 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
   };
 
   const handleLearnMore = (lender: string) => {
+    // In a real app, this would redirect to the lender's page
     console.log(`Learning more about ${lender}`);
-    // For demo purposes, just show an alert
-    alert(`More information about ${lender} would be displayed here.`);
+    alert(`Redirecting to ${lender}'s detailed information page...`);
   };
 
-  const handleApplyNow = async (loan: LoanOption) => {
-    console.log('Apply Now clicked for:', loan.lenderName);
+  const handleApplyNow = (lender: string, tier: string) => {
+    if (tier === 'red') return;
     
-    if (loan.eligibilityTier === 'red') {
-      console.log('User not eligible for this loan');
-      return;
-    }
-    
-    // Check if user is authenticated
-    if (!user) {
-      console.log('User not authenticated, redirecting to auth');
-      navigate('/auth');
-      return;
-    }
-
-    console.log('Submitting application for user:', user.id);
-    // Submit the loan application
-    const result = await submitApplication(loan, userProfile, user.id);
-    console.log('Application result:', result);
+    // In a real app, this would redirect to the application process
+    console.log(`Applying to ${lender}`);
+    alert(`Redirecting to ${lender}'s application process...`);
   };
 
   return (
@@ -227,12 +208,10 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
                   <Button 
                     size="sm"
                     className={loan.eligibilityTier === 'green' ? 'bg-green-600 hover:bg-green-700' : ''}
-                    disabled={loan.eligibilityTier === 'red' || loading}
-                    onClick={() => handleApplyNow(loan)}
+                    disabled={loan.eligibilityTier === 'red'}
+                    onClick={() => handleApplyNow(loan.lenderName, loan.eligibilityTier)}
                   >
-                    {loan.eligibilityTier === 'red' ? 'Not Eligible' : (
-                      loading ? 'Applying...' : (user ? 'Apply Now' : 'Sign In to Apply')
-                    )}
+                    {loan.eligibilityTier === 'red' ? 'Not Eligible' : 'Apply Now'}
                   </Button>
                 </div>
               </div>
