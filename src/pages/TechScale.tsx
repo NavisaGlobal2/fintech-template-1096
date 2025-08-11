@@ -13,7 +13,7 @@ const TechScale = () => {
       <main>
         <TechScaleHero />
 
-        {/* Why Tech Skill Accelerate Section */}
+        {/* Why TechScale Section */}
         <section className="w-full py-20 px-6 md:px-12 bg-background">
           <div className="max-w-6xl mx-auto text-center space-y-12">
             <div className="space-y-6">
@@ -21,7 +21,7 @@ const TechScale = () => {
                 Break Barriers. Build Dreams.
               </h2>
               <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-                At <strong>Tech Skill Accelerate</strong>, we believe talent should not be limited by borders or bank balances.
+                At <strong>TechScale</strong>, we believe talent should not be limited by borders or bank balances.
                 Whether you're an African student heading overseas or a young professional abroad looking to upskill, 
                 we connect you to trusted financing options, microloans, and sponsor networks — so you can focus on your future.
               </p>
@@ -72,7 +72,7 @@ const TechScale = () => {
                 </div>
                 <h3 className="text-xl font-medium">Secure Your Funding</h3>
                 <p className="text-muted-foreground">
-                  Apply directly through our trusted partners or with Tech Skill Accelerate's in-house Career Credit.
+                  Apply directly through our trusted partners or with TechScale's in-house Career Credit.
                 </p>
               </div>
             </div>
@@ -176,7 +176,7 @@ const TechScale = () => {
           <div className="max-w-6xl mx-auto text-center space-y-12">
             <div className="space-y-4">
               <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
-                Why Choose Tech Skill Accelerate
+                Why Choose TechScale
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                 Built for African talent, trusted by professionals worldwide
@@ -235,7 +235,7 @@ const TechScale = () => {
                 Success Stories
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Real stories from African students and professionals who achieved their dreams with Tech Skill Accelerate
+                Real stories from African students and professionals who achieved their dreams with TechScale
               </p>
             </div>
             
@@ -252,7 +252,7 @@ const TechScale = () => {
                     </div>
                   </div>
                   <p className="text-muted-foreground text-sm">
-                    "Tech Skill Accelerate helped me find the perfect loan for my Computer Science PhD at MIT. The process was seamless and I got approved within weeks!"
+                    "TechScale helped me find the perfect loan for my Computer Science PhD at MIT. The process was seamless and I got approved within weeks!"
                   </p>
                 </div>
               </div>
@@ -286,7 +286,7 @@ const TechScale = () => {
                     </div>
                   </div>
                   <p className="text-muted-foreground text-sm">
-                    "Tech Skill Accelerate not only found me financing but also helped improve my credit readiness. Now I'm pursuing my dream in Data Science!"
+                    "TechScale not only found me financing but also helped improve my credit readiness. Now I'm pursuing my dream in Data Science!"
                   </p>
                 </div>
               </div>

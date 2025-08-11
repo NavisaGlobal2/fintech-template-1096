@@ -1,3 +1,4 @@
+
 import React from 'react';
 import TechScaleLogo from './TechScaleLogo';
 import { Separator } from '@/components/ui/separator';
@@ -77,7 +78,7 @@ const TechScaleFooter = () => {
             <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-primary transition-colors">Cookie Policy</a>
           </div>
-          <p>&copy; 2024 Tech Skill Accelerate. All rights reserved.</p>
+          <p>&copy; 2024 TechScale. All rights reserved.</p>
         </div>
       </div>
     </footer>
