@@ -48,15 +48,15 @@ const Header = () => {
   };
 
   return (
-    <div className="sticky top-0 z-50 pt-8 px-4">
-      <header className="w-full max-w-7xl mx-auto py-3 px-6 md:px-8 flex items-center justify-between">
-        <div className="p-3">
+    <div className="sticky top-0 z-50 pt-4 md:pt-8 px-4">
+      <header className="w-full max-w-7xl mx-auto py-2 md:py-3 px-4 md:px-8 flex items-center justify-between">
+        <div className="p-2 md:p-3">
           <TechScaleLogo />
         </div>
         
         {/* Mobile menu button */}
         <button 
-          className="md:hidden p-3 rounded-2xl text-muted-foreground hover:text-foreground"
+          className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground touch-manipulation"
           onClick={toggleMobileMenu}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -69,7 +69,7 @@ const Header = () => {
               <ToggleGroupItem 
                 value="loan-matcher"
                 className={cn(
-                  "px-4 py-2 rounded-full transition-colors relative",
+                  "px-3 lg:px-4 py-2 rounded-full transition-colors relative text-sm",
                   activePage === 'loan-matcher' ? 'text-accent-foreground bg-accent' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 )}
                 onClick={handleNavClick('loan-matcher')}
@@ -79,7 +79,7 @@ const Header = () => {
               <ToggleGroupItem 
                 value="how-it-works" 
                 className={cn(
-                  "px-4 py-2 rounded-full transition-colors relative",
+                  "px-3 lg:px-4 py-2 rounded-full transition-colors relative text-sm",
                   activePage === 'how-it-works' ? 'text-accent-foreground bg-accent' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 )}
                 onClick={handleNavClick('how-it-works')}
@@ -89,7 +89,7 @@ const Header = () => {
               <ToggleGroupItem 
                 value="success-stories" 
                 className={cn(
-                  "px-4 py-2 rounded-full transition-colors relative",
+                  "px-3 lg:px-4 py-2 rounded-full transition-colors relative text-sm",
                   activePage === 'success-stories' ? 'text-accent-foreground bg-accent' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 )}
                 onClick={handleNavClick('success-stories')}
@@ -102,35 +102,35 @@ const Header = () => {
         
         {/* Mobile navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-20 left-4 right-4 bg-background/95 backdrop-blur-md py-4 px-6 border border-border rounded-2xl shadow-lg z-50">
+          <div className="md:hidden absolute top-16 left-4 right-4 bg-background/95 backdrop-blur-md py-4 px-6 border border-border rounded-2xl shadow-lg z-50">
             <div className="flex flex-col gap-4">
               <button 
-                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                className={`px-3 py-3 text-sm rounded-md transition-colors text-left touch-manipulation ${
                   activePage === 'loan-matcher' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={handleNavClick('loan-matcher')}
               >
-                <Calculator size={16} className="inline-block mr-1.5" /> Loan Matcher
+                <Calculator size={16} className="inline-block mr-2" /> Loan Matcher
               </button>
               <button 
-                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                className={`px-3 py-3 text-sm rounded-md transition-colors text-left touch-manipulation ${
                   activePage === 'how-it-works' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={handleNavClick('how-it-works')}
               >
-                <BookOpen size={16} className="inline-block mr-1.5" /> How It Works
+                <BookOpen size={16} className="inline-block mr-2" /> How It Works
               </button>
               <button 
-                className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                className={`px-3 py-3 text-sm rounded-md transition-colors text-left touch-manipulation ${
                   activePage === 'success-stories' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={handleNavClick('success-stories')}
               >
-                <Users size={16} className="inline-block mr-1.5" /> Success Stories
+                <Users size={16} className="inline-block mr-2" /> Success Stories
               </button>
               
               {/* Theme toggle for mobile */}
-              <div className="flex items-center justify-between px-3 py-2">
+              <div className="flex items-center justify-between px-3 py-2 border-t border-border mt-2 pt-4">
                 <span className="text-sm text-muted-foreground">Theme</span>
                 <div className="flex items-center gap-2">
                   <Moon size={16} className={`${isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
@@ -142,6 +142,18 @@ const Header = () => {
                   <Sun size={16} className={`${!isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
                 </div>
               </div>
+              
+              {/* Mobile Get Started Button */}
+              <Button 
+                variant="default" 
+                className="w-full mt-2 h-12 text-base touch-manipulation"
+                onClick={() => {
+                  handleGetStarted();
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Get Started
+              </Button>
             </div>
           </div>
         )}

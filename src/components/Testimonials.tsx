@@ -24,37 +24,37 @@ const Testimonials = () => {
   ];
   
   return (
-    <section className="w-full py-20 px-6 md:px-12 bg-card relative overflow-hidden">
+    <section className="w-full py-12 md:py-20 px-4 md:px-6 lg:px-12 bg-card relative overflow-hidden">
       {/* Background grid */}
       <div className="absolute inset-0 cosmic-grid opacity-20"></div>
       
-      <div className="max-w-7xl mx-auto space-y-16 relative z-10">
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
+      <div className="max-w-7xl mx-auto space-y-12 md:space-y-16 relative z-10">
+        <div className="text-center space-y-3 md:space-y-4 max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-foreground">
             Trusted by finance teams worldwide
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base md:text-lg">
             See how our platform transforms financial operations for businesses
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {testimonials.map((testimonial, index) => (
             <div 
               key={index}
-              className="p-6 rounded-xl border border-border bg-background/80 backdrop-blur-sm hover:border-border/60 transition-all duration-300"
+              className="p-4 md:p-6 rounded-xl border border-border bg-background/80 backdrop-blur-sm hover:border-border/60 transition-all duration-300"
             >
-              <div className="mb-6">
+              <div className="mb-4 md:mb-6">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="text-primary inline-block mr-1">★</span>
                 ))}
               </div>
-              <p className="text-lg mb-8 text-foreground/90 italic">"{testimonial.quote}"</p>
-              <div className="flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-full ${testimonial.avatar} bg-muted`}></div>
+              <p className="text-base md:text-lg mb-6 md:mb-8 text-foreground/90 italic">"{testimonial.quote}"</p>
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className={`h-10 w-10 md:h-12 md:w-12 rounded-full ${testimonial.avatar} bg-muted`}></div>
                 <div>
-                  <h4 className="font-medium text-foreground">{testimonial.author}</h4>
-                  <p className="text-sm text-muted-foreground">{testimonial.position}</p>
+                  <h4 className="font-medium text-foreground text-sm md:text-base">{testimonial.author}</h4>
+                  <p className="text-xs md:text-sm text-muted-foreground">{testimonial.position}</p>
                 </div>
               </div>
             </div>
