@@ -92,6 +92,30 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
+              {/* User Type */}
+              <FormField
+                control={form.control}
+                name="userType"
+                rules={{ required: "Please select your profile type" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>I am a...</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your profile" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="student">Student (pursuing education)</SelectItem>
+                        <SelectItem value="professional">Professional (career advancement)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Loan Purpose */}
               <FormField
                 control={form.control}
@@ -116,7 +140,9 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid md:grid-cols-2 gap-6">
               {/* Income Range */}
               <FormField
                 control={form.control}
@@ -143,9 +169,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
               {/* Employment Status */}
               <FormField
                 control={form.control}
@@ -166,35 +190,6 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                         <SelectItem value="self-employed">Self-employed</SelectItem>
                         <SelectItem value="student">Student</SelectItem>
                         <SelectItem value="unemployed">Unemployed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Field of Study */}
-              <FormField
-                control={form.control}
-                name="fieldOfStudy"
-                rules={{ required: "Please select field of study" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Field of Study/Interest</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select field" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="computer-science">Computer Science</SelectItem>
-                        <SelectItem value="business">Business & Management</SelectItem>
-                        <SelectItem value="engineering">Engineering</SelectItem>
-                        <SelectItem value="medicine">Medicine & Healthcare</SelectItem>
-                        <SelectItem value="finance">Finance</SelectItem>
-                        <SelectItem value="data-science">Data Science</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

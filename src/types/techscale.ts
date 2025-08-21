@@ -5,7 +5,7 @@ export interface UserProfile {
   loanPurpose: 'study-abroad' | 'upskilling' | 'career-development';
   incomeRange: string;
   employmentStatus: string;
-  fieldOfStudy: string;
+  userType: 'student' | 'professional';
   institution?: string;
   loanAmount?: string;
   hasCoSigner: boolean;

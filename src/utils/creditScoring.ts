@@ -5,7 +5,7 @@ export const calculateCreditReadinessScore = (profile: UserProfile): CreditScore
   // Calculate individual factor scores
   const incomeScore = calculateIncomeScore(profile.incomeRange);
   const employmentScore = calculateEmploymentScore(profile.employmentStatus);
-  const educationScore = calculateEducationScore(profile.fieldOfStudy, profile.loanPurpose);
+  const educationScore = calculateEducationScore(profile.userType, profile.loanPurpose);
   const coSignerScore = profile.hasCoSigner ? 20 : 0;
   
   // Calculate weighted total score
@@ -61,16 +61,17 @@ const calculateEmploymentScore = (employmentStatus: string): number => {
   }
 };
 
-const calculateEducationScore = (fieldOfStudy: string, loanPurpose: string): number => {
-  const highDemandFields = ['computer-science', 'data-science', 'engineering', 'medicine', 'finance'];
+const calculateEducationScore = (userType: string, loanPurpose: string): number => {
   let score = 5; // Base score
   
-  if (highDemandFields.includes(fieldOfStudy)) {
-    score += 3;
+  // Students get additional points for education pursuits
+  if (userType === 'student') {
+    score += 2;
   }
   
-  if (loanPurpose === 'upskilling') {
-    score += 2;
+  // Professionals get bonus points for upskilling and career development
+  if (userType === 'professional' && (loanPurpose === 'upskilling' || loanPurpose === 'career-development')) {
+    score += 3;
   }
   
   return score;
