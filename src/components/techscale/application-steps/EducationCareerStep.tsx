@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, CheckCircle } from 'lucide-react';
+import { FileText, CheckCircle, Plus, Minus } from 'lucide-react';
 import { FullLoanApplication } from '@/types/loanApplication';
 import DocumentUpload from '../DocumentUpload';
 
@@ -18,8 +18,8 @@ interface EducationCareerStepProps {
 }
 
 const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applicationId, onComplete }) => {
-  const [hasEmployment, setHasEmployment] = useState(false);
   const [uploading, setUploading] = useState<{ [key: string]: boolean }>({});
+  const [hasEmployment, setHasEmployment] = useState(false);
 
   const educationCareer = form.watch('educationCareer');
 
@@ -53,7 +53,8 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
 
   const canContinue = educationCareer.highestQualification && 
                      educationCareer.institution && 
-                     educationCareer.transcripts.uploaded && 
+                     educationCareer.graduationYear &&
+                     educationCareer.transcripts.uploaded &&
                      educationCareer.resume.uploaded;
 
   return (
@@ -79,8 +80,7 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
                     <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
                     <SelectItem value="master">Master's Degree</SelectItem>
                     <SelectItem value="phd">PhD/Doctorate</SelectItem>
-                    <SelectItem value="professional">Professional Certificate</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="professional">Professional Certification</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -90,13 +90,13 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
 
           <FormField
             control={form.control}
-            name="educationCareer.graduationYear"
-            rules={{ required: "Graduation year is required" }}
+            name="educationCareer.institution"
+            rules={{ required: "Institution name is required" }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Graduation Year</FormLabel>
+                <FormLabel>Institution Name</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="e.g., 2023" {...field} />
+                  <Input placeholder="Enter institution name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -106,158 +106,160 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
 
         <FormField
           control={form.control}
-          name="educationCareer.institution"
-          rules={{ required: "Institution name is required" }}
+          name="educationCareer.graduationYear"
+          rules={{ required: "Graduation year is required" }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Institution Name</FormLabel>
+              <FormLabel>Graduation Year</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your institution name" {...field} />
+                <Input type="number" placeholder="Enter graduation year" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Academic Documents */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Academic Documents</h3>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Academic Transcripts
-                {educationCareer.transcripts.uploaded && (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DocumentUpload
-                documentType="transcripts"
-                acceptedTypes={['application/pdf', 'image/jpeg', 'image/png']}
-                maxSize={10 * 1024 * 1024}
-                onUpload={(file) => handleFileUpload('transcripts', file)}
-                isUploading={uploading.transcripts}
-                uploadedFile={educationCareer.transcripts.uploaded ? {
-                  name: educationCareer.transcripts.fileName || '',
-                  url: educationCareer.transcripts.fileUrl || '',
-                  verified: educationCareer.transcripts.verified || false
-                } : null}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                CV/Resume
-                {educationCareer.resume.uploaded && (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DocumentUpload
-                documentType="resume"
-                acceptedTypes={['application/pdf', 'image/jpeg', 'image/png']}
-                maxSize={10 * 1024 * 1024}
-                onUpload={(file) => handleFileUpload('resume', file)}
-                isUploading={uploading.resume}
-                uploadedFile={educationCareer.resume.uploaded ? {
-                  name: educationCareer.resume.fileName || '',
-                  url: educationCareer.resume.fileUrl || '',
-                  verified: educationCareer.resume.verified || false
-                } : null}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Employment Information */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="hasEmployment" 
-              checked={hasEmployment}
-              onCheckedChange={setHasEmployment}
+        {/* Transcripts Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Academic Transcripts
+              {educationCareer.transcripts.uploaded && (
+                <CheckCircle className="h-4 w-4 text-green-500" />
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DocumentUpload
+              documentType="transcripts"
+              acceptedTypes={['application/pdf', 'image/jpeg', 'image/png']}
+              maxSize={10 * 1024 * 1024}
+              onUpload={(file) => handleFileUpload('transcripts', file)}
+              isUploading={uploading.transcripts}
+              uploadedFile={educationCareer.transcripts.uploaded ? {
+                name: educationCareer.transcripts.fileName || '',
+                url: educationCareer.transcripts.fileUrl || '',
+                verified: educationCareer.transcripts.verified || false
+              } : null}
             />
-            <label htmlFor="hasEmployment" className="text-sm font-medium">
-              I am currently employed
-            </label>
-          </div>
+            <div className="mt-2 text-xs text-muted-foreground">
+              Upload your official academic transcripts or certificates.
+            </div>
+          </CardContent>
+        </Card>
 
+        {/* Resume/CV Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Resume/CV
+              {educationCareer.resume.uploaded && (
+                <CheckCircle className="h-4 w-4 text-green-500" />
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DocumentUpload
+              documentType="resume"
+              acceptedTypes={['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']}
+              maxSize={10 * 1024 * 1024}
+              onUpload={(file) => handleFileUpload('resume', file)}
+              isUploading={uploading.resume}
+              uploadedFile={educationCareer.resume.uploaded ? {
+                name: educationCareer.resume.fileName || '',
+                url: educationCareer.resume.fileUrl || '',
+                verified: educationCareer.resume.verified || false
+              } : null}
+            />
+            <div className="mt-2 text-xs text-muted-foreground">
+              Upload your current resume or CV.
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Current Employment (Optional) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center justify-between">
+              Current Employment (Optional)
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="has-employment" 
+                  checked={hasEmployment}
+                  onCheckedChange={(checked) => setHasEmployment(checked === true)}
+                />
+                <label htmlFor="has-employment" className="text-sm font-normal">
+                  I am currently employed
+                </label>
+              </div>
+            </CardTitle>
+          </CardHeader>
           {hasEmployment && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Current Employment</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="educationCareer.currentEmployment.company"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Company Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter company name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="educationCareer.currentEmployment.company"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter company name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="educationCareer.currentEmployment.position"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Job Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter your job title" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="educationCareer.currentEmployment.position"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Title/Position</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter job title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="educationCareer.currentEmployment.startDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Start Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <div className="grid md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="educationCareer.currentEmployment.startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Start Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="educationCareer.currentEmployment.salary"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Annual Salary (£)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter annual salary" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+                <FormField
+                  control={form.control}
+                  name="educationCareer.currentEmployment.salary"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Annual Salary (£)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter annual salary" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
           )}
-        </div>
+        </Card>
 
         <div className="flex justify-end">
           <Button 
@@ -265,7 +267,7 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
             disabled={!canContinue}
             className="bg-primary"
           >
-            Continue to Program Details
+            Continue to Program Information
           </Button>
         </div>
       </div>
