@@ -174,39 +174,56 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         return;
       }
 
+      console.log('Saving application with status:', isDraft ? 'draft' : 'submitted');
+      console.log('Form data:', formData);
+
       // Convert complex objects to JSON-compatible format
       const applicationData = {
         user_id: user.data.user.id,
         loan_option_id: formData.loanOptionId,
         lender_name: formData.lenderName,
-        personal_info: JSON.parse(JSON.stringify(formData.personalInfo)),
-        kyc_documents: JSON.parse(JSON.stringify(formData.kycDocuments)),
-        education_career: JSON.parse(JSON.stringify(formData.educationCareer)),
-        program_info: JSON.parse(JSON.stringify(formData.programInfo)),
-        financial_info: JSON.parse(JSON.stringify(formData.financialInfo)),
+        personal_info: formData.personalInfo,
+        kyc_documents: formData.kycDocuments,
+        education_career: formData.educationCareer,
+        program_info: formData.programInfo,
+        financial_info: formData.financialInfo,
         loan_type_requested: formData.loanTypeRequest.type,
-        declarations: JSON.parse(JSON.stringify(formData.declarations)),
+        declarations: formData.declarations,
         is_draft: isDraft,
-        completed_steps: JSON.parse(JSON.stringify(formData.completedSteps)),
+        completed_steps: formData.completedSteps,
         status: isDraft ? 'draft' : 'submitted',
         submitted_at: isDraft ? null : new Date().toISOString()
       };
 
+      console.log('Application data to save:', applicationData);
+
       if (applicationId) {
-        const { error } = await supabase
+        console.log('Updating existing application with ID:', applicationId);
+        const { data, error } = await supabase
           .from('loan_applications')
           .update(applicationData)
-          .eq('id', applicationId);
+          .eq('id', applicationId)
+          .select()
+          .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
+        console.log('Updated application:', data);
       } else {
+        console.log('Creating new application');
         const { data, error } = await supabase
           .from('loan_applications')
           .insert(applicationData)
           .select()
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+        console.log('Created application:', data);
         setApplicationId(data.id);
       }
 
@@ -217,7 +234,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
       }
     } catch (error) {
       console.error('Error saving application:', error);
-      toast.error('Failed to save application. Please try again.');
+      toast.error(`Failed to save application: ${error.message || 'Please try again.'}`);
     } finally {
       setIsLoading(false);
     }
@@ -357,7 +374,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
               className="bg-green-600 hover:bg-green-700"
             >
               <Send className="h-4 w-4 mr-2" />
-              Submit Application
+              {isLoading ? 'Submitting...' : 'Submit Application'}
             </Button>
           ) : (
             <Button onClick={nextStep}>
