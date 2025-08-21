@@ -1,7 +1,6 @@
 
 import TechScaleHero from '@/components/techscale/TechScaleHero';
 import LoanMatcher from '@/components/techscale/LoanMatcher';
-import LoanProcessFlow from '@/components/techscale/LoanProcessFlow';
 import StatsSection from '@/components/techscale/StatsSection';
 import FAQSection from '@/components/techscale/FAQSection';
 import TechScaleFooter from '@/components/techscale/TechScaleFooter';
@@ -31,8 +30,6 @@ const TechScale = () => {
         </section>
 
         <LoanMatcher />
-        
-        <LoanProcessFlow />
         
         <StatsSection />
         
