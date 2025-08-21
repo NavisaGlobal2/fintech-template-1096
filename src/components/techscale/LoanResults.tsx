@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LoanOption, UserProfile } from '@/types/techscale';
 import { CheckCircle, AlertCircle, XCircle, Clock, DollarSign, Users, Calendar, ExternalLink, Info } from 'lucide-react';
+import LoanApplicationForm from './LoanApplicationForm';
+import { FullLoanApplication } from '@/types/loanApplication';
 
 interface LoanResultsProps {
   loans: LoanOption[];
@@ -13,6 +15,8 @@ interface LoanResultsProps {
 
 const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
   const [sortBy, setSortBy] = useState<'relevance' | 'rate' | 'amount'>('relevance');
+  const [selectedLoan, setSelectedLoan] = useState<LoanOption | null>(null);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
 
   const sortedLoans = [...loans].sort((a, b) => {
     if (sortBy === 'relevance') {
@@ -72,18 +76,39 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
   };
 
   const handleLearnMore = (lender: string) => {
-    // In a real app, this would redirect to the lender's page
     console.log(`Learning more about ${lender}`);
     alert(`Redirecting to ${lender}'s detailed information page...`);
   };
 
-  const handleApplyNow = (lender: string, tier: string) => {
-    if (tier === 'red') return;
+  const handleApplyNow = (loan: LoanOption) => {
+    if (loan.eligibilityTier === 'red') return;
     
-    // In a real app, this would redirect to the application process
-    console.log(`Applying to ${lender}`);
-    alert(`Redirecting to ${lender}'s application process...`);
+    setSelectedLoan(loan);
+    setShowApplicationForm(true);
   };
+
+  const handleApplicationComplete = (application: FullLoanApplication) => {
+    console.log('Application completed:', application);
+    setShowApplicationForm(false);
+    setSelectedLoan(null);
+    // Here you would typically redirect to a success page or dashboard
+    alert('Application submitted successfully! You will receive a confirmation email shortly.');
+  };
+
+  const handleBackToResults = () => {
+    setShowApplicationForm(false);
+    setSelectedLoan(null);
+  };
+
+  if (showApplicationForm && selectedLoan) {
+    return (
+      <LoanApplicationForm 
+        loanOption={selectedLoan}
+        onBack={handleBackToResults}
+        onComplete={handleApplicationComplete}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -209,7 +234,7 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
                     size="sm"
                     className={loan.eligibilityTier === 'green' ? 'bg-green-600 hover:bg-green-700' : ''}
                     disabled={loan.eligibilityTier === 'red'}
-                    onClick={() => handleApplyNow(loan.lenderName, loan.eligibilityTier)}
+                    onClick={() => handleApplyNow(loan)}
                   >
                     {loan.eligibilityTier === 'red' ? 'Not Eligible' : 'Apply Now'}
                   </Button>
