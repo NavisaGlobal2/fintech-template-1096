@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import TechScaleLogo from './techscale/TechScaleLogo';
+import AuthButton from './auth/AuthButton';
 import { Menu, X, Calculator, BookOpen, Users, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -143,17 +144,10 @@ const Header = () => {
                 </div>
               </div>
               
-              {/* Mobile Get Started Button */}
-              <Button 
-                variant="default" 
-                className="w-full mt-2 h-12 text-base touch-manipulation"
-                onClick={() => {
-                  handleGetStarted();
-                  setMobileMenuOpen(false);
-                }}
-              >
-                Get Started
-              </Button>
+              {/* Mobile Auth Button */}
+              <div className="mt-2">
+                <AuthButton />
+              </div>
             </div>
           </div>
         )}
@@ -169,15 +163,7 @@ const Header = () => {
             />
             <Sun size={18} className={`${!isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
           </div>
-          <div className="rounded-2xl">
-            <Button 
-              variant="ghost" 
-              className="text-muted-foreground hover:text-foreground hover:bg-muted"
-              onClick={handleGetStarted}
-            >
-              Get Started
-            </Button>
-          </div>
+          <AuthButton />
         </div>
       </header>
     </div>
