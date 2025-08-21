@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -22,7 +21,7 @@ const Pricing = () => {
     },
     {
       name: "Professional",
-      price: "$99",
+      price: "£99",
       period: "per month",
       description: "Ideal for growing businesses with higher transaction volumes",
       features: [
