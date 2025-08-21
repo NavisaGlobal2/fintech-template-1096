@@ -25,8 +25,8 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
       return aRate - bRate;
     }
     if (sortBy === 'amount') {
-      const aAmount = parseFloat(a.maxAmount.replace(/[$,]/g, ''));
-      const bAmount = parseFloat(b.maxAmount.replace(/[$,]/g, ''));
+      const aAmount = parseFloat(a.maxAmount.replace(/[£,]/g, ''));
+      const bAmount = parseFloat(b.maxAmount.replace(/[£,]/g, ''));
       return bAmount - aAmount;
     }
     return 0;

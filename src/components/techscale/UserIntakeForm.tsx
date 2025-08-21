@@ -124,7 +124,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                 rules={{ required: "Please select your income range" }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Annual Income (USD)</FormLabel>
+                    <FormLabel>Annual Income (GBP)</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -132,11 +132,11 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="under-10k">Under $10,000</SelectItem>
-                        <SelectItem value="10k-25k">$10,000 - $25,000</SelectItem>
-                        <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
-                        <SelectItem value="50k-100k">$50,000 - $100,000</SelectItem>
-                        <SelectItem value="over-100k">Over $100,000</SelectItem>
+                        <SelectItem value="under-10k">Under £8,000</SelectItem>
+                        <SelectItem value="10k-25k">£8,000 - £20,000</SelectItem>
+                        <SelectItem value="25k-50k">£20,000 - £40,000</SelectItem>
+                        <SelectItem value="50k-100k">£40,000 - £80,000</SelectItem>
+                        <SelectItem value="over-100k">Over £80,000</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -212,7 +212,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                   <FormItem>
                     <FormLabel>Institution (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Harvard University" {...field} />
+                      <Input placeholder="e.g., University of Oxford" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -225,7 +225,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                 name="loanAmount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Estimated Loan Amount (USD)</FormLabel>
+                    <FormLabel>Estimated Loan Amount (GBP)</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -233,11 +233,11 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="under-25k">Under $25,000</SelectItem>
-                        <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
-                        <SelectItem value="50k-100k">$50,000 - $100,000</SelectItem>
-                        <SelectItem value="100k-200k">$100,000 - $200,000</SelectItem>
-                        <SelectItem value="over-200k">Over $200,000</SelectItem>
+                        <SelectItem value="under-25k">Under £20,000</SelectItem>
+                        <SelectItem value="25k-50k">£20,000 - £40,000</SelectItem>
+                        <SelectItem value="50k-100k">£40,000 - £80,000</SelectItem>
+                        <SelectItem value="100k-200k">£80,000 - £160,000</SelectItem>
+                        <SelectItem value="over-200k">Over £160,000</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
