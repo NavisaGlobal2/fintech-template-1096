@@ -177,20 +177,20 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
       console.log('Saving application with status:', isDraft ? 'draft' : 'submitted');
       console.log('Form data:', formData);
 
-      // Convert complex objects to JSON-compatible format
+      // Convert complex objects to JSON-compatible format with proper casting
       const applicationData = {
         user_id: user.data.user.id,
         loan_option_id: formData.loanOptionId,
         lender_name: formData.lenderName,
-        personal_info: formData.personalInfo,
-        kyc_documents: formData.kycDocuments,
-        education_career: formData.educationCareer,
-        program_info: formData.programInfo,
-        financial_info: formData.financialInfo,
+        personal_info: JSON.parse(JSON.stringify(formData.personalInfo)),
+        kyc_documents: JSON.parse(JSON.stringify(formData.kycDocuments)),
+        education_career: JSON.parse(JSON.stringify(formData.educationCareer)),
+        program_info: JSON.parse(JSON.stringify(formData.programInfo)),
+        financial_info: JSON.parse(JSON.stringify(formData.financialInfo)),
         loan_type_requested: formData.loanTypeRequest.type,
-        declarations: formData.declarations,
+        declarations: JSON.parse(JSON.stringify(formData.declarations)),
         is_draft: isDraft,
-        completed_steps: formData.completedSteps,
+        completed_steps: JSON.parse(JSON.stringify(formData.completedSteps)),
         status: isDraft ? 'draft' : 'submitted',
         submitted_at: isDraft ? null : new Date().toISOString()
       };
