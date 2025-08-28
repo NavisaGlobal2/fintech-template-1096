@@ -154,7 +154,7 @@ const Header = () => {
         
         <div className="hidden md:flex items-center gap-4">
           {/* Theme toggle for desktop */}
-          <div className="flex items-center gap-2 rounded-full px-3 py-2">
+          <div className="flex items-center gap-2 rounded-full px-3 py-2 bg-background/80 backdrop-blur-md border border-border">
             <Moon size={18} className={`${isDarkMode ? 'text-primary' : 'text-muted-foreground'}`} />
             <Switch 
               checked={!isDarkMode} 
