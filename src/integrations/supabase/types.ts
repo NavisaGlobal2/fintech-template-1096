@@ -174,6 +174,81 @@ export type Database = {
         }
         Relationships: []
       }
+      loan_offers: {
+        Row: {
+          accepted_at: string | null
+          application_id: string
+          apr_rate: number | null
+          assessment_id: string
+          created_at: string
+          declined_at: string | null
+          grace_period_months: number | null
+          id: string
+          isa_percentage: number | null
+          loan_amount: number
+          offer_type: string
+          offer_valid_until: string
+          repayment_schedule: Json
+          repayment_term_months: number
+          status: string
+          terms_and_conditions: Json
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          application_id: string
+          apr_rate?: number | null
+          assessment_id: string
+          created_at?: string
+          declined_at?: string | null
+          grace_period_months?: number | null
+          id?: string
+          isa_percentage?: number | null
+          loan_amount: number
+          offer_type: string
+          offer_valid_until: string
+          repayment_schedule?: Json
+          repayment_term_months: number
+          status?: string
+          terms_and_conditions?: Json
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          application_id?: string
+          apr_rate?: number | null
+          assessment_id?: string
+          created_at?: string
+          declined_at?: string | null
+          grace_period_months?: number | null
+          id?: string
+          isa_percentage?: number | null
+          loan_amount?: number
+          offer_type?: string
+          offer_valid_until?: string
+          repayment_schedule?: Json
+          repayment_term_months?: number
+          status?: string
+          terms_and_conditions?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_offers_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_offers_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "underwriting_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payslip_audit_logs: {
         Row: {
           action: string
@@ -316,6 +391,95 @@ export type Database = {
           last_name?: string | null
           phone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      underwriting_assessments: {
+        Row: {
+          affordability_score: number
+          application_id: string
+          assessed_at: string
+          assessed_by: string | null
+          assessment_data: Json
+          decision: string
+          education_score: number
+          employment_score: number
+          id: string
+          risk_score: number
+          risk_tier: string
+          sponsor_score: number
+          user_id: string
+        }
+        Insert: {
+          affordability_score: number
+          application_id: string
+          assessed_at?: string
+          assessed_by?: string | null
+          assessment_data?: Json
+          decision: string
+          education_score: number
+          employment_score: number
+          id?: string
+          risk_score: number
+          risk_tier: string
+          sponsor_score: number
+          user_id: string
+        }
+        Update: {
+          affordability_score?: number
+          application_id?: string
+          assessed_at?: string
+          assessed_by?: string | null
+          assessment_data?: Json
+          decision?: string
+          education_score?: number
+          employment_score?: number
+          id?: string
+          risk_score?: number
+          risk_tier?: string
+          sponsor_score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "underwriting_assessments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      underwriting_rules: {
+        Row: {
+          active: boolean
+          conditions: Json
+          created_at: string
+          id: string
+          rule_name: string
+          rule_type: string
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          active?: boolean
+          conditions: Json
+          created_at?: string
+          id?: string
+          rule_name: string
+          rule_type: string
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          active?: boolean
+          conditions?: Json
+          created_at?: string
+          id?: string
+          rule_name?: string
+          rule_type?: string
+          updated_at?: string
+          weight?: number
         }
         Relationships: []
       }
