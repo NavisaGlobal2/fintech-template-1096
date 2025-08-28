@@ -6,11 +6,13 @@ import FAQSection from '@/components/techscale/FAQSection';
 import TechScaleFooter from '@/components/techscale/TechScaleFooter';
 import Header from '@/components/Header';
 import UnderwritingDashboard from '@/components/techscale/UnderwritingDashboard';
+import UserGuide from '@/components/techscale/UserGuide';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 const TechScale = () => {
   const [showUnderwriting, setShowUnderwriting] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   if (showUnderwriting) {
     return (
@@ -32,12 +34,40 @@ const TechScale = () => {
       </div>
     );
   }
+
+  if (showGuide) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto py-6">
+          <div className="flex items-center justify-between mb-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowGuide(false)}
+            >
+              ← Back to Main Site
+            </Button>
+          </div>
+          <UserGuide />
+        </div>
+        <TechScaleFooter />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-background">
         <Header />
         <main>
-          {/* Admin Access - Minimal UI Change */}
-          <div className="fixed top-20 right-4 z-50">
+          {/* Admin Access & User Guide - Minimal UI Change */}
+          <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowGuide(true)}
+              className="text-xs"
+            >
+              📖 How to Use
+            </Button>
             <Button 
               variant="ghost" 
               size="sm"
