@@ -77,8 +77,6 @@ const MOCK_LENDERS: LoanOption[] = [
 ];
 
 export const matchLoansToUser = (profile: UserProfile): LoanOption[] => {
-  console.log('Matching loans for profile:', profile);
-  
   const matches = MOCK_LENDERS.map(lender => {
     let eligibilityTier: 'green' | 'yellow' | 'red' = 'green';
     

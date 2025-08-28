@@ -174,9 +174,6 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         return;
       }
 
-      console.log('Saving application with status:', isDraft ? 'draft' : 'submitted');
-      console.log('Form data:', formData);
-
       // Convert complex objects to JSON-compatible format
       const applicationData = {
         user_id: user.data.user.id,
@@ -195,10 +192,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         submitted_at: isDraft ? null : new Date().toISOString()
       };
 
-      console.log('Application data to save:', applicationData);
-
       if (applicationId) {
-        console.log('Updating existing application with ID:', applicationId);
         const { data, error } = await supabase
           .from('loan_applications')
           .update(applicationData)
@@ -210,9 +204,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
           console.error('Update error:', error);
           throw error;
         }
-        console.log('Updated application:', data);
       } else {
-        console.log('Creating new application');
         const { data, error } = await supabase
           .from('loan_applications')
           .insert(applicationData)
@@ -223,7 +215,6 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
           console.error('Insert error:', error);
           throw error;
         }
-        console.log('Created application:', data);
         setApplicationId(data.id);
       }
 

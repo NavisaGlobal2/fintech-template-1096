@@ -76,7 +76,6 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
   };
 
   const handleLearnMore = (lender: string) => {
-    console.log(`Learning more about ${lender}`);
     alert(`Redirecting to ${lender}'s detailed information page...`);
   };
 
@@ -88,7 +87,6 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
   };
 
   const handleApplicationComplete = (application: FullLoanApplication) => {
-    console.log('Application completed:', application);
     setShowApplicationForm(false);
     setSelectedLoan(null);
     // Here you would typically redirect to a success page or dashboard
