@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   CheckCircle, 
   XCircle, 
@@ -11,13 +12,18 @@ import {
   DollarSign,
   Calendar,
   User,
-  FileText
+  FileText,
+  Settings,
+  Shield
 } from 'lucide-react';
 import { useUnderwriting } from '@/hooks/useUnderwriting';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import RoleManagement from './RoleManagement';
 import { toast } from 'sonner';
 
 const UnderwritingDashboard: React.FC = () => {
   const { data, processApplication, updateOfferStatus } = useUnderwriting();
+  const { isAuthorizedForUnderwriting, hasRole } = useUserRoles();
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const handleProcessApplication = async (application: any) => {
@@ -27,6 +33,8 @@ const UnderwritingDashboard: React.FC = () => {
       if (result) {
         toast.success('Application processed successfully');
       }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to process application');
     } finally {
       setProcessingId(null);
     }
@@ -57,6 +65,28 @@ const UnderwritingDashboard: React.FC = () => {
     }).format(amount);
   };
 
+  // Check authorization
+  if (!isAuthorizedForUnderwriting()) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Card className="max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <Shield className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Access Restricted</h2>
+              <p className="text-muted-foreground mb-4">
+                Only authorized underwriting staff can access this dashboard.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Contact your administrator to request underwriter or admin access.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (data.loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -68,7 +98,7 @@ const UnderwritingDashboard: React.FC = () => {
     );
   }
 
-  return (
+  const DashboardContent = () => (
     <div className="space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -275,6 +305,33 @@ const UnderwritingDashboard: React.FC = () => {
         </CardContent>
       </Card>
     </div>
+  );
+
+  return (
+    <Tabs defaultValue="dashboard" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="dashboard" className="flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Dashboard
+        </TabsTrigger>
+        {hasRole('admin') && (
+          <TabsTrigger value="roles" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Role Management
+          </TabsTrigger>
+        )}
+      </TabsList>
+
+      <TabsContent value="dashboard">
+        <DashboardContent />
+      </TabsContent>
+
+      {hasRole('admin') && (
+        <TabsContent value="roles">
+          <RoleManagement />
+        </TabsContent>
+      )}
+    </Tabs>
   );
 };
 

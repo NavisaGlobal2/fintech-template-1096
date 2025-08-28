@@ -50,13 +50,20 @@ export const useUnderwriting = () => {
 
   const processApplication = async (application: any): Promise<{ assessment: RiskAssessment; offer: LoanOffer } | null> => {
     try {
-      // Fetch underwriting rules
-      const { data: rules } = await supabase
+      // Fetch underwriting rules (only accessible to authorized staff)
+      const { data: rules, error: rulesError } = await supabase
         .from('underwriting_rules')
         .select('*')
         .eq('active', true);
 
-      if (!rules) throw new Error('No underwriting rules found');
+      if (rulesError) {
+        if (rulesError.code === 'PGRST116') {
+          throw new Error('Access denied: Only authorized staff can process applications');
+        }
+        throw rulesError;
+      }
+
+      if (!rules || rules.length === 0) throw new Error('No underwriting rules found');
 
       // Create underwriting engine and assess application
       const engine = new UnderwritingEngine(rules as any);
