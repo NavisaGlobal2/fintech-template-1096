@@ -4,7 +4,7 @@ import TechScaleLogo from './TechScaleLogo';
 import { Separator } from '@/components/ui/separator';
 import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from 'lucide-react';
 
-const TechScaleFooter = () => {
+const TechScaleFooter = ({ onShowGuide }: { onShowGuide?: () => void }) => {
   return (
     <footer className="bg-background border-t border-border py-16 px-6 md:px-12">
       <div className="max-w-6xl mx-auto">
@@ -44,7 +44,14 @@ const TechScaleFooter = () => {
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Application Guide</a></li>
+              <li>
+                <button 
+                  onClick={onShowGuide}
+                  className="hover:text-primary transition-colors text-left"
+                >
+                  📖 How to Use
+                </button>
+              </li>
               <li><a href="#" className="hover:text-primary transition-colors">FAQ</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Contact Support</a></li>
             </ul>

@@ -58,23 +58,16 @@ const TechScale = () => {
     <div className="min-h-screen bg-background">
         <Header />
         <main>
-          {/* Admin Access & User Guide - Minimal UI Change */}
-          <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowGuide(true)}
-              className="text-xs"
-            >
-              📖 How to Use
-            </Button>
+          {/* Subtle Admin Access - Bottom Corner */}
+          <div className="fixed bottom-4 right-4 z-40">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => setShowUnderwriting(true)}
-              className="text-xs opacity-30 hover:opacity-100"
+              className="text-xs opacity-20 hover:opacity-60 transition-opacity w-8 h-8 p-0"
+              title="Admin Access"
             >
-              Admin
+              ⚙️
             </Button>
           </div>
 
@@ -403,7 +396,7 @@ const TechScale = () => {
           </div>
         </section>
       </main>
-      <TechScaleFooter />
+        <TechScaleFooter onShowGuide={() => setShowGuide(true)} />
     </div>
   );
 };
