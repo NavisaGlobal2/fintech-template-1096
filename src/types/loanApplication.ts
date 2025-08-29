@@ -113,7 +113,7 @@ export interface Declarations {
 
 export interface FullLoanApplication {
   id?: string;
-  userId: string;
+  userId?: string;  // Made optional since users create accounts at the end
   loanOptionId: string;
   lenderName: string;
   personalInfo: PersonalInfo;
@@ -142,10 +142,9 @@ export interface ApplicationStep {
 }
 
 export type ApplicationStepId = 
-  | 'personal-info'
-  | 'kyc-documents'
+  | 'personal-kyc'
   | 'education-career'
   | 'program-info'
   | 'financial-info'
   | 'loan-type'
-  | 'declarations';
+  | 'account-creation';

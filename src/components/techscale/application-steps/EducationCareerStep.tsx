@@ -54,7 +54,6 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
   const canContinue = educationCareer.highestQualification && 
                      educationCareer.institution && 
                      educationCareer.graduationYear &&
-                     educationCareer.transcripts.uploaded &&
                      educationCareer.resume.uploaded;
 
   return (
@@ -119,12 +118,12 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
           )}
         />
 
-        {/* Transcripts Upload */}
+        {/* Transcripts Upload (Optional) */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Academic Transcripts
+              Academic Transcripts (Optional)
               {educationCareer.transcripts.uploaded && (
                 <CheckCircle className="h-4 w-4 text-green-500" />
               )}
@@ -144,7 +143,7 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
               } : null}
             />
             <div className="mt-2 text-xs text-muted-foreground">
-              Upload your official academic transcripts or certificates.
+              Upload your academic transcripts for better loan matching (optional).
             </div>
           </CardContent>
         </Card>

@@ -8,13 +8,12 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Save, Send, CheckCircle } from 'lucide-react';
 import { FullLoanApplication, ApplicationStep, ApplicationStepId } from '@/types/loanApplication';
 import { LoanOption } from '@/types/techscale';
-import PersonalInfoStep from './application-steps/PersonalInfoStep';
-import KYCDocumentsStep from './application-steps/KYCDocumentsStep';
+import PersonalInfoKYCStep from './application-steps/PersonalInfoKYCStep';
 import EducationCareerStep from './application-steps/EducationCareerStep';
 import ProgramInfoStep from './application-steps/ProgramInfoStep';
 import FinancialInfoStep from './application-steps/FinancialInfoStep';
 import LoanTypeStep from './application-steps/LoanTypeStep';
-import DeclarationsStep from './application-steps/DeclarationsStep';
+import AccountCreationStep from './application-steps/AccountCreationStep';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -29,12 +28,28 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   onBack,
   onComplete
 }) => {
-  const [currentStep, setCurrentStep] = useState<ApplicationStepId>('personal-info');
+  const [currentStep, setCurrentStep] = useState<ApplicationStepId>('personal-kyc');
   const [isLoading, setIsLoading] = useState(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
 
+  // Load draft from localStorage on mount
+  const loadDraftFromStorage = () => {
+    const savedDraft = localStorage.getItem('loanApplicationDraft');
+    if (savedDraft) {
+      try {
+        return JSON.parse(savedDraft);
+      } catch (error) {
+        console.error('Error parsing draft from localStorage:', error);
+      }
+    }
+    return null;
+  };
+
+  const savedDraft = loadDraftFromStorage();
+
   const form = useForm<FullLoanApplication>({
-    defaultValues: {
+    defaultValues: savedDraft || {
+      userId: '',
       loanOptionId: loanOption.id,
       lenderName: loanOption.lenderName,
       isDraft: true,
@@ -108,127 +123,83 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
     }
   });
 
-  const steps: ApplicationStep[] = [
-    {
-      id: 'personal-info',
-      title: 'Personal Information',
-      description: 'Basic personal details',
-      completed: form.watch('completedSteps')?.includes('personal-info') || false,
-      current: currentStep === 'personal-info'
-    },
-    {
-      id: 'kyc-documents',
-      title: 'Identity Verification',
-      description: 'Upload ID and proof of residence',
-      completed: form.watch('completedSteps')?.includes('kyc-documents') || false,
-      current: currentStep === 'kyc-documents'
-    },
-    {
-      id: 'education-career',
-      title: 'Education & Career',
-      description: 'Academic background and employment',
-      completed: form.watch('completedSteps')?.includes('education-career') || false,
-      current: currentStep === 'education-career'
-    },
-    {
-      id: 'program-info',
-      title: 'Program Details',
-      description: 'Course and institution information',
-      completed: form.watch('completedSteps')?.includes('program-info') || false,
-      current: currentStep === 'program-info'
-    },
-    {
-      id: 'financial-info',
-      title: 'Financial Information',
-      description: 'Income and banking details',
-      completed: form.watch('completedSteps')?.includes('financial-info') || false,
-      current: currentStep === 'financial-info'
-    },
-    {
-      id: 'loan-type',
-      title: 'Loan Requirements',
-      description: 'Loan type and amount',
-      completed: form.watch('completedSteps')?.includes('loan-type') || false,
-      current: currentStep === 'loan-type'
-    },
-    {
-      id: 'declarations',
-      title: 'Consent & Signature',
-      description: 'Terms and declarations',
-      completed: form.watch('completedSteps')?.includes('declarations') || false,
-      current: currentStep === 'declarations'
+  // Save draft to localStorage whenever form changes
+  const formData = form.watch();
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem('loanApplicationDraft', JSON.stringify(formData));
+    }, 1000); // Debounce saves
+
+    return () => clearTimeout(timeoutId);
+  }, [formData]);
+
+  const loanType = form.watch('loanTypeRequest.type');
+  
+  const getStepsForLoanType = (): ApplicationStep[] => {
+    const baseSteps = [
+      {
+        id: 'personal-kyc',
+        title: 'Personal & Identity',
+        description: 'Personal details and ID verification',
+        completed: form.watch('completedSteps')?.includes('personal-kyc') || false,
+        current: currentStep === 'personal-kyc'
+      },
+      {
+        id: 'education-career',
+        title: 'Education & Career',
+        description: 'Academic background and employment',
+        completed: form.watch('completedSteps')?.includes('education-career') || false,
+        current: currentStep === 'education-career'
+      }
+    ];
+
+    // Add program info step only for study-abroad loans
+    if (loanType === 'study-abroad') {
+      baseSteps.push({
+        id: 'program-info',
+        title: 'Program Details',
+        description: 'Course and institution information',
+        completed: form.watch('completedSteps')?.includes('program-info') || false,
+        current: currentStep === 'program-info'
+      });
     }
-  ];
+
+    baseSteps.push(
+      {
+        id: 'financial-info',
+        title: 'Financial Information',
+        description: 'Essential financial details',
+        completed: form.watch('completedSteps')?.includes('financial-info') || false,
+        current: currentStep === 'financial-info'
+      },
+      {
+        id: 'loan-type',
+        title: 'Loan Requirements',
+        description: 'Loan type and amount',
+        completed: form.watch('completedSteps')?.includes('loan-type') || false,
+        current: currentStep === 'loan-type'
+      },
+      {
+        id: 'account-creation',
+        title: 'Create Account & Submit',
+        description: 'Account creation and final submission',
+        completed: form.watch('completedSteps')?.includes('account-creation') || false,
+        current: currentStep === 'account-creation'
+      }
+    );
+
+    return baseSteps;
+  };
+
+  const steps = getStepsForLoanType();
 
   const currentStepIndex = steps.findIndex(step => step.id === currentStep);
   const progressPercentage = ((currentStepIndex + 1) / steps.length) * 100;
 
-  const saveApplication = async (isDraft: boolean = true) => {
-    setIsLoading(true);
-    try {
-      const formData = form.getValues();
-      const user = await supabase.auth.getUser();
-      
-      if (!user.data.user) {
-        toast.error('Please log in to save your application');
-        return;
-      }
-
-      // Convert complex objects to JSON-compatible format
-      const applicationData = {
-        user_id: user.data.user.id,
-        loan_option_id: formData.loanOptionId,
-        lender_name: formData.lenderName,
-        personal_info: JSON.parse(JSON.stringify(formData.personalInfo)),
-        kyc_documents: JSON.parse(JSON.stringify(formData.kycDocuments)),
-        education_career: JSON.parse(JSON.stringify(formData.educationCareer)),
-        program_info: JSON.parse(JSON.stringify(formData.programInfo)),
-        financial_info: JSON.parse(JSON.stringify(formData.financialInfo)),
-        loan_type_requested: formData.loanTypeRequest.type,
-        declarations: JSON.parse(JSON.stringify(formData.declarations)),
-        is_draft: isDraft,
-        completed_steps: JSON.parse(JSON.stringify(formData.completedSteps)),
-        status: isDraft ? 'draft' : 'submitted',
-        submitted_at: isDraft ? null : new Date().toISOString()
-      };
-
-      if (applicationId) {
-        const { data, error } = await supabase
-          .from('loan_applications')
-          .update(applicationData)
-          .eq('id', applicationId)
-          .select()
-          .single();
-        
-        if (error) {
-          console.error('Update error:', error);
-          throw error;
-        }
-      } else {
-        const { data, error } = await supabase
-          .from('loan_applications')
-          .insert(applicationData)
-          .select()
-          .single();
-        
-        if (error) {
-          console.error('Insert error:', error);
-          throw error;
-        }
-        setApplicationId(data.id);
-      }
-
-      toast.success(isDraft ? 'Application saved as draft' : 'Application submitted successfully!');
-      
-      if (!isDraft) {
-        onComplete(formData);
-      }
-    } catch (error) {
-      console.error('Error saving application:', error);
-      toast.error(`Failed to save application: ${error.message || 'Please try again.'}`);
-    } finally {
-      setIsLoading(false);
-    }
+  const saveDraftToLocalStorage = () => {
+    const formData = form.getValues();
+    localStorage.setItem('loanApplicationDraft', JSON.stringify(formData));
+    toast.success('Draft saved locally');
   };
 
   const handleStepComplete = (stepId: ApplicationStepId) => {
@@ -236,12 +207,29 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
     if (!completedSteps.includes(stepId)) {
       form.setValue('completedSteps', [...completedSteps, stepId]);
     }
-    saveApplication(true);
+    saveDraftToLocalStorage();
+    
+    // Auto-advance to next step except for final step
+    if (stepId !== 'account-creation') {
+      setTimeout(() => {
+        nextStep();
+      }, 500);
+    }
   };
 
   const nextStep = () => {
     if (currentStepIndex < steps.length - 1) {
       const nextStepId = steps[currentStepIndex + 1].id as ApplicationStepId;
+      
+      // Skip program info step for non-study-abroad loans
+      if (nextStepId === 'program-info' && loanType !== 'study-abroad') {
+        const afterProgramInfoIndex = steps.findIndex(s => s.id === 'financial-info');
+        if (afterProgramInfoIndex !== -1) {
+          setCurrentStep('financial-info');
+          return;
+        }
+      }
+      
       setCurrentStep(nextStepId);
     }
   };
@@ -249,21 +237,21 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   const prevStep = () => {
     if (currentStepIndex > 0) {
       const prevStepId = steps[currentStepIndex - 1].id as ApplicationStepId;
+      
+      // Skip program info step for non-study-abroad loans when going back
+      if (currentStep === 'financial-info' && loanType !== 'study-abroad') {
+        setCurrentStep('education-career');
+        return;
+      }
+      
       setCurrentStep(prevStepId);
     }
   };
 
-  const handleSubmit = () => {
-    handleStepComplete(currentStep);
-    saveApplication(false);
-  };
-
   const renderCurrentStep = () => {
     switch (currentStep) {
-      case 'personal-info':
-        return <PersonalInfoStep form={form} onComplete={() => handleStepComplete('personal-info')} />;
-      case 'kyc-documents':
-        return <KYCDocumentsStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('kyc-documents')} />;
+      case 'personal-kyc':
+        return <PersonalInfoKYCStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('personal-kyc')} />;
       case 'education-career':
         return <EducationCareerStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('education-career')} />;
       case 'program-info':
@@ -272,8 +260,8 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         return <FinancialInfoStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('financial-info')} />;
       case 'loan-type':
         return <LoanTypeStep form={form} loanOption={loanOption} onComplete={() => handleStepComplete('loan-type')} />;
-      case 'declarations':
-        return <DeclarationsStep form={form} onComplete={() => handleStepComplete('declarations')} />;
+      case 'account-creation':
+        return <AccountCreationStep form={form} onComplete={onComplete} />;
       default:
         return null;
     }
@@ -291,7 +279,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
           <h1 className="text-2xl font-medium">Loan Application</h1>
           <p className="text-muted-foreground">{loanOption.lenderName}</p>
         </div>
-        <Button variant="outline" onClick={() => saveApplication(true)} disabled={isLoading}>
+        <Button variant="outline" onClick={saveDraftToLocalStorage}>
           <Save className="h-4 w-4 mr-2" />
           Save Draft
         </Button>
@@ -308,7 +296,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
           </div>
           <Progress value={progressPercentage} className="mb-4" />
           
-          <div className="grid grid-cols-7 gap-2">
+          <div className={`grid gap-2 ${steps.length === 5 ? 'grid-cols-5' : steps.length === 6 ? 'grid-cols-6' : 'grid-cols-4'}`}>
             {steps.map((step, index) => (
               <div key={step.id} className="text-center">
                 <div className={`w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-medium ${
@@ -320,7 +308,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
                 }`}>
                   {step.completed ? <CheckCircle className="h-4 w-4" /> : index + 1}
                 </div>
-                <p className="text-xs text-muted-foreground">{step.title}</p>
+                <p className="text-xs text-muted-foreground truncate">{step.title}</p>
               </div>
             ))}
           </div>
@@ -358,16 +346,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         </Button>
 
         <div className="flex gap-2">
-          {currentStepIndex === steps.length - 1 ? (
-            <Button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Send className="h-4 w-4 mr-2" />
-              {isLoading ? 'Submitting...' : 'Submit Application'}
-            </Button>
-          ) : (
+          {currentStepIndex !== steps.length - 1 && (
             <Button onClick={nextStep}>
               Next
               <ArrowRight className="h-4 w-4 ml-2" />
