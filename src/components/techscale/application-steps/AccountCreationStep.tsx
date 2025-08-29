@@ -71,6 +71,15 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
         return;
       }
 
+      // Transfer any temporary documents to user account
+      try {
+        const { transferSessionDocumentsToUser } = await import('@/utils/sessionManager');
+        await transferSessionDocumentsToUser(authData.user.id);
+      } catch (transferError) {
+        console.warn('Failed to transfer documents:', transferError);
+        // Don't block account creation if document transfer fails
+      }
+
       // Update form with user ID
       form.setValue('userId', authData.user.id);
 

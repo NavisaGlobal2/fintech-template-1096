@@ -48,16 +48,18 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
     }
 
     try {
-      // Get user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        toast.error('Please log in to upload documents');
-        return;
-      }
-
+      // Import session manager
+      const { getOrCreateSessionId, addSessionDocument } = await import('@/utils/sessionManager');
+      
+      // Get user (if authenticated) or use session ID
+      const { data: { user } } = await supabase.auth.getUser();
+      const sessionId = user ? null : getOrCreateSessionId();
+      
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${documentType}_${Date.now()}.${fileExt}`;
+      const fileName = user 
+        ? `${user.id}/${documentType}_${Date.now()}.${fileExt}`
+        : `temp/${sessionId}/${documentType}_${Date.now()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('application-documents')
@@ -77,7 +79,8 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
       const { error: dbError } = await supabase
         .from('application_documents')
         .insert({
-          user_id: user.id,
+          user_id: user?.id || null,
+          session_id: sessionId,
           document_type: documentType,
           file_name: file.name,
           file_url: urlData.publicUrl,
@@ -87,6 +90,17 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
         });
 
       if (dbError) throw dbError;
+
+      // Store in session storage for anonymous users
+      if (!user && sessionId) {
+        addSessionDocument({
+          documentType,
+          fileName: file.name,
+          fileUrl: urlData.publicUrl,
+          fileSize: file.size,
+          mimeType: file.type
+        });
+      }
 
       onUpload(file);
       toast.success('Document uploaded successfully!');

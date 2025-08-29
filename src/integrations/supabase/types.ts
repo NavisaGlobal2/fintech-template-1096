@@ -23,8 +23,9 @@ export type Database = {
           file_url: string
           id: string
           mime_type: string | null
+          session_id: string | null
           uploaded_at: string | null
-          user_id: string
+          user_id: string | null
           verification_status: string | null
           verified_at: string | null
         }
@@ -36,8 +37,9 @@ export type Database = {
           file_url: string
           id?: string
           mime_type?: string | null
+          session_id?: string | null
           uploaded_at?: string | null
-          user_id: string
+          user_id?: string | null
           verification_status?: string | null
           verified_at?: string | null
         }
@@ -49,8 +51,9 @@ export type Database = {
           file_url?: string
           id?: string
           mime_type?: string | null
+          session_id?: string | null
           uploaded_at?: string | null
-          user_id?: string
+          user_id?: string | null
           verification_status?: string | null
           verified_at?: string | null
         }
@@ -522,6 +525,10 @@ export type Database = {
       is_authorized_for_underwriting: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      transfer_temp_documents_to_user: {
+        Args: { temp_session_id: string; user_id: string }
+        Returns: undefined
       }
     }
     Enums: {
