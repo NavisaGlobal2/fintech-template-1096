@@ -48,7 +48,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
 
   return (
     <div 
-      className={`flex flex-col w-64 md:w-72 min-w-64 md:min-w-72 rounded-lg border border-border backdrop-blur-sm transition-all duration-300 ${
+      className={`flex flex-col w-56 sm:w-64 md:w-72 min-w-56 sm:min-w-64 md:min-w-72 rounded-lg border border-border backdrop-blur-sm transition-all duration-300 ${
         isOver ? 'column-highlight border-muted/50' : 'bg-card/50'
       }`}
       onDragOver={handleDragOver}

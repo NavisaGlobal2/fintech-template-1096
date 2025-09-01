@@ -101,38 +101,38 @@ const UnderwritingDashboard: React.FC = () => {
   const DashboardContent = () => (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <FileText className="h-4 w-4 text-blue-600" />
-              <div>
-                <p className="text-sm text-muted-foreground">Pending Applications</p>
-                <p className="text-2xl font-medium">{data.applications.length}</p>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground">Pending Applications</p>
+                <p className="text-xl sm:text-2xl font-medium">{data.applications.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <div>
-                <p className="text-sm text-muted-foreground">Assessments</p>
-                <p className="text-2xl font-medium">{data.assessments.length}</p>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground">Assessments</p>
+                <p className="text-xl sm:text-2xl font-medium">{data.assessments.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="h-4 w-4 text-purple-600" />
-              <div>
-                <p className="text-sm text-muted-foreground">Active Offers</p>
-                <p className="text-2xl font-medium">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground">Active Offers</p>
+                <p className="text-xl sm:text-2xl font-medium">
                   {data.offers.filter(o => o.status === 'pending').length}
                 </p>
               </div>
@@ -141,12 +141,12 @@ const UnderwritingDashboard: React.FC = () => {
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <div>
-                <p className="text-sm text-muted-foreground">Accepted Offers</p>
-                <p className="text-2xl font-medium">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground">Accepted Offers</p>
+                <p className="text-xl sm:text-2xl font-medium">
                   {data.offers.filter(o => o.status === 'accepted').length}
                 </p>
               </div>
@@ -171,15 +171,15 @@ const UnderwritingDashboard: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {data.applications.map((app) => (
-                <div key={app.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <User className="h-8 w-8 text-muted-foreground" />
-                      <div>
-                        <h3 className="font-medium">
+                <div key={app.id} className="border rounded-lg p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+                    <div className="flex items-center space-x-3 sm:space-x-4">
+                      <User className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground flex-shrink-0" />
+                      <div className="min-w-0">
+                        <h3 className="font-medium text-sm sm:text-base truncate">
                           {app.personal_info?.firstName} {app.personal_info?.lastName}
                         </h3>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                           {app.lender_name} • Applied {new Date(app.created_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -188,6 +188,7 @@ const UnderwritingDashboard: React.FC = () => {
                       onClick={() => handleProcessApplication(app)}
                       disabled={processingId === app.id}
                       size="sm"
+                      className="w-full sm:w-auto"
                     >
                       {processingId === app.id ? 'Processing...' : 'Process Application'}
                     </Button>
@@ -231,7 +232,7 @@ const UnderwritingDashboard: React.FC = () => {
                     </Badge>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                     <div>
                       <p className="text-muted-foreground">Affordability</p>
                       <Progress value={assessment.affordability_score} className="mt-1" />

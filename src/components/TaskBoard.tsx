@@ -242,7 +242,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ className }) => {
   };
 
   return (
-    <div className={`flex gap-4 overflow-x-auto pb-4 ${className}`}>
+    <div className={`flex gap-3 sm:gap-4 overflow-x-auto pb-4 px-1 ${className}`}>
       {columns.map(column => (
         <TaskColumn
           key={column.id}
