@@ -1,7 +1,7 @@
 
 export interface UserProfile {
   countryOfOrigin: string;
-  destination: string;
+  destination?: string;
   loanPurpose: 'study-abroad' | 'upskilling' | 'career-development';
   incomeRange: string;
   employmentStatus: string;

@@ -60,37 +60,6 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                 )}
               />
 
-              {/* Destination */}
-              <FormField
-                control={form.control}
-                name="destination"
-                rules={{ required: "Please select your destination" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Study/Work Destination</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select destination" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="usa">United States</SelectItem>
-                        <SelectItem value="uk">United Kingdom</SelectItem>
-                        <SelectItem value="canada">Canada</SelectItem>
-                        <SelectItem value="australia">Australia</SelectItem>
-                        <SelectItem value="germany">Germany</SelectItem>
-                        <SelectItem value="france">France</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
               {/* User Type */}
               <FormField
                 control={form.control}
@@ -114,7 +83,9 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid md:grid-cols-2 gap-6">
               {/* Loan Purpose */}
               <FormField
                 control={form.control}
@@ -133,6 +104,32 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                         <SelectItem value="study-abroad">Study Abroad</SelectItem>
                         <SelectItem value="upskilling">Professional Upskilling</SelectItem>
                         <SelectItem value="career-development">Career Development</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Estimated Loan Amount */}
+              <FormField
+                control={form.control}
+                name="loanAmount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estimated Loan Amount (£)</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select amount range" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="under-25k">Under £25,000</SelectItem>
+                        <SelectItem value="25k-50k">£25,000 - £50,000</SelectItem>
+                        <SelectItem value="50k-100k">£50,000 - £100,000</SelectItem>
+                        <SelectItem value="100k-200k">£100,000 - £200,000</SelectItem>
+                        <SelectItem value="over-200k">Over £200,000</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -198,49 +195,6 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Institution */}
-              <FormField
-                control={form.control}
-                name="institution"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Institution (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., University of Oxford" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Loan Amount */}
-              <FormField
-                control={form.control}
-                name="loanAmount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estimated Loan Amount (£)</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select amount range" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="under-25k">Under £25,000</SelectItem>
-                        <SelectItem value="25k-50k">£25,000 - £50,000</SelectItem>
-                        <SelectItem value="50k-100k">£50,000 - £100,000</SelectItem>
-                        <SelectItem value="100k-200k">£100,000 - £200,000</SelectItem>
-                        <SelectItem value="over-200k">Over £200,000</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
               {/* Credit History */}
               <FormField
                 control={form.control}
@@ -288,6 +242,38 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                 )}
               />
             </div>
+
+            {/* Additional Information Section */}
+            <div className="mt-8">
+              <h3 className="text-lg font-medium text-foreground mb-4 border-b border-border pb-2">
+                Additional Information
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Help us find better matches by providing additional details about your educational background.
+              </p>
+              
+              <FormField
+                control={form.control}
+                name="institution"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Target Institution or University</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="e.g., University of Oxford, Harvard Business School" 
+                        className="bg-muted/30"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Mentioning prestigious institutions may help you access premium lender programs
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
 
             <Button 
               type="submit" 
