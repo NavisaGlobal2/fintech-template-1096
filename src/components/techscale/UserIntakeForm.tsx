@@ -24,13 +24,14 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
 
   return (
     <Card className="max-w-4xl mx-auto cosmic-glass">
-      <CardHeader>
-        <CardTitle className="text-2xl text-center">Tell Us About Your Goals</CardTitle>
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl sm:text-2xl">Tell Us About Your Goals</CardTitle>
+        <p className="text-sm text-muted-foreground">Help us find the perfect financing options for you</p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Country of Origin */}
               <FormField
                 control={form.control}
@@ -85,7 +86,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Loan Purpose */}
               <FormField
                 control={form.control}
@@ -96,7 +97,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                     <FormLabel>Loan Purpose</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="min-h-[44px]">
                           <SelectValue placeholder="Select purpose" />
                         </SelectTrigger>
                       </FormControl>
@@ -120,7 +121,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                     <FormLabel>Estimated Loan Amount (£)</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="min-h-[44px]">
                           <SelectValue placeholder="Select amount range" />
                         </SelectTrigger>
                       </FormControl>
@@ -138,7 +139,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Income Range */}
               <FormField
                 control={form.control}
@@ -149,7 +150,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                     <FormLabel>Annual Income (£)</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="min-h-[44px]">
                           <SelectValue placeholder="Select income range" />
                         </SelectTrigger>
                       </FormControl>
@@ -176,7 +177,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                     <FormLabel>Employment Status</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="min-h-[44px]">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
@@ -194,7 +195,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Credit History */}
               <FormField
                 control={form.control}
@@ -205,7 +206,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                     <FormLabel>Credit History</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="min-h-[44px]">
                           <SelectValue placeholder="Select credit history" />
                         </SelectTrigger>
                       </FormControl>
@@ -228,14 +229,15 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
                 name="hasCoSigner"
                 render={({ field }) => (
                   <FormItem className="flex flex-col justify-end">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 p-2">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
+                          className="min-h-[20px] min-w-[20px]"
                         />
                       </FormControl>
-                      <FormLabel>I have a co-signer available</FormLabel>
+                      <FormLabel className="text-sm leading-relaxed">I have a co-signer available</FormLabel>
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +279,7 @@ const UserIntakeForm: React.FC<UserIntakeFormProps> = ({ onSubmit, isLoading }) 
 
             <Button 
               type="submit" 
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 text-base"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 sm:h-14 text-base sm:text-lg font-medium"
               disabled={isLoading}
             >
               {isLoading ? (

@@ -49,15 +49,15 @@ const Header = () => {
   };
 
   return (
-    <div className="sticky top-0 z-50 pt-4 md:pt-8 px-4">
-      <header className="w-full max-w-7xl mx-auto py-2 md:py-3 px-4 md:px-8 flex items-center justify-between">
-        <div className="p-2 md:p-3">
+    <div className="sticky top-0 z-50 pt-2 md:pt-4 lg:pt-8 px-2 md:px-4">
+      <header className="w-full max-w-7xl mx-auto py-2 md:py-3 px-2 sm:px-4 md:px-8 flex items-center justify-between">
+        <div className="p-1 md:p-2 lg:p-3">
           <TechScaleLogo />
         </div>
         
         {/* Mobile menu button */}
         <button 
-          className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground touch-manipulation"
+          className="md:hidden p-3 rounded-xl text-muted-foreground hover:text-foreground touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
           onClick={toggleMobileMenu}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -103,15 +103,15 @@ const Header = () => {
         
         {/* Mobile navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-16 left-4 right-4 bg-background/95 backdrop-blur-md py-4 px-6 border border-border rounded-2xl shadow-lg z-50">
-            <div className="flex flex-col gap-4">
+          <div className="md:hidden absolute top-14 left-2 right-2 bg-background/95 backdrop-blur-md py-4 px-4 border border-border rounded-2xl shadow-lg z-50">
+            <div className="flex flex-col gap-2">
               <button 
-                className={`px-3 py-3 text-sm rounded-md transition-colors text-left touch-manipulation ${
+                className={`px-4 py-4 text-base rounded-lg transition-colors text-left touch-manipulation min-h-[44px] ${
                   activePage === 'loan-matcher' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={handleNavClick('loan-matcher')}
               >
-                <Calculator size={16} className="inline-block mr-2" /> Loan Matcher
+                <Calculator size={18} className="inline-block mr-3" /> Loan Matcher
               </button>
               <button 
                 className={`px-3 py-3 text-sm rounded-md transition-colors text-left touch-manipulation ${

@@ -268,20 +268,20 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <Button variant="outline" onClick={onBack} className="flex items-center gap-2 min-h-[44px] w-full sm:w-auto">
           <ArrowLeft className="h-4 w-4" />
           Back to Loan Options
         </Button>
-        <div className="text-center">
-          <h1 className="text-2xl font-medium">Loan Application</h1>
-          <p className="text-muted-foreground">{loanOption.lenderName}</p>
+        <div className="text-center flex-1 order-first sm:order-none">
+          <h1 className="text-xl sm:text-2xl font-medium">Loan Application</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">{loanOption.lenderName}</p>
         </div>
-        <Button variant="outline" onClick={saveDraftToLocalStorage}>
+        <Button variant="outline" onClick={saveDraftToLocalStorage} className="min-h-[44px] w-full sm:w-auto">
           <Save className="h-4 w-4 mr-2" />
-          Save Draft
+          <span className="sm:inline">Save Draft</span>
         </Button>
       </div>
 
@@ -296,10 +296,10 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
           </div>
           <Progress value={progressPercentage} className="mb-4" />
           
-          <div className={`grid gap-2 ${steps.length === 5 ? 'grid-cols-5' : steps.length === 6 ? 'grid-cols-6' : 'grid-cols-4'}`}>
+          <div className="flex gap-2 overflow-x-auto pb-2">
             {steps.map((step, index) => (
-              <div key={step.id} className="text-center">
-                <div className={`w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-medium ${
+              <div key={step.id} className="text-center flex-shrink-0 min-w-[80px]">
+                <div className={`w-10 h-10 sm:w-8 sm:h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-medium ${
                   step.completed 
                     ? 'bg-green-500 text-white' 
                     : step.current 
@@ -308,7 +308,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
                 }`}>
                   {step.completed ? <CheckCircle className="h-4 w-4" /> : index + 1}
                 </div>
-                <p className="text-xs text-muted-foreground truncate">{step.title}</p>
+                <p className="text-xs text-muted-foreground text-center leading-tight">{step.title}</p>
               </div>
             ))}
           </div>
@@ -335,11 +335,12 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
       </Card>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <Button
           variant="outline"
           onClick={prevStep}
           disabled={currentStepIndex === 0}
+          className="min-h-[44px] w-full sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Previous
@@ -347,7 +348,7 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
 
         <div className="flex gap-2">
           {currentStepIndex !== steps.length - 1 && (
-            <Button onClick={nextStep}>
+            <Button onClick={nextStep} className="min-h-[44px] w-full sm:w-auto">
               Next
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>

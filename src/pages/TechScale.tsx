@@ -74,13 +74,13 @@ const TechScale = () => {
           <TechScaleHero />
 
         {/* Why TechScale Section */}
-        <section className="w-full py-20 px-6 md:px-12 bg-background">
-          <div className="max-w-6xl mx-auto text-center space-y-12">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
+        <section className="w-full py-12 md:py-20 px-4 sm:px-6 md:px-12 bg-background">
+          <div className="max-w-6xl mx-auto text-center space-y-8 md:space-y-12">
+            <div className="space-y-4 md:space-y-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
                 Break Barriers. Build Dreams.
               </h2>
-              <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
+              <p className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto leading-relaxed">
                 At <strong>TechScale</strong>, we believe talent should not be limited by borders or bank balances.
                 Whether you're an African student heading overseas or a young professional abroad looking to upskill, 
                 we connect you to trusted financing options, microloans, and sponsor networks — so you can focus on your future.
@@ -94,44 +94,44 @@ const TechScale = () => {
         <StatsSection />
         
         {/* How It Works Section */}
-        <section id="how-it-works" className="w-full py-20 px-6 md:px-12 bg-background">
-          <div className="max-w-6xl mx-auto text-center space-y-12">
+        <section id="how-it-works" className="w-full py-12 md:py-20 px-4 sm:px-6 md:px-12 bg-background">
+          <div className="max-w-6xl mx-auto text-center space-y-8 md:space-y-12">
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
                 How It Works – 3 Steps
               </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
                 Get matched with the perfect financing for your education and career journey in three simple steps
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg mx-auto">
+            <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div className="space-y-4 p-4 sm:p-6">
+                <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl sm:text-lg mx-auto">
                   1
                 </div>
-                <h3 className="text-xl font-medium">Tell Us About Your Plans</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-medium">Tell Us About Your Plans</h3>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                   Fill out our quick application — your destination, field of study, or career goal.
                 </p>
               </div>
               
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg mx-auto">
+              <div className="space-y-4 p-4 sm:p-6">
+                <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl sm:text-lg mx-auto">
                   2
                 </div>
-                <h3 className="text-xl font-medium">Get Matched</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-medium">Get Matched</h3>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                   Our smart match engine connects you to vetted lenders, career microloans, or sponsors.
                 </p>
               </div>
               
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg mx-auto">
+              <div className="space-y-4 p-4 sm:p-6">
+                <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl sm:text-lg mx-auto">
                   3
                 </div>
-                <h3 className="text-xl font-medium">Secure Your Funding</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-medium">Secure Your Funding</h3>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                   Apply directly through our trusted partners or with TechScale's in-house Career Credit.
                 </p>
               </div>
@@ -140,44 +140,44 @@ const TechScale = () => {
         </section>
 
         {/* Who We Help Section */}
-        <section className="w-full py-20 px-6 md:px-12 bg-muted/30">
-          <div className="max-w-6xl mx-auto text-center space-y-12">
+        <section className="w-full py-12 md:py-20 px-4 sm:px-6 md:px-12 bg-muted/30">
+          <div className="max-w-6xl mx-auto text-center space-y-8 md:space-y-12">
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
                 Who We Help
               </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
                 Empowering African talent at every stage of their global journey
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-background p-8 rounded-lg shadow-sm space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div className="bg-background p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                   <span className="text-2xl">🎓</span>
                 </div>
-                <h3 className="text-xl font-medium">African Students Abroad</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-medium">African Students Abroad</h3>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                   Study at top universities without worrying about upfront costs.
                 </p>
               </div>
               
-              <div className="bg-background p-8 rounded-lg shadow-sm space-y-4">
+              <div className="bg-background p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                   <span className="text-2xl">💼</span>
                 </div>
-                <h3 className="text-xl font-medium">Young Professionals Overseas</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-medium">Young Professionals Overseas</h3>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                   Access career credit for certifications, relocations, and professional growth.
                 </p>
               </div>
               
-              <div className="bg-background p-8 rounded-lg shadow-sm space-y-4">
+              <div className="bg-background p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                   <span className="text-2xl">🤝</span>
                 </div>
-                <h3 className="text-xl font-medium">Diaspora Sponsors & Investors</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-medium">Diaspora Sponsors & Investors</h3>
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                   Support the next generation of African talent while tracking impact.
                 </p>
               </div>
@@ -186,44 +186,44 @@ const TechScale = () => {
         </section>
 
         {/* Financing Options Section */}
-        <section className="w-full py-20 px-6 md:px-12 bg-background">
-          <div className="max-w-6xl mx-auto text-center space-y-12">
+        <section className="w-full py-12 md:py-20 px-4 sm:px-6 md:px-12 bg-background">
+          <div className="max-w-6xl mx-auto text-center space-y-8 md:space-y-12">
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-foreground">
                 Our Financing Options
               </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
                 Flexible funding solutions tailored to your unique journey
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="p-6 rounded-lg border border-border bg-card space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div className="p-4 sm:p-6 rounded-lg border border-border bg-card space-y-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-bold">SL</span>
                 </div>
-                <h3 className="text-xl font-medium text-left">Study Abroad Loans</h3>
-                <p className="text-muted-foreground text-left">
+                <h3 className="text-lg sm:text-xl font-medium text-left">Study Abroad Loans</h3>
+                <p className="text-muted-foreground text-sm sm:text-base text-left leading-relaxed">
                   Co-signer-free options from trusted global lenders.
                 </p>
               </div>
               
-              <div className="p-6 rounded-lg border border-border bg-card space-y-4">
+              <div className="p-4 sm:p-6 rounded-lg border border-border bg-card space-y-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-bold">SC</span>
                 </div>
-                <h3 className="text-xl font-medium text-left">Career Microloans (SkillCredit)</h3>
-                <p className="text-muted-foreground text-left">
+                <h3 className="text-lg sm:text-xl font-medium text-left">Career Microloans (SkillCredit)</h3>
+                <p className="text-muted-foreground text-sm sm:text-base text-left leading-relaxed">
                   £500–£7,500 for upskilling and certifications.
                 </p>
               </div>
               
-              <div className="p-6 rounded-lg border border-border bg-card space-y-4">
+              <div className="p-4 sm:p-6 rounded-lg border border-border bg-card space-y-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-bold">SM</span>
                 </div>
-                <h3 className="text-xl font-medium text-left">Sponsor Match</h3>
-                <p className="text-muted-foreground text-left">
+                <h3 className="text-lg sm:text-xl font-medium text-left">Sponsor Match</h3>
+                <p className="text-muted-foreground text-sm sm:text-base text-left leading-relaxed">
                   Connect with diaspora donors, alumni, and NGOs for grants or partial funding.
                 </p>
               </div>
@@ -357,13 +357,13 @@ const TechScale = () => {
         <FAQSection />
 
         {/* Final CTA Section */}
-        <section className="w-full py-20 px-6 md:px-12 bg-primary">
-          <div className="max-w-6xl mx-auto text-center space-y-8">
+        <section className="w-full py-12 md:py-20 px-4 sm:px-6 md:px-12 bg-primary">
+          <div className="max-w-6xl mx-auto text-center space-y-6 md:space-y-8">
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-primary-foreground">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tighter text-primary-foreground">
                 Your future starts here.
               </h2>
-              <p className="text-primary-foreground/80 text-lg max-w-2xl mx-auto">
+              <p className="text-primary-foreground/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
                 Don't let funding hold you back — take the first step today.
               </p>
             </div>
@@ -376,16 +376,16 @@ const TechScale = () => {
                     matcherElement.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-8 py-3 rounded-lg font-medium text-lg transition-colors"
+                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg transition-colors min-h-[44px] w-full sm:w-auto max-w-xs sm:max-w-none"
               >
                 Start My Application →
               </button>
             </div>
             
             {/* Trust Section */}
-            <div className="pt-12 border-t border-primary-foreground/20">
+            <div className="pt-8 sm:pt-12 border-t border-primary-foreground/20">
               <p className="text-primary-foreground/60 text-sm mb-4">Proudly partnered with [Partner Logos]</p>
-              <div className="flex justify-center gap-8 text-primary-foreground/80 text-sm font-medium">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-primary-foreground/80 text-sm font-medium">
                 <span>Secure</span>
                 <span>•</span>
                 <span>Transparent</span>
