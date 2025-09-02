@@ -111,16 +111,16 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
   return (
     <div className="space-y-6">
       {/* Sorting controls */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="text-sm text-muted-foreground">
           Showing {loans.length} loan options
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Sort by:</span>
+          <span className="text-sm text-muted-foreground whitespace-nowrap">Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="text-sm border border-border rounded px-2 py-1 bg-background"
+            className="text-sm border border-border rounded px-2 py-1 bg-background min-h-[36px] min-w-[120px]"
           >
             <option value="relevance">Relevance</option>
             <option value="rate">Interest Rate</option>
@@ -155,34 +155,34 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
             
             <CardContent className="space-y-6">
               {/* Key metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="flex items-center gap-2 p-2 sm:p-0">
+                  <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="min-w-0">
                     <div className="text-sm font-medium">APR Range</div>
                     <div className="text-sm text-muted-foreground">{loan.aprRange}</div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <div>
+                <div className="flex items-center gap-2 p-2 sm:p-0">
+                  <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="min-w-0">
                     <div className="text-sm font-medium">Max Amount</div>
                     <div className="text-sm text-muted-foreground">{loan.maxAmount}</div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <div>
+                <div className="flex items-center gap-2 p-2 sm:p-0">
+                  <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="min-w-0">
                     <div className="text-sm font-medium">Term</div>
                     <div className="text-sm text-muted-foreground">{loan.repaymentTerm}</div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <div>
+                <div className="flex items-center gap-2 p-2 sm:p-0">
+                  <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="min-w-0">
                     <div className="text-sm font-medium">Processing</div>
                     <div className="text-sm text-muted-foreground">{loan.processingTime}</div>
                   </div>
@@ -213,24 +213,24 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Info className="h-3 w-3" />
-                  Match score based on your profile
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-border">
+                <div className="text-xs text-muted-foreground flex items-center gap-1 order-2 sm:order-1">
+                  <Info className="h-3 w-3 flex-shrink-0" />
+                  <span>Match score based on your profile</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto order-1 sm:order-2">
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => handleLearnMore(loan.lenderName)}
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-1 justify-center min-h-[40px] w-full sm:w-auto"
                   >
                     <ExternalLink className="h-3 w-3" />
                     Learn More
                   </Button>
                   <Button 
                     size="sm"
-                    className={loan.eligibilityTier === 'green' ? 'bg-green-600 hover:bg-green-700' : ''}
+                    className={`min-h-[40px] w-full sm:w-auto ${loan.eligibilityTier === 'green' ? 'bg-green-600 hover:bg-green-700' : ''}`}
                     disabled={loan.eligibilityTier === 'red'}
                     onClick={() => handleApplyNow(loan)}
                   >

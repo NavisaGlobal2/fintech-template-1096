@@ -171,29 +171,29 @@ const UnderwritingDashboard: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {data.applications.map((app) => (
-                <div key={app.id} className="border rounded-lg p-3 sm:p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
-                    <div className="flex items-center space-x-3 sm:space-x-4">
-                      <User className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground flex-shrink-0" />
-                      <div className="min-w-0">
-                        <h3 className="font-medium text-sm sm:text-base truncate">
-                          {app.personal_info?.firstName} {app.personal_info?.lastName}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          {app.lender_name} • Applied {new Date(app.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => handleProcessApplication(app)}
-                      disabled={processingId === app.id}
-                      size="sm"
-                      className="w-full sm:w-auto"
-                    >
-                      {processingId === app.id ? 'Processing...' : 'Process Application'}
-                    </Button>
-                  </div>
-                </div>
+                <div key={app.id} className="border rounded-lg p-4">
+                   <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+                     <div className="flex items-center space-x-4">
+                       <User className="h-8 w-8 text-muted-foreground flex-shrink-0" />
+                       <div className="min-w-0 flex-1">
+                         <h3 className="font-medium text-base truncate">
+                           {app.personal_info?.firstName} {app.personal_info?.lastName}
+                         </h3>
+                         <p className="text-sm text-muted-foreground">
+                           {app.lender_name} • Applied {new Date(app.created_at).toLocaleDateString()}
+                         </p>
+                       </div>
+                     </div>
+                     <Button
+                       onClick={() => handleProcessApplication(app)}
+                       disabled={processingId === app.id}
+                       size="sm"
+                       className="w-full sm:w-auto min-h-[40px]"
+                     >
+                       {processingId === app.id ? 'Processing...' : 'Process Application'}
+                     </Button>
+                   </div>
+                 </div>
               ))}
             </div>
           )}
@@ -215,43 +215,43 @@ const UnderwritingDashboard: React.FC = () => {
             </p>
           ) : (
             <div className="space-y-4">
-              {data.assessments.slice(0, 5).map((assessment) => (
-                <div key={assessment.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      {getDecisionIcon(assessment.decision)}
-                      <div>
-                        <p className="font-medium">Risk Score: {assessment.risk_score}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Assessed {new Date(assessment.assessed_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge className={getRiskBadgeColor(assessment.risk_tier)}>
-                      {assessment.risk_tier.toUpperCase()} RISK
-                    </Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Affordability</p>
-                      <Progress value={assessment.affordability_score} className="mt-1" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Education</p>
-                      <Progress value={assessment.education_score} className="mt-1" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Employment</p>
-                      <Progress value={assessment.employment_score} className="mt-1" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Sponsor</p>
-                      <Progress value={assessment.sponsor_score} className="mt-1" />
-                    </div>
-                  </div>
-                </div>
-              ))}
+               {data.assessments.slice(0, 5).map((assessment) => (
+                 <div key={assessment.id} className="border rounded-lg p-4">
+                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                     <div className="flex items-center gap-3">
+                       {getDecisionIcon(assessment.decision)}
+                       <div>
+                         <p className="font-medium">Risk Score: {assessment.risk_score}</p>
+                         <p className="text-sm text-muted-foreground">
+                           Assessed {new Date(assessment.assessed_at).toLocaleDateString()}
+                         </p>
+                       </div>
+                     </div>
+                     <Badge className={getRiskBadgeColor(assessment.risk_tier)}>
+                       {assessment.risk_tier.toUpperCase()} RISK
+                     </Badge>
+                   </div>
+                   
+                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                     <div>
+                       <p className="text-muted-foreground mb-1">Affordability</p>
+                       <Progress value={assessment.affordability_score} className="mt-1" />
+                     </div>
+                     <div>
+                       <p className="text-muted-foreground mb-1">Education</p>
+                       <Progress value={assessment.education_score} className="mt-1" />
+                     </div>
+                     <div>
+                       <p className="text-muted-foreground mb-1">Employment</p>
+                       <Progress value={assessment.employment_score} className="mt-1" />
+                     </div>
+                     <div>
+                       <p className="text-muted-foreground mb-1">Sponsor</p>
+                       <Progress value={assessment.sponsor_score} className="mt-1" />
+                     </div>
+                   </div>
+                 </div>
+               ))}
             </div>
           )}
         </CardContent>
