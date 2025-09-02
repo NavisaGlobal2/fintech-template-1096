@@ -10,6 +10,7 @@ import { FullLoanApplication, ApplicationStep, ApplicationStepId } from '@/types
 import { LoanOption } from '@/types/techscale';
 import PersonalInfoKYCStep from './application-steps/PersonalInfoKYCStep';
 import EducationCareerStep from './application-steps/EducationCareerStep';
+import ProfessionalEmploymentStep from './application-steps/ProfessionalEmploymentStep';
 import ProgramInfoStep from './application-steps/ProgramInfoStep';
 import FinancialInfoStep from './application-steps/FinancialInfoStep';
 import LoanTypeStep from './application-steps/LoanTypeStep';
@@ -82,6 +83,16 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         transcripts: { uploaded: false },
         resume: { uploaded: false }
       },
+      professionalEmployment: {
+        employmentType: 'full-time',
+        company: '',
+        jobTitle: '',
+        employmentDuration: '',
+        monthlySalary: '',
+        workAuthorization: '',
+        employmentLetter: { uploaded: false },
+        paySlips: { uploaded: false }
+      },
       programInfo: {
         institution: '',
         programName: '',
@@ -143,24 +154,34 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         description: 'Personal details and ID verification',
         completed: form.watch('completedSteps')?.includes('personal-kyc') || false,
         current: currentStep === 'personal-kyc'
-      },
-      {
+      }
+    ];
+
+    // Add education-career step for study-abroad loans, professional-employment for others
+    if (loanType === 'study-abroad') {
+      baseSteps.push({
         id: 'education-career',
         title: 'Education & Career',
         description: 'Academic background and employment',
         completed: form.watch('completedSteps')?.includes('education-career') || false,
         current: currentStep === 'education-career'
-      }
-    ];
-
-    // Add program info step only for study-abroad loans
-    if (loanType === 'study-abroad') {
+      });
+      
       baseSteps.push({
         id: 'program-info',
         title: 'Program Details',
         description: 'Course and institution information',
         completed: form.watch('completedSteps')?.includes('program-info') || false,
         current: currentStep === 'program-info'
+      });
+    } else {
+      // For career-microloan and sponsor-match, use professional employment
+      baseSteps.push({
+        id: 'professional-employment',
+        title: 'Professional Employment',
+        description: 'Employment verification and details',
+        completed: form.watch('completedSteps')?.includes('professional-employment') || false,
+        current: currentStep === 'professional-employment'
       });
     }
 
@@ -220,16 +241,6 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   const nextStep = () => {
     if (currentStepIndex < steps.length - 1) {
       const nextStepId = steps[currentStepIndex + 1].id as ApplicationStepId;
-      
-      // Skip program info step for non-study-abroad loans
-      if (nextStepId === 'program-info' && loanType !== 'study-abroad') {
-        const afterProgramInfoIndex = steps.findIndex(s => s.id === 'financial-info');
-        if (afterProgramInfoIndex !== -1) {
-          setCurrentStep('financial-info');
-          return;
-        }
-      }
-      
       setCurrentStep(nextStepId);
     }
   };
@@ -237,13 +248,6 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   const prevStep = () => {
     if (currentStepIndex > 0) {
       const prevStepId = steps[currentStepIndex - 1].id as ApplicationStepId;
-      
-      // Skip program info step for non-study-abroad loans when going back
-      if (currentStep === 'financial-info' && loanType !== 'study-abroad') {
-        setCurrentStep('education-career');
-        return;
-      }
-      
       setCurrentStep(prevStepId);
     }
   };
@@ -254,6 +258,8 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         return <PersonalInfoKYCStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('personal-kyc')} />;
       case 'education-career':
         return <EducationCareerStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('education-career')} />;
+      case 'professional-employment':
+        return <ProfessionalEmploymentStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('professional-employment')} />;
       case 'program-info':
         return <ProgramInfoStep form={form} applicationId={applicationId} onComplete={() => handleStepComplete('program-info')} />;
       case 'financial-info':

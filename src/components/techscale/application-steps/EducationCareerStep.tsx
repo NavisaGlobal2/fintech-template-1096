@@ -51,19 +51,34 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
     }
   };
 
-  const canContinue = educationCareer.highestQualification && 
-                     educationCareer.institution && 
-                     educationCareer.graduationYear &&
-                     educationCareer.resume.uploaded;
+  // Make education career optional for non-student loans
+  const loanType = form.watch('loanTypeRequest.type');
+  const isStudentLoan = loanType === 'study-abroad';
+  
+  const canContinue = isStudentLoan 
+    ? (educationCareer.highestQualification && 
+       educationCareer.institution && 
+       educationCareer.graduationYear &&
+       educationCareer.resume.uploaded)
+    : true; // Optional for other loan types
 
   return (
     <Form {...form}>
       <div className="space-y-6">
+        {!isStudentLoan && (
+          <div className="bg-muted/30 border border-dashed border-muted-foreground/25 rounded-lg p-4 mb-6">
+            <p className="text-sm text-muted-foreground text-center">
+              <strong>Note:</strong> Education and career information is optional for this loan type. 
+              You can skip this section or fill it out to improve your application.
+            </p>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
             name="educationCareer.highestQualification"
-            rules={{ required: "Highest qualification is required" }}
+            rules={{ required: isStudentLoan ? "Highest qualification is required" : false }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Highest Qualification</FormLabel>
@@ -90,7 +105,7 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
           <FormField
             control={form.control}
             name="educationCareer.institution"
-            rules={{ required: "Institution name is required" }}
+            rules={{ required: isStudentLoan ? "Institution name is required" : false }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Institution Name</FormLabel>
@@ -106,7 +121,7 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
         <FormField
           control={form.control}
           name="educationCareer.graduationYear"
-          rules={{ required: "Graduation year is required" }}
+          rules={{ required: isStudentLoan ? "Graduation year is required" : false }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Graduation Year</FormLabel>
@@ -266,7 +281,7 @@ const EducationCareerStep: React.FC<EducationCareerStepProps> = ({ form, applica
             disabled={!canContinue}
             className="bg-primary"
           >
-            Continue to Program Information
+            {isStudentLoan ? 'Continue to Program Information' : 'Continue to Financial Information'}
           </Button>
         </div>
       </div>

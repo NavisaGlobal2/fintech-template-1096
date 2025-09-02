@@ -149,6 +149,7 @@ const LoanTypeStep: React.FC<LoanTypeStepProps> = ({ form, loanOption, onComplet
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="3-months">3 months</SelectItem>
                           <SelectItem value="6-months">6 months</SelectItem>
                           <SelectItem value="12-months">12 months</SelectItem>
                           <SelectItem value="24-months">24 months</SelectItem>

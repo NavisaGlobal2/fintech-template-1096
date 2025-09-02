@@ -55,6 +55,33 @@ export interface EducationCareer {
   };
 }
 
+export interface ProfessionalEmployment {
+  employmentType: 'full-time' | 'part-time' | 'self-employed' | 'contract' | 'unemployed';
+  company: string;
+  jobTitle: string;
+  employmentDuration: string;
+  monthlySalary: string;
+  workAuthorization: string;
+  employmentLetter: {
+    uploaded: boolean;
+    fileUrl?: string;
+    fileName?: string;
+    verified?: boolean;
+  };
+  paySlips: {
+    uploaded: boolean;
+    fileUrl?: string;
+    fileName?: string;
+    verified?: boolean;
+  };
+  contractDocument?: {
+    uploaded: boolean;
+    fileUrl?: string;
+    fileName?: string;
+    verified?: boolean;
+  };
+}
+
 export interface ProgramInfo {
   institution: string;
   programName: string;
@@ -118,7 +145,8 @@ export interface FullLoanApplication {
   lenderName: string;
   personalInfo: PersonalInfo;
   kycDocuments: KYCDocuments;
-  educationCareer: EducationCareer;
+  educationCareer?: EducationCareer;  // Made optional for professional loans
+  professionalEmployment?: ProfessionalEmployment;  // New field for professional loans
   programInfo: ProgramInfo;
   financialInfo: FinancialInfo;
   loanTypeRequest: LoanTypeDetails;
@@ -144,6 +172,7 @@ export interface ApplicationStep {
 export type ApplicationStepId = 
   | 'personal-kyc'
   | 'education-career'
+  | 'professional-employment'
   | 'program-info'
   | 'financial-info'
   | 'loan-type'

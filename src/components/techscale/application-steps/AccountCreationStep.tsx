@@ -11,6 +11,7 @@ import { FullLoanApplication } from '@/types/loanApplication';
 import ESignature from '../ESignature';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AccountCreationStepProps {
   form: UseFormReturn<FullLoanApplication>;
@@ -18,12 +19,14 @@ interface AccountCreationStepProps {
 }
 
 const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onComplete }) => {
+  const { user } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const [useExistingAccount, setUseExistingAccount] = useState(!!user);
 
   const declarations = form.watch('declarations');
   const personalInfo = form.watch('personalInfo');
@@ -38,9 +41,7 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
                    declarations.dataPrivacyConsent && 
                    declarations.termsAndConditions &&
                    declarations.signatureImage &&
-                   password &&
-                   confirmPassword &&
-                   password === confirmPassword;
+                   (useExistingAccount || (password && confirmPassword && password === confirmPassword));
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -48,50 +49,62 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
     setIsCreatingAccount(true);
     
     try {
-      // Create user account
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: personalInfo.email,
-        password: password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            first_name: personalInfo.firstName,
-            last_name: personalInfo.lastName,
+      let userId = user?.id;
+      
+      if (!useExistingAccount) {
+        // Create new user account
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: personalInfo.email,
+          password: password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              first_name: personalInfo.firstName,
+              last_name: personalInfo.lastName,
+            }
           }
-        }
-      });
+        });
 
-      if (authError) {
-        toast.error(`Account creation failed: ${authError.message}`);
-        return;
+        if (authError) {
+          toast.error(`Account creation failed: ${authError.message}`);
+          return;
+        }
+
+        if (!authData.user) {
+          toast.error('Account creation failed. Please try again.');
+          return;
+        }
+
+        userId = authData.user.id;
       }
 
-      if (!authData.user) {
-        toast.error('Account creation failed. Please try again.');
+      if (!userId) {
+        toast.error('User authentication failed. Please try again.');
         return;
       }
 
       // Transfer any temporary documents to user account
       try {
         const { transferSessionDocumentsToUser } = await import('@/utils/sessionManager');
-        await transferSessionDocumentsToUser(authData.user.id);
+        await transferSessionDocumentsToUser(userId);
       } catch (transferError) {
         console.warn('Failed to transfer documents:', transferError);
         // Don't block account creation if document transfer fails
       }
 
       // Update form with user ID
-      form.setValue('userId', authData.user.id);
+      form.setValue('userId', userId);
 
       // Save application to database
       const formData = form.getValues();
       const applicationData = {
-        user_id: authData.user.id,
+        user_id: userId,
         loan_option_id: formData.loanOptionId,
         lender_name: formData.lenderName,
         personal_info: JSON.parse(JSON.stringify(formData.personalInfo)),
         kyc_documents: JSON.parse(JSON.stringify(formData.kycDocuments)),
-        education_career: JSON.parse(JSON.stringify(formData.educationCareer)),
+        education_career: formData.educationCareer ? JSON.parse(JSON.stringify(formData.educationCareer)) : {},
+        professional_employment: formData.professionalEmployment ? JSON.parse(JSON.stringify(formData.professionalEmployment)) : {},
         program_info: JSON.parse(JSON.stringify(formData.programInfo)),
         financial_info: JSON.parse(JSON.stringify(formData.financialInfo)),
         loan_type_requested: formData.loanTypeRequest.type,
@@ -112,19 +125,23 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
         return;
       }
 
-      // Create profile
-      await supabase.from('profiles').insert({
-        id: authData.user.id,
-        first_name: personalInfo.firstName,
-        last_name: personalInfo.lastName,
-        email: personalInfo.email,
-        phone: personalInfo.phone
-      });
+      // Create profile if it doesn't exist
+      if (!useExistingAccount) {
+        await supabase.from('profiles').insert({
+          id: userId,
+          first_name: personalInfo.firstName,
+          last_name: personalInfo.lastName,
+          email: personalInfo.email,
+          phone: personalInfo.phone
+        });
+      }
 
       // Clear localStorage
       localStorage.removeItem('loanApplicationDraft');
 
-      toast.success('Account created and application submitted successfully!');
+      toast.success(useExistingAccount 
+        ? 'Application submitted successfully!' 
+        : 'Account created and application submitted successfully!');
       onComplete(formData);
 
     } catch (error) {
@@ -141,14 +158,30 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
         {/* Account Creation Section */}
         <div className="flex items-center gap-2 mb-4">
           <UserPlus className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-medium">Create Your Account</h3>
+          <h3 className="text-lg font-medium">
+            {user ? 'Submit Application' : 'Create Your Account'}
+          </h3>
         </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              Create an account using your email address to secure and submit your application.
-            </p>
+        {user && (
+          <Card className="mb-6 bg-green-50 border-green-200">
+            <CardContent className="p-6">
+              <p className="text-sm text-green-800">
+                <strong>You're already signed in as:</strong> {user.email}
+              </p>
+              <p className="text-xs text-green-700 mt-1">
+                Your application will be submitted directly to your existing account.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {!user && (
+          <Card>
+            <CardContent className="p-6">
+              <p className="text-sm text-muted-foreground mb-4">
+                Create an account using your email address to secure and submit your application.
+              </p>
             
             <div className="space-y-4">
               <div>
@@ -210,6 +243,7 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
             </div>
           </CardContent>
         </Card>
+        )}
 
         <Separator />
 
@@ -381,7 +415,9 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
             disabled={!canSubmit || isCreatingAccount}
             className="bg-green-600 hover:bg-green-700 text-white px-8"
           >
-            {isCreatingAccount ? 'Creating Account & Submitting...' : 'Create Account & Submit Application'}
+            {isCreatingAccount 
+              ? (useExistingAccount ? 'Submitting Application...' : 'Creating Account & Submitting...') 
+              : (useExistingAccount ? 'Submit Application' : 'Create Account & Submit Application')}
           </Button>
         </div>
       </div>

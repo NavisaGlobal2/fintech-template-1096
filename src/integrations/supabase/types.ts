@@ -123,6 +123,7 @@ export type Database = {
           loan_option_id: string
           loan_type_requested: string | null
           personal_info: Json | null
+          professional_employment: Json | null
           program_info: Json | null
           reviewed_at: string | null
           reviewer_notes: string | null
@@ -145,6 +146,7 @@ export type Database = {
           loan_option_id: string
           loan_type_requested?: string | null
           personal_info?: Json | null
+          professional_employment?: Json | null
           program_info?: Json | null
           reviewed_at?: string | null
           reviewer_notes?: string | null
@@ -167,6 +169,7 @@ export type Database = {
           loan_option_id?: string
           loan_type_requested?: string | null
           personal_info?: Json | null
+          professional_employment?: Json | null
           program_info?: Json | null
           reviewed_at?: string | null
           reviewer_notes?: string | null
