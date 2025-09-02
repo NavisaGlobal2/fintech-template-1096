@@ -35,6 +35,8 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
     const file = acceptedFiles[0];
     if (!file) return;
 
+    console.log('Starting file upload:', { fileName: file.name, size: file.size, type: file.type });
+
     // Validate file type
     if (!acceptedTypes.includes(file.type)) {
       toast.error(`Invalid file type. Please upload: ${acceptedTypes.join(', ')}`);
@@ -47,66 +49,116 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
       return;
     }
 
+    setUploadProgress(10);
+
     try {
       // Import session manager
       const { getOrCreateSessionId, addSessionDocument } = await import('@/utils/sessionManager');
       
       // Get user (if authenticated) or use session ID
-      const { data: { user } } = await supabase.auth.getUser();
-      const sessionId = user ? null : getOrCreateSessionId();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.warn('Auth error, proceeding as anonymous:', authError);
+      }
       
-      // Upload to Supabase Storage
+      const sessionId = user ? null : getOrCreateSessionId();
+      console.log('Upload mode:', user ? 'authenticated' : 'anonymous', { userId: user?.id, sessionId });
+      
+      setUploadProgress(30);
+      
+      // Generate consistent filename for both storage and database
       const fileExt = file.name.split('.').pop();
-      const fileName = user 
-        ? `${user.id}/${documentType}_${Date.now()}.${fileExt}`
-        : `temp/${sessionId}/${documentType}_${Date.now()}.${fileExt}`;
+      const timestamp = Date.now();
+      const generatedFileName = `${documentType}_${timestamp}.${fileExt}`;
+      const storagePath = user 
+        ? `${user.id}/${generatedFileName}`
+        : `temp/${sessionId}/${generatedFileName}`;
+
+      console.log('Uploading to path:', storagePath);
 
       const { data, error } = await supabase.storage
         .from('application-documents')
-        .upload(fileName, file, {
+        .upload(storagePath, file, {
           cacheControl: '3600',
           upsert: false
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Storage upload error:', error);
+        throw new Error(`Storage upload failed: ${error.message}`);
+      }
+
+      setUploadProgress(60);
+      console.log('Storage upload successful:', data);
 
       // Get public URL
       const { data: urlData } = supabase.storage
         .from('application-documents')
-        .getPublicUrl(fileName);
+        .getPublicUrl(storagePath);
+
+      console.log('Generated public URL:', urlData.publicUrl);
+      
+      setUploadProgress(80);
 
       // Save document record to database
+      const documentRecord = {
+        user_id: user?.id || null,
+        session_id: sessionId,
+        document_type: documentType,
+        file_name: generatedFileName, // Use consistent filename
+        file_url: urlData.publicUrl,
+        file_size: file.size,
+        mime_type: file.type,
+        verification_status: 'pending'
+      };
+
+      console.log('Inserting document record:', documentRecord);
+
       const { error: dbError } = await supabase
         .from('application_documents')
-        .insert({
-          user_id: user?.id || null,
-          session_id: sessionId,
-          document_type: documentType,
-          file_name: file.name,
-          file_url: urlData.publicUrl,
-          file_size: file.size,
-          mime_type: file.type,
-          verification_status: 'pending'
-        });
+        .insert(documentRecord);
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error('Database insert error:', dbError);
+        throw new Error(`Database insert failed: ${dbError.message}`);
+      }
+
+      console.log('Database insert successful');
+      
+      setUploadProgress(90);
 
       // Store in session storage for anonymous users
       if (!user && sessionId) {
+        console.log('Storing in session storage for anonymous user');
         addSessionDocument({
           documentType,
-          fileName: file.name,
+          fileName: generatedFileName, // Use consistent filename
           fileUrl: urlData.publicUrl,
           fileSize: file.size,
           mimeType: file.type
         });
       }
 
+      setUploadProgress(100);
       onUpload(file);
       toast.success('Document uploaded successfully!');
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast.error('Failed to upload document. Please try again.');
+      
+      setTimeout(() => setUploadProgress(0), 1000);
+      
+    } catch (error: any) {
+      console.error('Upload error details:', error);
+      setUploadProgress(0);
+      
+      // More specific error messages
+      if (error.message?.includes('Storage upload failed')) {
+        toast.error('Failed to upload file to storage. Please check your connection and try again.');
+      } else if (error.message?.includes('Database insert failed')) {
+        toast.error('File uploaded but failed to save record. Please contact support.');
+      } else if (error.message?.includes('Row Level Security')) {
+        toast.error('Permission error. Please sign in or check your account status.');
+      } else {
+        toast.error(`Upload failed: ${error.message || 'Unknown error'}`);
+      }
     }
   }, [documentType, acceptedTypes, maxSize, onUpload]);
 

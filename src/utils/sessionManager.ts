@@ -86,6 +86,8 @@ export const transferSessionDocumentsToUser = async (userId: string): Promise<vo
   const sessionId = getOrCreateSessionId();
   const documents = getSessionDocuments();
   
+  console.log('Transferring documents to user:', { userId, sessionId, documentCount: documents.length });
+  
   if (documents.length === 0) return;
   
   // Import supabase client
@@ -94,39 +96,46 @@ export const transferSessionDocumentsToUser = async (userId: string): Promise<vo
   try {
     // Move each document from temp to user folder
     for (const doc of documents) {
-      // Download file from temp location
+      console.log('Processing document:', doc);
+      
+      // Download file from temp location using the correct filename
+      const tempPath = `temp/${sessionId}/${doc.fileName}`;
+      console.log('Downloading from temp path:', tempPath);
+      
       const { data: fileData, error: downloadError } = await supabase.storage
         .from('application-documents')
-        .download(`temp/${sessionId}/${doc.fileName}`);
+        .download(tempPath);
         
       if (downloadError) {
-        console.error('Failed to download temp file:', downloadError);
+        console.error('Failed to download temp file:', { tempPath, error: downloadError });
         continue;
       }
       
-      // Upload to user folder
-      const fileExt = doc.fileName.split('.').pop();
-      const newFileName = `${userId}/${doc.documentType}_${Date.now()}.${fileExt}`;
+      // Upload to user folder with same filename structure
+      const newPath = `${userId}/${doc.fileName}`;
+      console.log('Uploading to user path:', newPath);
       
       const { error: uploadError } = await supabase.storage
         .from('application-documents')
-        .upload(newFileName, fileData, {
+        .upload(newPath, fileData, {
           cacheControl: '3600',
           upsert: false
         });
         
       if (uploadError) {
-        console.error('Failed to upload to user folder:', uploadError);
+        console.error('Failed to upload to user folder:', { newPath, error: uploadError });
         continue;
       }
       
       // Get new public URL
       const { data: urlData } = supabase.storage
         .from('application-documents')
-        .getPublicUrl(newFileName);
+        .getPublicUrl(newPath);
+      
+      console.log('Updating database record for document:', doc.documentType);
       
       // Update database record
-      await supabase
+      const { error: updateError } = await supabase
         .from('application_documents')
         .update({
           user_id: userId,
@@ -135,14 +144,27 @@ export const transferSessionDocumentsToUser = async (userId: string): Promise<vo
         })
         .eq('session_id', sessionId)
         .eq('document_type', doc.documentType);
+        
+      if (updateError) {
+        console.error('Failed to update database record:', updateError);
+        continue;
+      }
       
       // Delete temp file
-      await supabase.storage
+      const { error: deleteError } = await supabase.storage
         .from('application-documents')
-        .remove([`temp/${sessionId}/${doc.fileName}`]);
+        .remove([tempPath]);
+        
+      if (deleteError) {
+        console.error('Failed to delete temp file:', deleteError);
+        // Don't continue on delete error as it's not critical
+      }
+      
+      console.log('Successfully transferred document:', doc.documentType);
     }
     
     // Clear session data after successful transfer
+    console.log('Clearing session data');
     clearSessionData();
     
   } catch (error) {
