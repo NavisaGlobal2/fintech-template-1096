@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
 import { 
   FileText, 
   Clock, 
@@ -21,13 +22,26 @@ import {
   User,
   GraduationCap,
   Briefcase,
-  CreditCard
+  CreditCard,
+  Phone,
+  Mail,
+  MapPin,
+  Save,
+  ArrowLeft,
+  Trash2,
+  Copy,
+  Archive,
+  MessageSquare
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FullLoanApplication } from '@/types/loanApplication';
 import { formatDistanceToNow, format } from 'date-fns';
 import ApplicationTimeline from './ApplicationTimeline';
+import PersonalInfoEditor from './editors/PersonalInfoEditor';
+import FinancialInfoEditor from './editors/FinancialInfoEditor';
+import DocumentManager from './DocumentManager';
+import StatusManager from './StatusManager';
 
 interface ApplicationDetailViewProps {
   applicationId: string;
@@ -37,6 +51,8 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
   const { user } = useAuth();
   const [application, setApplication] = useState<FullLoanApplication | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (user && applicationId) {
@@ -178,51 +194,181 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
     return application?.status === 'draft' || application?.status === 'submitted';
   };
 
+  const getCompletionPercentage = () => {
+    if (!application) return 0;
+    const sections = ['personalInfo', 'kycDocuments', 'financialInfo', 'declarations'];
+    const completed = sections.filter(section => {
+      const data = application[section as keyof FullLoanApplication] as any;
+      return data && Object.keys(data).length > 0;
+    }).length;
+    return Math.round((completed / sections.length) * 100);
+  };
+
+  const updateApplication = async (updates: Partial<FullLoanApplication>) => {
+    if (!application) return;
+
+    try {
+      const { error } = await supabase
+        .from('loan_applications')
+        .update({
+          personal_info: updates.personalInfo || application.personalInfo as any,
+          financial_info: updates.financialInfo || application.financialInfo as any,
+          kyc_documents: updates.kycDocuments || application.kycDocuments as any,
+          declarations: updates.declarations || application.declarations as any,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', application.id);
+
+      if (error) throw error;
+
+      setApplication({ ...application, ...updates });
+      setHasChanges(false);
+      toast.success('Application updated successfully');
+    } catch (error) {
+      console.error('Error updating application:', error);
+      toast.error('Failed to update application');
+    }
+  };
+
+  const duplicateApplication = async () => {
+    if (!application) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('loan_applications')
+        .insert({
+          user_id: user?.id!,
+          lender_name: application.lenderName,
+          loan_option_id: `${application.loanOptionId}-copy`,
+          personal_info: application.personalInfo as any,
+          kyc_documents: {} as any,
+          financial_info: application.financialInfo as any,
+          status: 'draft',
+          is_draft: true
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast.success('Application duplicated successfully');
+      window.location.href = `/application/${data.id}`;
+    } catch (error) {
+      console.error('Error duplicating application:', error);
+      toast.error('Failed to duplicate application');
+    }
+  };
+
+  const archiveApplication = async () => {
+    if (!application) return;
+
+    try {
+      const { error } = await supabase
+        .from('loan_applications')
+        .update({ status: 'archived' })
+        .eq('id', application.id);
+
+      if (error) throw error;
+
+      setApplication({ ...application, status: 'archived' as any });
+      toast.success('Application archived successfully');
+    } catch (error) {
+      console.error('Error archiving application:', error);
+      toast.error('Failed to archive application');
+    }
+  };
+
   const renderPersonalInfo = () => {
     const personalInfo = application?.personalInfo as any;
+    
+    if (editingSection === 'personal') {
+      return (
+        <PersonalInfoEditor
+          data={personalInfo}
+          onSave={(data) => {
+            updateApplication({ personalInfo: data });
+            setEditingSection(null);
+          }}
+          onCancel={() => setEditingSection(null)}
+        />
+      );
+    }
+
     if (!personalInfo || Object.keys(personalInfo).length === 0) {
-      return <p className="text-muted-foreground">No personal information provided yet.</p>;
+      return (
+        <div className="flex flex-col items-center py-8 text-center">
+          <User className="h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground mb-4">No personal information provided yet.</p>
+          {canEdit() && (
+            <Button variant="outline" onClick={() => setEditingSection('personal')}>
+              <Edit className="h-4 w-4 mr-2" />
+              Add Personal Info
+            </Button>
+          )}
+        </div>
+      );
     }
 
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 className="font-medium mb-2">Personal Details</h4>
-            <div className="space-y-2 text-sm">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-semibold">Personal Details</h4>
+          {canEdit() && (
+            <Button variant="ghost" size="sm" onClick={() => setEditingSection('personal')}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+              <User className="h-5 w-5 text-primary" />
               <div>
-                <span className="text-muted-foreground">Full Name:</span>
-                <p>{personalInfo.firstName} {personalInfo.lastName}</p>
+                <p className="text-sm text-muted-foreground">Full Name</p>
+                <p className="font-medium">{personalInfo.firstName} {personalInfo.lastName}</p>
               </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+              <Mail className="h-5 w-5 text-primary" />
               <div>
-                <span className="text-muted-foreground">Email:</span>
-                <p>{personalInfo.email}</p>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{personalInfo.email}</p>
               </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+              <Phone className="h-5 w-5 text-primary" />
               <div>
-                <span className="text-muted-foreground">Phone:</span>
-                <p>{personalInfo.phone}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Date of Birth:</span>
-                <p>{personalInfo.dateOfBirth}</p>
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-medium">{personalInfo.phone || 'Not provided'}</p>
               </div>
             </div>
           </div>
-          
-          <div>
-            <h4 className="font-medium mb-2">Address</h4>
-            <div className="space-y-2 text-sm">
+
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+              <MapPin className="h-5 w-5 text-primary mt-1" />
               <div>
-                <span className="text-muted-foreground">Street:</span>
-                <p>{personalInfo.address?.street}</p>
+                <p className="text-sm text-muted-foreground">Address</p>
+                <div className="font-medium">
+                  {personalInfo.address?.street && <p>{personalInfo.address.street}</p>}
+                  {personalInfo.address?.city && <p>{personalInfo.address.city}</p>}
+                  {personalInfo.address?.country && <p>{personalInfo.address.country}</p>}
+                  {!personalInfo.address?.street && !personalInfo.address?.city && (
+                    <p>Not provided</p>
+                  )}
+                </div>
               </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+              <Calendar className="h-5 w-5 text-primary" />
               <div>
-                <span className="text-muted-foreground">City:</span>
-                <p>{personalInfo.address?.city}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Country:</span>
-                <p>{personalInfo.address?.country}</p>
+                <p className="text-sm text-muted-foreground">Date of Birth</p>
+                <p className="font-medium">{personalInfo.dateOfBirth || 'Not provided'}</p>
               </div>
             </div>
           </div>
@@ -231,38 +377,89 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
     );
   };
 
-  const renderDocumentSection = (title: string, documents: any) => {
-    if (!documents || Object.keys(documents).length === 0) {
+  const renderFinancialInfo = () => {
+    const financialInfo = application?.financialInfo as any;
+    
+    if (editingSection === 'financial') {
       return (
-        <div>
-          <h4 className="font-medium mb-2">{title}</h4>
-          <p className="text-muted-foreground text-sm">No documents uploaded yet.</p>
+        <FinancialInfoEditor
+          data={financialInfo}
+          onSave={(data) => {
+            updateApplication({ financialInfo: data });
+            setEditingSection(null);
+          }}
+          onCancel={() => setEditingSection(null)}
+        />
+      );
+    }
+
+    if (!financialInfo || Object.keys(financialInfo).length === 0) {
+      return (
+        <div className="flex flex-col items-center py-8 text-center">
+          <CreditCard className="h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground mb-4">No financial information provided yet.</p>
+          {canEdit() && (
+            <Button variant="outline" onClick={() => setEditingSection('financial')}>
+              <Edit className="h-4 w-4 mr-2" />
+              Add Financial Info
+            </Button>
+          )}
         </div>
       );
     }
 
     return (
-      <div>
-        <h4 className="font-medium mb-2">{title}</h4>
-        <div className="space-y-2">
-          {Object.entries(documents).map(([key, doc]: [string, any]) => (
-            <div key={key} className="flex items-center justify-between p-2 border rounded">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
-                {doc?.verified && (
-                  <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">Verified</Badge>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-semibold">Financial Information</h4>
+          {canEdit() && (
+            <Button variant="ghost" size="sm" onClick={() => setEditingSection('financial')}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="p-4 rounded-lg bg-muted/50">
+              <p className="text-sm text-muted-foreground mb-2">Household Income</p>
+              <p className="text-xl font-semibold text-primary">
+                {financialInfo.householdIncome ? `$${financialInfo.householdIncome}` : 'Not provided'}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-lg bg-muted/50">
+              <p className="text-sm text-muted-foreground mb-2">Dependents</p>
+              <p className="text-lg font-medium">
+                {financialInfo.dependents !== undefined ? financialInfo.dependents : 'Not provided'}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="p-4 rounded-lg bg-muted/50">
+              <p className="text-sm text-muted-foreground mb-2">Bank Account</p>
+              <div className="font-medium">
+                {financialInfo.bankAccount?.bankName && (
+                  <p>{financialInfo.bankAccount.bankName}</p>
                 )}
-              </div>
-              <div className="flex gap-1">
-                {doc?.uploaded && (
-                  <Button variant="ghost" size="sm">
-                    <Download className="h-3 w-3" />
-                  </Button>
+                {financialInfo.bankAccount?.accountType && (
+                  <p className="text-sm text-muted-foreground">
+                    {financialInfo.bankAccount.accountType}
+                  </p>
                 )}
+                {!financialInfo.bankAccount?.bankName && <p>Not provided</p>}
               </div>
             </div>
-          ))}
+
+            <div className="p-4 rounded-lg bg-muted/50">
+              <p className="text-sm text-muted-foreground mb-2">Existing Loans</p>
+              <p className="font-medium">
+                {financialInfo.existingLoans || 'Not provided'}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -275,7 +472,7 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
           <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <Card key={i}>
+              <Card key={i} className="cosmic-card">
                 <CardHeader>
                   <div className="h-6 bg-muted rounded w-1/2"></div>
                 </CardHeader>
@@ -304,7 +501,10 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
           The application you're looking for doesn't exist or you don't have access to it.
         </p>
         <Button asChild>
-          <Link to="/my-applications">Back to Applications</Link>
+          <Link to="/my-applications">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Applications
+          </Link>
         </Button>
       </div>
     );
@@ -320,47 +520,74 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-medium">{getPersonalName()}</h1>
-            <Badge variant={getStatusVariant(application.status)} className="flex items-center gap-1">
-              {getStatusIcon(application.status)}
-              {getStatusText(application.status)}
-            </Badge>
+      {/* Enhanced Header */}
+      <div className="cosmic-card p-6 rounded-lg">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-semibold">{getPersonalName()}</h1>
+                <Badge variant={getStatusVariant(application.status)} className="flex items-center gap-2 px-3 py-1">
+                  {getStatusIcon(application.status)}
+                  {getStatusText(application.status)}
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-6 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Building className="h-4 w-4" />
+                <span>{application.lenderName}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <DollarSign className="h-4 w-4" />
+                <span>{getLoanTypeDisplay(application.loanTypeRequest?.type || 'study-abroad')}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>Created {formatDateRelative(application.createdAt)}</span>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Application Completion</span>
+                <span className="font-medium">{getCompletionPercentage()}%</span>
+              </div>
+              <Progress value={getCompletionPercentage()} className="h-2" />
+            </div>
           </div>
-          
-          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Building className="h-4 w-4" />
-              {application.lenderName}
-            </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3">
+            <StatusManager
+              application={application}
+              onStatusChange={(newStatus) => {
+                setApplication({ ...application, status: newStatus as any });
+              }}
+              canEdit={canEdit()}
+            />
             
-            <div className="flex items-center gap-1">
-              <DollarSign className="h-4 w-4" />
-              {getLoanTypeDisplay(application.loanTypeRequest?.type || 'study-abroad')}
-            </div>
+            <Button variant="outline" onClick={duplicateApplication}>
+              <Copy className="h-4 w-4 mr-2" />
+              Duplicate
+            </Button>
             
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              Created {formatDateRelative(application.createdAt)}
-            </div>
+            {canEdit() && (
+              <Button variant="outline" onClick={archiveApplication}>
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+            )}
           </div>
         </div>
-
-        {canEdit() && (
-          <Button variant="outline" asChild>
-            <Link to={`/application/${application.id}/edit`}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Application
-            </Link>
-          </Button>
-        )}
       </div>
 
-      {/* Key Information Card */}
-      <Card>
+      {/* Application Summary Card */}
+      <Card className="cosmic-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
@@ -371,7 +598,7 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <span className="text-sm text-muted-foreground">Application ID</span>
-              <p className="font-medium">{application.id}</p>
+              <p className="font-medium font-mono text-sm">{application.id}</p>
             </div>
             
             <div>
@@ -402,18 +629,21 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
           {application.reviewerNotes && (
             <>
               <Separator className="my-4" />
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">Reviewer Notes:</span>
-                <p className="mt-2 p-3 bg-muted/50 rounded-md text-sm">{application.reviewerNotes}</p>
+              <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageSquare className="h-4 w-4" />
+                  <span className="text-sm font-medium">Reviewer Notes</span>
+                </div>
+                <p className="text-sm">{application.reviewerNotes}</p>
               </div>
             </>
           )}
         </CardContent>
       </Card>
 
-      {/* Detailed Information Tabs */}
-      <Tabs defaultValue="details" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+      {/* Enhanced Tabs */}
+      <Tabs defaultValue="details" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:w-fit">
           <TabsTrigger value="details" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Details
@@ -428,9 +658,9 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="details" className="space-y-4">
+        <TabsContent value="details" className="space-y-6">
           {/* Personal Information */}
-          <Card>
+          <Card className="cosmic-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -442,9 +672,22 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
             </CardContent>
           </Card>
 
-          {/* Education/Career or Professional Employment */}
-          {(application.loanTypeRequest?.type === 'study-abroad' ? application.educationCareer : application.professionalEmployment) && Object.keys(application.loanTypeRequest?.type === 'study-abroad' ? application.educationCareer || {} : application.professionalEmployment || {}).length > 0 && (
-            <Card>
+          {/* Financial Information */}
+          <Card className="cosmic-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Financial Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {renderFinancialInfo()}
+            </CardContent>
+          </Card>
+
+          {/* Employment/Education */}
+          {(application.educationCareer || application.professionalEmployment) && (
+            <Card className="cosmic-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   {application.loanTypeRequest?.type === 'study-abroad' ? (
@@ -465,58 +708,18 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
               </CardContent>
             </Card>
           )}
-
-          {/* Financial Information */}
-          {application.financialInfo && Object.keys(application.financialInfo).length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Financial Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Financial details and bank information provided in application.</p>
-              </CardContent>
-            </Card>
-          )}
         </TabsContent>
 
-        <TabsContent value="documents" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>KYC Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {renderDocumentSection("Identity Documents", application.kycDocuments)}
-            </CardContent>
-          </Card>
-
-          {application.loanTypeRequest?.type === 'study-abroad' && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Education Documents</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {renderDocumentSection("Academic Documents", (application.educationCareer as any)?.transcripts || {})}
-              </CardContent>
-            </Card>
-          )}
-
-          {application.loanTypeRequest?.type !== 'study-abroad' && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Employment Documents</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {renderDocumentSection("Employment Documents", (application.professionalEmployment as any)?.employmentLetter || {})}
-              </CardContent>
-            </Card>
-          )}
+        <TabsContent value="documents" className="space-y-6">
+          <DocumentManager
+            applicationId={application.id!}
+            loanType={application.loanTypeRequest?.type || 'study-abroad'}
+            canEdit={canEdit()}
+          />
         </TabsContent>
 
-        <TabsContent value="timeline" className="space-y-4">
-          <ApplicationTimeline applicationId={application.id || ''} />
+        <TabsContent value="timeline">
+          <ApplicationTimeline applicationId={application.id!} />
         </TabsContent>
       </Tabs>
     </div>
