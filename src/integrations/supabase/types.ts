@@ -108,6 +108,59 @@ export type Database = {
           },
         ]
       }
+      contract_signatures: {
+        Row: {
+          contract_id: string | null
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          signature_data: string | null
+          signed_at: string | null
+          signer_email: string
+          signer_id: string
+          signer_name: string
+          signer_type: string
+          status: string
+          user_agent: string | null
+        }
+        Insert: {
+          contract_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          signature_data?: string | null
+          signed_at?: string | null
+          signer_email: string
+          signer_id: string
+          signer_name: string
+          signer_type: string
+          status?: string
+          user_agent?: string | null
+        }
+        Update: {
+          contract_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          signature_data?: string | null
+          signed_at?: string | null
+          signer_email?: string
+          signer_id?: string
+          signer_name?: string
+          signer_type?: string
+          status?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_signatures_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "loan_contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_applications: {
         Row: {
           application_data: Json | null
@@ -180,9 +233,77 @@ export type Database = {
         }
         Relationships: []
       }
+      loan_contracts: {
+        Row: {
+          application_id: string | null
+          contract_data: Json
+          contract_pdf_url: string | null
+          contract_type: string
+          created_at: string
+          executed_at: string | null
+          id: string
+          offer_id: string | null
+          signed_at: string | null
+          status: string
+          template_version: string | null
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          application_id?: string | null
+          contract_data?: Json
+          contract_pdf_url?: string | null
+          contract_type?: string
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          offer_id?: string | null
+          signed_at?: string | null
+          status?: string
+          template_version?: string | null
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          application_id?: string | null
+          contract_data?: Json
+          contract_pdf_url?: string | null
+          contract_type?: string
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          offer_id?: string | null
+          signed_at?: string | null
+          status?: string
+          template_version?: string | null
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_contracts_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_contracts_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "loan_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_offers: {
         Row: {
+          acceptance_conditions: Json | null
           accepted_at: string | null
+          accepted_by: string | null
           application_id: string
           apr_rate: number | null
           assessment_id: string
@@ -201,7 +322,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          acceptance_conditions?: Json | null
           accepted_at?: string | null
+          accepted_by?: string | null
           application_id: string
           apr_rate?: number | null
           assessment_id: string
@@ -220,7 +343,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          acceptance_conditions?: Json | null
           accepted_at?: string | null
+          accepted_by?: string | null
           application_id?: string
           apr_rate?: number | null
           assessment_id?: string
@@ -254,6 +379,101 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      loan_payments: {
+        Row: {
+          amount: number
+          contract_id: string | null
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          id: string
+          payment_type: string
+          processed_date: string | null
+          scheduled_date: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          contract_id?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          id?: string
+          payment_type: string
+          processed_date?: string | null
+          scheduled_date?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          contract_id?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          id?: string
+          payment_type?: string
+          processed_date?: string | null
+          scheduled_date?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_payments_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "loan_contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          brand: string | null
+          created_at: string
+          exp_month: number | null
+          exp_year: number | null
+          id: string
+          is_default: boolean | null
+          last_four: string | null
+          stripe_payment_method_id: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          created_at?: string
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          stripe_payment_method_id: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          created_at?: string
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          stripe_payment_method_id?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       payslip_audit_logs: {
         Row: {
@@ -486,6 +706,36 @@ export type Database = {
           rule_type?: string
           updated_at?: string
           weight?: number
+        }
+        Relationships: []
+      }
+      user_role_audit_log: {
+        Row: {
+          action: string
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          notes: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          action: string
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          action?: string
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
