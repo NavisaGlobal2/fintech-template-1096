@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,9 +11,13 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCw,
-  ExternalLink
+  ExternalLink,
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSignedUrl } from '@/hooks/useSignedUrl';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface DocumentViewerProps {
   document: {
@@ -31,6 +35,11 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, trigger }) =>
   const [isOpen, setIsOpen] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
+  const [pdfError, setPdfError] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  
+  const { signedUrl, loading: urlLoading, error: urlError } = useSignedUrl(document.fileUrl);
 
   const getFileType = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
@@ -75,21 +84,36 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, trigger }) =>
   };
 
   const handleDownload = async () => {
+    if (!signedUrl && !document.fileUrl) {
+      toast.error('Document URL not available');
+      return;
+    }
+
+    setDownloading(true);
     try {
-      const response = await fetch(document.fileUrl);
+      const urlToUse = signedUrl || document.fileUrl;
+      const response = await fetch(urlToUse);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = window.document.createElement('a');
       link.href = url;
       link.download = document.fileName;
+      link.style.display = 'none';
       window.document.body.appendChild(link);
       link.click();
       window.document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast.success('Download started');
+      toast.success('Download completed successfully');
     } catch (error) {
       console.error('Download failed:', error);
-      toast.error('Download failed');
+      toast.error(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -98,16 +122,60 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, trigger }) =>
   const handleRotate = () => setRotation(prev => (prev + 90) % 360);
 
   const renderDocumentContent = () => {
+    if (urlLoading) {
+      return (
+        <div className="flex justify-center items-center h-[60vh] border rounded-lg">
+          <div className="flex flex-col items-center gap-4">
+            <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-muted-foreground">Loading document...</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (urlError && !signedUrl) {
+      return (
+        <Alert variant="destructive" className="m-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Failed to load document: {urlError}
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
     const fileType = getFileType(document.fileName);
+    const urlToUse = signedUrl || document.fileUrl;
     
     if (fileType === 'pdf') {
       return (
         <div className="w-full h-[60vh] border rounded-lg overflow-hidden">
-          <iframe
-            src={`${document.fileUrl}#toolbar=1&navpanes=1&scrollbar=1`}
-            className="w-full h-full"
-            title={document.fileName}
-          />
+          {!pdfError ? (
+            <iframe
+              src={`${urlToUse}#toolbar=1&navpanes=1&scrollbar=1`}
+              className="w-full h-full"
+              title={document.fileName}
+              onError={() => setPdfError(true)}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full">
+              <AlertCircle className="h-8 w-8 text-destructive mb-4" />
+              <p className="text-lg font-medium mb-2">PDF preview unavailable</p>
+              <p className="text-muted-foreground mb-4">Unable to display this PDF in the browser</p>
+              <div className="flex gap-2">
+                <Button onClick={handleDownload} disabled={downloading}>
+                  {downloading ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+                  Download PDF
+                </Button>
+                <Button variant="outline" asChild>
+                  <a href={urlToUse} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Open Externally
+                  </a>
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
@@ -115,15 +183,28 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, trigger }) =>
     if (fileType === 'image') {
       return (
         <div className="flex justify-center items-center bg-muted/20 rounded-lg p-4">
-          <img
-            src={document.fileUrl}
-            alt={document.fileName}
-            className="max-w-full max-h-[60vh] object-contain rounded transition-transform duration-200"
-            style={{ 
-              transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-              transformOrigin: 'center'
-            }}
-          />
+          {!imageError ? (
+            <img
+              src={urlToUse}
+              alt={document.fileName}
+              className="max-w-full max-h-[60vh] object-contain rounded transition-transform duration-200"
+              style={{ 
+                transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+                transformOrigin: 'center'
+              }}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-[40vh]">
+              <AlertCircle className="h-8 w-8 text-destructive mb-4" />
+              <p className="text-lg font-medium mb-2">Image preview unavailable</p>
+              <p className="text-muted-foreground mb-4">Unable to display this image</p>
+              <Button onClick={handleDownload} disabled={downloading}>
+                {downloading ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+                Download Image
+              </Button>
+            </div>
+          )}
         </div>
       );
     }
@@ -134,12 +215,12 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, trigger }) =>
         <p className="text-lg font-medium mt-4 mb-2">{document.fileName}</p>
         <p className="text-muted-foreground mb-4">Preview not available for this file type</p>
         <div className="flex gap-2">
-          <Button onClick={handleDownload} className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
+          <Button onClick={handleDownload} disabled={downloading} className="flex items-center gap-2">
+            {downloading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             Download File
           </Button>
           <Button variant="outline" asChild>
-            <a href={document.fileUrl} target="_blank" rel="noopener noreferrer">
+            <a href={urlToUse} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4 mr-2" />
               Open Externally
             </a>
@@ -199,12 +280,12 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, trigger }) =>
                 </>
               )}
               
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={handleDownload} disabled={downloading}>
+                {downloading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               </Button>
               
               <Button variant="outline" size="sm" asChild>
-                <a href={document.fileUrl} target="_blank" rel="noopener noreferrer">
+                <a href={signedUrl || document.fileUrl} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
