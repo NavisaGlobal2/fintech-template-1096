@@ -42,6 +42,8 @@ import PersonalInfoEditor from './editors/PersonalInfoEditor';
 import FinancialInfoEditor from './editors/FinancialInfoEditor';
 import DocumentManager from './DocumentManager';
 import StatusManager from './StatusManager';
+import LoanRequestSummary from './LoanRequestSummary';
+import RelatedOffers from './RelatedOffers';
 
 interface ApplicationDetailViewProps {
   applicationId: string;
@@ -544,6 +546,18 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
                 <DollarSign className="h-4 w-4" />
                 <span>{getLoanTypeDisplay(application.loanTypeRequest?.type || 'study-abroad')}</span>
               </div>
+
+              {application.loanTypeRequest?.amount && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="font-medium text-primary">
+                    {new Intl.NumberFormat('en-GB', {
+                      style: 'currency',
+                      currency: 'GBP'
+                    }).format(parseFloat(application.loanTypeRequest.amount))}
+                  </span>
+                  <span>requested</span>
+                </div>
+              )}
               
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="h-4 w-4" />
@@ -585,6 +599,9 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
           </div>
         </div>
       </div>
+
+      {/* Loan Request Summary */}
+      <LoanRequestSummary application={application} />
 
       {/* Application Summary Card */}
       <Card className="cosmic-card">
@@ -641,12 +658,16 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
         </CardContent>
       </Card>
 
-      {/* Enhanced Tabs */}
+      {/* Enhanced Tabs with Offers */}
       <Tabs defaultValue="details" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:w-fit">
+        <TabsList className="grid w-full grid-cols-4 lg:w-fit">
           <TabsTrigger value="details" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Details
+          </TabsTrigger>
+          <TabsTrigger value="offers" className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Offers
           </TabsTrigger>
           <TabsTrigger value="documents" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
@@ -708,6 +729,14 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="offers" className="space-y-6">
+          <RelatedOffers
+            applicationId={application.id!}
+            userId={user?.id!}
+            canEdit={canEdit()}
+          />
         </TabsContent>
 
         <TabsContent value="documents" className="space-y-6">
