@@ -2,6 +2,7 @@
 import React from 'react';
 import TechScaleLogo from './TechScaleLogo';
 import { Separator } from '@/components/ui/separator';
+import ThemeToggle from '@/components/ui/theme-toggle';
 import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from 'lucide-react';
 
 const TechScaleFooter = ({ onShowGuide }: { onShowGuide?: () => void }) => {
@@ -80,10 +81,16 @@ const TechScaleFooter = ({ onShowGuide }: { onShowGuide?: () => void }) => {
         <Separator className="mb-8" />
         
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-primary transition-colors">Cookie Policy</a>
+          <div className="flex items-center gap-6">
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-primary transition-colors">Cookie Policy</a>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs">Theme:</span>
+              <ThemeToggle size={14} />
+            </div>
           </div>
           <p>&copy; 2024 TechScale. All rights reserved.</p>
         </div>
