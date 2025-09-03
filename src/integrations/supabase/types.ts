@@ -529,6 +529,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      is_techskill_domain: {
+        Args: { email: string }
+        Returns: boolean
+      }
       transfer_temp_documents_to_user: {
         Args: { temp_session_id: string; user_id: string }
         Returns: undefined

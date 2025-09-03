@@ -191,7 +191,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ application, onStatusChan
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               {secondaryActions.map((action, index) => (
-                <React.Fragment key={action.key}>
+                <div key={action.key}>
                   <DropdownMenuItem
                     onClick={action.action}
                     className={action.variant === 'destructive' ? 'text-destructive focus:text-destructive' : ''}
@@ -200,7 +200,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ application, onStatusChan
                     <span className="ml-2">{action.label}</span>
                   </DropdownMenuItem>
                   {index < secondaryActions.length - 1 && <DropdownMenuSeparator />}
-                </React.Fragment>
+                </div>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
