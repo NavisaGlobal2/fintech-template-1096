@@ -52,6 +52,28 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
       let userId = user?.id;
       
       if (!useExistingAccount) {
+        // Check for existing applications by email before creating account
+        const { data: existingProfiles } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', personalInfo.email)
+          .limit(1);
+
+        if (existingProfiles && existingProfiles.length > 0) {
+          // Check if this user has submitted applications
+          const { data: existingApps } = await supabase
+            .from('loan_applications')
+            .select('id, status, submitted_at')
+            .eq('user_id', existingProfiles[0].id)
+            .eq('is_draft', false)
+            .limit(1);
+
+          if (existingApps && existingApps.length > 0) {
+            toast.error('An application has already been submitted with this email address. Please sign in to your existing account or contact support.');
+            return;
+          }
+        }
+
         // Create new user account
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: personalInfo.email,
@@ -66,7 +88,14 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
         });
 
         if (authError) {
-          toast.error(`Account creation failed: ${authError.message}`);
+          // Provide specific error messages
+          if (authError.message.includes('already registered') || authError.message.includes('already been taken')) {
+            toast.error('An account with this email already exists. Please sign in instead or use the "Forgot Password" option.');
+          } else if (authError.message.includes('weak')) {
+            toast.error('Password is too weak. Please create a stronger password.');
+          } else {
+            toast.error(`Account creation failed: ${authError.message}`);
+          }
           return;
         }
 
@@ -76,6 +105,19 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
         }
 
         userId = authData.user.id;
+      } else {
+        // Check if existing user already has submitted application
+        const { data: existingApps } = await supabase
+          .from('loan_applications')
+          .select('id, status, submitted_at')
+          .eq('user_id', user.id)
+          .eq('is_draft', false)
+          .limit(1);
+
+        if (existingApps && existingApps.length > 0) {
+          toast.error('You have already submitted an application. Please check your dashboard or contact support.');
+          return;
+        }
       }
 
       if (!userId) {
