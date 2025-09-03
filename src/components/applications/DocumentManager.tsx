@@ -14,11 +14,14 @@ import {
   AlertCircle, 
   X,
   Plus,
-  Trash2
+  Trash2,
+  Image as ImageIcon,
+  FileIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoanTypeRequest } from '@/types/loanApplication';
 import { useDropzone } from 'react-dropzone';
+import DocumentViewer from './DocumentViewer';
 
 interface Document {
   id: string;
@@ -313,9 +316,36 @@ const DocumentItem: React.FC<{
     }
   };
 
+  const getFileIcon = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    if (['pdf'].includes(ext || '')) return <FileText className="h-5 w-5 text-red-500" />;
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) return <ImageIcon className="h-5 w-5 text-blue-500" />;
+    if (['doc', 'docx'].includes(ext || '')) return <FileText className="h-5 w-5 text-blue-600" />;
+    return <FileIcon className="h-5 w-5 text-muted-foreground" />;
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(document.fileUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = window.document.createElement('a');
+      link.href = url;
+      link.download = document.fileName;
+      window.document.body.appendChild(link);
+      link.click();
+      window.document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success('Download started');
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Download failed');
+    }
+  };
+
   return (
     <div className={`flex items-center gap-3 p-3 rounded-lg border ${isLatest ? 'border-primary/20 bg-primary/5' : 'border-border'}`}>
-      <FileText className="h-5 w-5 text-muted-foreground" />
+      {getFileIcon(document.fileName)}
       
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
@@ -329,15 +359,9 @@ const DocumentItem: React.FC<{
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" asChild>
-          <a href={document.fileUrl} target="_blank" rel="noopener noreferrer">
-            <Eye className="h-4 w-4" />
-          </a>
-        </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <a href={document.fileUrl} download={document.fileName}>
-            <Download className="h-4 w-4" />
-          </a>
+        <DocumentViewer document={document} />
+        <Button variant="ghost" size="sm" onClick={handleDownload}>
+          <Download className="h-4 w-4" />
         </Button>
         {onDelete && (
           <Button variant="ghost" size="sm" onClick={onDelete}>
