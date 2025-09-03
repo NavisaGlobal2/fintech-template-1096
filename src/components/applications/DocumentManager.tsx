@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +37,7 @@ interface DocumentManagerProps {
 }
 
 const DocumentManager: React.FC<DocumentManagerProps> = ({ applicationId, loanType, canEdit }) => {
+  const { user } = useAuth();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -108,6 +110,7 @@ const DocumentManager: React.FC<DocumentManagerProps> = ({ applicationId, loanTy
         .from('application_documents')
         .insert({
           application_id: applicationId,
+          user_id: user?.id,
           document_type: documentType,
           file_name: file.name,
           file_url: publicUrl,
