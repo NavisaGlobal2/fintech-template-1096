@@ -154,10 +154,17 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         description: 'Personal details and ID verification',
         completed: form.watch('completedSteps')?.includes('personal-kyc') || false,
         current: currentStep === 'personal-kyc'
+      },
+      {
+        id: 'loan-type',
+        title: 'Loan Requirements',
+        description: 'Select loan type and amount',
+        completed: form.watch('completedSteps')?.includes('loan-type') || false,
+        current: currentStep === 'loan-type'
       }
     ];
 
-    // Add education-career step for study-abroad loans, professional-employment for others
+    // Add appropriate steps based on loan type
     if (loanType === 'study-abroad') {
       baseSteps.push({
         id: 'education-career',
@@ -192,13 +199,6 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
         description: 'Essential financial details',
         completed: form.watch('completedSteps')?.includes('financial-info') || false,
         current: currentStep === 'financial-info'
-      },
-      {
-        id: 'loan-type',
-        title: 'Loan Requirements',
-        description: 'Loan type and amount',
-        completed: form.watch('completedSteps')?.includes('loan-type') || false,
-        current: currentStep === 'loan-type'
       },
       {
         id: 'account-creation',

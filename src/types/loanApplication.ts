@@ -171,9 +171,9 @@ export interface ApplicationStep {
 
 export type ApplicationStepId = 
   | 'personal-kyc'
+  | 'loan-type'
   | 'education-career'
   | 'professional-employment'
   | 'program-info'
   | 'financial-info'
-  | 'loan-type'
   | 'account-creation';
