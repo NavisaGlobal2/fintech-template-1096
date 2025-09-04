@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -83,18 +84,23 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate email content based on type
     const emailContent = generateEmailContent(type, data, profile.first_name || 'there');
 
-    // Use Supabase's built-in email service via admin API
-    // This would normally use Supabase's SMTP configuration
-    const emailResponse = await supabase.auth.admin.generateLink({
-      type: 'recovery',
-      email: profile.email,
-      options: {
-        redirectTo: `${Deno.env.get('SUPABASE_URL')}/auth/v1/verify`
-      }
+    // Initialize Resend with API key
+    const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+
+    // Send email using Resend
+    const emailResponse = await resend.emails.send({
+      from: 'TechScale <noreply@techscale.com>',
+      to: [profile.email],
+      subject: emailContent.subject,
+      html: emailContent.text.replace(/\n/g, '<br>'),
     });
 
-    // For now, we'll create a notification record and log the email content
-    // In production, you'd integrate with your SMTP service here
+    if (emailResponse.error) {
+      console.error('Error sending email:', emailResponse.error);
+      throw new Error(`Failed to send email: ${emailResponse.error.message}`);
+    }
+
+    // Create notification record for in-app notifications
     await supabase.from('notifications').insert({
       user_id: userId,
       type: type,
@@ -103,10 +109,9 @@ const handler = async (req: Request): Promise<Response> => {
       data: data
     });
 
-    console.log(`Email notification created for user ${userId}:`, {
-      to: profile.email,
-      subject: emailContent.subject,
-      content: emailContent.text
+    console.log(`Email sent successfully to ${profile.email}:`, {
+      emailId: emailResponse.data?.id,
+      subject: emailContent.subject
     });
 
     return new Response(JSON.stringify({ 
