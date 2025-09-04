@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,21 +9,19 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  CalendarDays,
-  DollarSign,
-  Percent,
-  Clock,
-  TrendingUp,
-  FileText,
   CheckCircle,
   XCircle,
   AlertTriangle,
-  Info
+  Download,
+  FileText,
+  Maximize
 } from 'lucide-react';
+import { OfferDocument } from './OfferDocument';
+import { PDFGenerator } from '@/utils/pdfGenerator';
+import { toast } from 'sonner';
 
 interface OfferDetailsModalProps {
   offer: {
@@ -55,6 +53,9 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   onDecline,
   showActions = true
 }) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
@@ -83,22 +84,74 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
     return diffInHours <= 24 && diffInHours > 0;
   };
 
+  const handleDownloadPDF = async () => {
+    try {
+      setDownloadingPDF(true);
+      const element = document.getElementById('offer-document');
+      
+      if (!element) {
+        toast.error('Document not found');
+        return;
+      }
+
+      await PDFGenerator.generateOfferDocument(
+        element,
+        {
+          loanAmount: offer.loan_amount,
+          offerType: offer.offer_type,
+          offerId: offer.id
+        },
+        {
+          filename: `loan-offer-${offer.offer_type}-${offer.id.slice(0, 8)}.pdf`
+        }
+      );
+
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF');
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent className={isFullscreen ? "max-w-full max-h-full w-full h-full" : "max-w-6xl max-h-[90vh]"}>
         <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span>{formatCurrency(offer.loan_amount)}</span>
-              <Badge variant="outline">{getOfferTypeDisplay(offer.offer_type)}</Badge>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="text-2xl flex items-center gap-3">
+                <span>{formatCurrency(offer.loan_amount)}</span>
+                <Badge variant="outline">{getOfferTypeDisplay(offer.offer_type)}</Badge>
+              </DialogTitle>
+              <DialogDescription>
+                Professional loan agreement document with downloadable PDF
+              </DialogDescription>
             </div>
-          </DialogTitle>
-          <DialogDescription>
-            Review all terms and conditions before accepting this loan offer.
-          </DialogDescription>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsFullscreen(!isFullscreen)}
+              >
+                <Maximize className="h-4 w-4 mr-2" />
+                {isFullscreen ? 'Exit' : 'Fullscreen'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadPDF}
+                disabled={downloadingPDF}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {downloadingPDF ? 'Generating...' : 'Download PDF'}
+              </Button>
+            </div>
+          </div>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[60vh] overflow-y-auto">
+        <ScrollArea className="flex-1 overflow-y-auto">
           <div className="space-y-6">
             {/* Offer Status Alert */}
             {(isExpired() || isExpiringSoon()) && (
@@ -118,242 +171,119 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
               </div>
             )}
 
-            <Tabs defaultValue="overview" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="repayment">Repayment</TabsTrigger>
-                <TabsTrigger value="terms">Terms</TabsTrigger>
-                <TabsTrigger value="conditions">Conditions</TabsTrigger>
+            <Tabs defaultValue="document" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="document">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Full Agreement
+                </TabsTrigger>
+                <TabsTrigger value="summary">Summary View</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="space-y-4">
+              <TabsContent value="document" className="space-y-4">
+                <OfferDocument
+                  offer={offer}
+                  borrowerInfo={{
+                    name: 'Loan Applicant',
+                    email: 'applicant@email.com'
+                  }}
+                  lenderInfo={{
+                    name: 'TechScale Finance Ltd',
+                    address: 'London, United Kingdom',
+                    registration: 'TSF123456'
+                  }}
+                />
+              </TabsContent>
+
+              <TabsContent value="summary" className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <DollarSign className="h-4 w-4" />
-                      <span className="text-sm">Loan Amount</span>
-                    </div>
-                    <p className="text-2xl font-bold">{formatCurrency(offer.loan_amount)}</p>
+                  <div className="space-y-2 text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Loan Amount</p>
+                    <p className="text-2xl font-bold text-primary">{formatCurrency(offer.loan_amount)}</p>
                   </div>
 
-                  {offer.offer_type === 'loan' || offer.offer_type === 'hybrid' ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Percent className="h-4 w-4" />
-                        <span className="text-sm">APR</span>
-                      </div>
-                      <p className="text-2xl font-bold">{offer.apr_rate}%</p>
+                  {offer.apr_rate && (
+                    <div className="space-y-2 text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">APR</p>
+                      <p className="text-2xl font-bold text-primary">{offer.apr_rate}%</p>
                     </div>
-                  ) : null}
+                  )}
 
-                  {offer.offer_type === 'isa' || offer.offer_type === 'hybrid' ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <TrendingUp className="h-4 w-4" />
-                        <span className="text-sm">Income Share</span>
-                      </div>
-                      <p className="text-2xl font-bold">{offer.isa_percentage}%</p>
+                  {offer.isa_percentage && (
+                    <div className="space-y-2 text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Income Share</p>
+                      <p className="text-2xl font-bold text-primary">{offer.isa_percentage}%</p>
                     </div>
-                  ) : null}
+                  )}
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <CalendarDays className="h-4 w-4" />
-                      <span className="text-sm">Term</span>
-                    </div>
-                    <p className="text-2xl font-bold">{offer.repayment_term_months}</p>
+                  <div className="space-y-2 text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Term</p>
+                    <p className="text-2xl font-bold text-primary">{offer.repayment_term_months}</p>
                     <p className="text-xs text-muted-foreground">months</p>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      <span className="text-sm">Grace Period</span>
-                    </div>
-                    <p className="text-2xl font-bold">{offer.grace_period_months}</p>
+                  <div className="space-y-2 text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Grace Period</p>
+                    <p className="text-2xl font-bold text-primary">{offer.grace_period_months}</p>
                     <p className="text-xs text-muted-foreground">months</p>
                   </div>
                 </div>
 
-                <Separator />
-
-                {/* Offer Details */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold">Offer Details</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Offer Created</p>
-                      <p className="font-medium">
-                        {new Date(offer.created_at).toLocaleDateString('en-GB')}
+                {/* Monthly Payment Highlight */}
+                {offer.repayment_schedule?.monthlyPayment && (
+                  <div className="text-center p-6 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-2">Monthly Payment</p>
+                    <p className="text-4xl font-bold text-primary mb-2">
+                      {formatCurrency(offer.repayment_schedule.monthlyPayment)}
+                    </p>
+                    {offer.repayment_schedule.firstPaymentDate && (
+                      <p className="text-sm text-muted-foreground">
+                        Starting {new Date(offer.repayment_schedule.firstPaymentDate).toLocaleDateString('en-GB')}
                       </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Valid Until</p>
-                      <p className={`font-medium ${
-                        isExpiringSoon() ? 'text-orange-600' : 
-                        isExpired() ? 'text-destructive' : ''
-                      }`}>
-                        {new Date(offer.offer_valid_until).toLocaleDateString('en-GB', {
-                          weekday: 'short',
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="repayment" className="space-y-4">
-                {offer.repayment_schedule && (
-                  <div className="space-y-4">
-                    <h4 className="font-semibold flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Repayment Schedule
-                    </h4>
-                    
-                    <div className="bg-muted/50 p-6 rounded-lg space-y-4">
-                      {offer.repayment_schedule.monthlyPayment && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-1">Monthly Payment</p>
-                            <p className="text-2xl font-bold text-primary">
-                              {formatCurrency(offer.repayment_schedule.monthlyPayment)}
-                            </p>
-                          </div>
-                          {offer.repayment_schedule.totalRepayment && (
-                            <div>
-                              <p className="text-sm text-muted-foreground mb-1">Total Repayment</p>
-                              <p className="text-2xl font-bold">
-                                {formatCurrency(offer.repayment_schedule.totalRepayment)}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {offer.repayment_schedule.firstPaymentDate && (
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-1">First Payment Due</p>
-                          <p className="text-lg font-semibold">
-                            {new Date(offer.repayment_schedule.firstPaymentDate).toLocaleDateString('en-GB', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {offer.offer_type === 'isa' && (
-                      <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <Info className="h-4 w-4 text-blue-600 mt-0.5" />
-                          <div className="text-sm">
-                            <p className="font-medium text-blue-800 mb-1">Income Share Agreement</p>
-                            <p className="text-blue-700">
-                              You'll pay {offer.isa_percentage}% of your gross income for {offer.repayment_term_months} months. 
-                              Payments automatically adjust based on your income level.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
                     )}
                   </div>
                 )}
-              </TabsContent>
 
-              <TabsContent value="terms" className="space-y-4">
-                {offer.terms_and_conditions && (
-                  <div className="space-y-6">
-                    {/* Benefits */}
-                    {offer.terms_and_conditions.benefits && (
-                      <div>
-                        <h4 className="font-semibold mb-3 flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          Benefits
-                        </h4>
-                        <ul className="space-y-2">
-                          {offer.terms_and_conditions.benefits.map((benefit: string, index: number) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm">{benefit}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Eligibility Requirements */}
-                    {offer.terms_and_conditions.eligibilityRequirements && (
-                      <div>
-                        <h4 className="font-semibold mb-3 flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Eligibility Requirements
-                        </h4>
-                        <ul className="space-y-2">
-                          {offer.terms_and_conditions.eligibilityRequirements.map((requirement: string, index: number) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                              <span className="text-sm">{requirement}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="conditions" className="space-y-4">
-                {offer.terms_and_conditions?.specialConditions && (
-                  <div>
+                {/* Quick Benefits */}
+                {offer.terms_and_conditions?.benefits && (
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-orange-600" />
-                      Special Conditions
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      Key Benefits
                     </h4>
-                    <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg">
-                      <ul className="space-y-2">
-                        {offer.terms_and_conditions.specialConditions.map((condition: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-orange-800">{condition}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <ul className="space-y-2">
+                      {offer.terms_and_conditions.benefits.slice(0, 4).map((benefit: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <h5 className="font-medium mb-2">Important Notes</h5>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• This offer is binding once accepted</li>
-                    <li>• You have until the expiry date to make your decision</li>
-                    <li>• Contract generation will begin immediately upon acceptance</li>
-                    <li>• All terms are subject to final credit verification</li>
-                  </ul>
-                </div>
               </TabsContent>
             </Tabs>
           </div>
         </ScrollArea>
 
         {showActions && offer.status === 'pending' && !isExpired() && (
-          <DialogFooter className="flex gap-2 pt-4">
+          <DialogFooter className="flex gap-2 pt-4 border-t">
             <Button variant="outline" onClick={onClose}>
               Close
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDownloadPDF}
+              disabled={downloadingPDF}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download Agreement
             </Button>
             <Button variant="destructive" onClick={onDecline}>
               <XCircle className="h-4 w-4 mr-2" />
               Decline Offer
             </Button>
-            <Button onClick={onAccept}>
+            <Button onClick={onAccept} className="bg-primary hover:bg-primary/90">
               <CheckCircle className="h-4 w-4 mr-2" />
               Accept Offer
             </Button>

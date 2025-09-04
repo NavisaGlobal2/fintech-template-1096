@@ -5,6 +5,68 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Print-specific styles for offer documents */
+@media print {
+  #offer-document {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #offer-document * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .cosmic-card {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  .bg-gradient-primary\/5 {
+    background: #f8fafc !important;
+  }
+
+  .text-primary {
+    color: #3b82f6 !important;
+  }
+
+  .border-primary {
+    border-color: #3b82f6 !important;
+  }
+
+  .bg-primary\/5 {
+    background: #f0f7ff !important;
+  }
+
+  .border-primary\/20 {
+    border-color: rgba(59, 130, 246, 0.2) !important;
+  }
+
+  @page {
+    margin: 1in;
+    size: A4;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 8%; /* Dark charcoal */
