@@ -1,16 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Bell, Settings } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ApplicationDashboard from '@/components/applications/ApplicationDashboard';
 import TechScaleLogo from '@/components/techscale/TechScaleLogo';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const MyApplications = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { isAuthorizedForUnderwriting } = useUserRoles();
+  const { unreadCount } = useNotifications();
+  const [activeTab, setActiveTab] = useState("applications");
 
   if (loading) {
     return (
@@ -52,6 +59,26 @@ const MyApplications = () => {
                 </Link>
               </Button>
               
+              {/* Notification Bell */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setActiveTab("notifications")}
+                  className={`relative ${activeTab === "notifications" ? "bg-muted" : ""}`}
+                >
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center"
+                    >
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+              </div>
+              
               {isAuthorizedForUnderwriting && (
                 <Button
                   variant="ghost"
@@ -84,7 +111,35 @@ const MyApplications = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
-        <ApplicationDashboard />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-3">
+            <TabsTrigger value="applications">Applications</TabsTrigger>
+            <TabsTrigger value="notifications" className="relative">
+              Notifications
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="ml-2 h-4 w-4 p-0 text-xs">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="h-4 w-4 mr-1" />
+              Settings
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="applications">
+            <ApplicationDashboard />
+          </TabsContent>
+          
+          <TabsContent value="notifications">
+            <NotificationCenter />
+          </TabsContent>
+          
+          <TabsContent value="settings">
+            <NotificationPreferences />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );

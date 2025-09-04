@@ -118,9 +118,12 @@ export type Database = {
         Row: {
           contract_id: string | null
           created_at: string
+          dependency_signature_id: string | null
+          guarantor_id: string | null
           id: string
           ip_address: unknown | null
           signature_data: string | null
+          signature_order: number | null
           signed_at: string | null
           signer_email: string
           signer_id: string
@@ -132,9 +135,12 @@ export type Database = {
         Insert: {
           contract_id?: string | null
           created_at?: string
+          dependency_signature_id?: string | null
+          guarantor_id?: string | null
           id?: string
           ip_address?: unknown | null
           signature_data?: string | null
+          signature_order?: number | null
           signed_at?: string | null
           signer_email: string
           signer_id: string
@@ -146,9 +152,12 @@ export type Database = {
         Update: {
           contract_id?: string | null
           created_at?: string
+          dependency_signature_id?: string | null
+          guarantor_id?: string | null
           id?: string
           ip_address?: unknown | null
           signature_data?: string | null
+          signature_order?: number | null
           signed_at?: string | null
           signer_email?: string
           signer_id?: string
@@ -163,6 +172,20 @@ export type Database = {
             columns: ["contract_id"]
             isOneToOne: false
             referencedRelation: "loan_contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_signatures_dependency_signature_id_fkey"
+            columns: ["dependency_signature_id"]
+            isOneToOne: false
+            referencedRelation: "contract_signatures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_signatures_guarantor_id_fkey"
+            columns: ["guarantor_id"]
+            isOneToOne: false
+            referencedRelation: "loan_guarantors"
             referencedColumns: ["id"]
           },
         ]
@@ -204,6 +227,59 @@ export type Database = {
             columns: ["document_id"]
             isOneToOne: false
             referencedRelation: "application_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guarantor_documents: {
+        Row: {
+          document_type: string
+          file_name: string
+          file_size: number | null
+          file_url: string
+          guarantor_id: string
+          id: string
+          mime_type: string | null
+          reviewer_notes: string | null
+          uploaded_at: string | null
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          document_type: string
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          guarantor_id: string
+          id?: string
+          mime_type?: string | null
+          reviewer_notes?: string | null
+          uploaded_at?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          document_type?: string
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          guarantor_id?: string
+          id?: string
+          mime_type?: string | null
+          reviewer_notes?: string | null
+          uploaded_at?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guarantor_documents_guarantor_id_fkey"
+            columns: ["guarantor_id"]
+            isOneToOne: false
+            referencedRelation: "loan_guarantors"
             referencedColumns: ["id"]
           },
         ]
@@ -504,6 +580,71 @@ export type Database = {
           },
         ]
       }
+      loan_guarantors: {
+        Row: {
+          created_at: string | null
+          documents_submitted_at: string | null
+          guarantor_email: string
+          guarantor_name: string | null
+          guarantor_phone: string | null
+          guarantor_relationship: string | null
+          id: string
+          invitation_expires_at: string | null
+          invitation_token: string | null
+          invited_at: string | null
+          offer_id: string
+          rejection_reason: string | null
+          status: string
+          updated_at: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          documents_submitted_at?: string | null
+          guarantor_email: string
+          guarantor_name?: string | null
+          guarantor_phone?: string | null
+          guarantor_relationship?: string | null
+          id?: string
+          invitation_expires_at?: string | null
+          invitation_token?: string | null
+          invited_at?: string | null
+          offer_id: string
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          documents_submitted_at?: string | null
+          guarantor_email?: string
+          guarantor_name?: string | null
+          guarantor_phone?: string | null
+          guarantor_relationship?: string | null
+          id?: string
+          invitation_expires_at?: string | null
+          invitation_token?: string | null
+          invited_at?: string | null
+          offer_id?: string
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_guarantors_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "loan_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_offers: {
         Row: {
           acceptance_conditions: Json | null
@@ -516,6 +657,7 @@ export type Database = {
           created_by_underwriter: string | null
           declined_at: string | null
           grace_period_months: number | null
+          guarantor_requirements: Json | null
           id: string
           is_manual_offer: boolean | null
           isa_percentage: number | null
@@ -526,6 +668,7 @@ export type Database = {
           offer_valid_until: string
           repayment_schedule: Json
           repayment_term_months: number
+          requires_guarantor: boolean | null
           status: string
           terms_and_conditions: Json
           user_id: string
@@ -541,6 +684,7 @@ export type Database = {
           created_by_underwriter?: string | null
           declined_at?: string | null
           grace_period_months?: number | null
+          guarantor_requirements?: Json | null
           id?: string
           is_manual_offer?: boolean | null
           isa_percentage?: number | null
@@ -551,6 +695,7 @@ export type Database = {
           offer_valid_until: string
           repayment_schedule?: Json
           repayment_term_months: number
+          requires_guarantor?: boolean | null
           status?: string
           terms_and_conditions?: Json
           user_id: string
@@ -566,6 +711,7 @@ export type Database = {
           created_by_underwriter?: string | null
           declined_at?: string | null
           grace_period_months?: number | null
+          guarantor_requirements?: Json | null
           id?: string
           is_manual_offer?: boolean | null
           isa_percentage?: number | null
@@ -576,6 +722,7 @@ export type Database = {
           offer_valid_until?: string
           repayment_schedule?: Json
           repayment_term_months?: number
+          requires_guarantor?: boolean | null
           status?: string
           terms_and_conditions?: Json
           user_id?: string

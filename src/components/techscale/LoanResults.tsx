@@ -7,6 +7,7 @@ import { LoanOption, UserProfile } from '@/types/techscale';
 import { CheckCircle, AlertCircle, XCircle, Clock, DollarSign, Users, Calendar, ExternalLink, Info } from 'lucide-react';
 import LoanApplicationForm from './LoanApplicationForm';
 import { FullLoanApplication } from '@/types/loanApplication';
+import { notifyApplicationSubmitted } from '@/utils/notifications';
 
 interface LoanResultsProps {
   loans: LoanOption[];
@@ -86,10 +87,20 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
     setShowApplicationForm(true);
   };
 
-  const handleApplicationComplete = (application: FullLoanApplication) => {
+  const handleApplicationComplete = async (application: FullLoanApplication) => {
     setShowApplicationForm(false);
     setSelectedLoan(null);
-    // Here you would typically redirect to a success page or dashboard
+    
+    // Send notification after successful application submission
+    if (application.userId) {
+      await notifyApplicationSubmitted(
+        application.userId,
+        application.id || 'temp-id',
+        selectedLoan?.lenderName,
+        selectedLoan?.maxAmount
+      );
+    }
+    
     alert('Application submitted successfully! You will receive a confirmation email shortly.');
   };
 

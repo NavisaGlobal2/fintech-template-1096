@@ -14,13 +14,18 @@ const LoanMatcher = () => {
   const handleFormSubmit = async (profile: UserProfile) => {
     setIsLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const matches = matchLoansToUser(profile);
-    setUserProfile(profile);
-    setMatchedLoans(matches);
-    setIsLoading(false);
+    try {
+      // Fetch real loan matches from database
+      const matches = await matchLoansToUser(profile);
+      setUserProfile(profile);
+      setMatchedLoans(matches);
+    } catch (error) {
+      console.error('Error matching loans:', error);
+      // Fallback to empty state or show error message
+      setMatchedLoans([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
