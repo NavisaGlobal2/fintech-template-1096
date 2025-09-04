@@ -5,35 +5,12 @@ import StatsSection from '@/components/techscale/StatsSection';
 import FAQSection from '@/components/techscale/FAQSection';
 import TechScaleFooter from '@/components/techscale/TechScaleFooter';
 import Header from '@/components/Header';
-import UnderwritingDashboard from '@/components/techscale/UnderwritingDashboard';
 import UserGuide from '@/components/techscale/UserGuide';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 const TechScale = () => {
-  const [showUnderwriting, setShowUnderwriting] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
-
-  if (showUnderwriting) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto py-6">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-medium">Underwriting Dashboard</h1>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowUnderwriting(false)}
-            >
-              ← Back to Main Site
-            </Button>
-          </div>
-          <UnderwritingDashboard />
-        </div>
-        <TechScaleFooter />
-      </div>
-    );
-  }
 
   if (showGuide) {
     return (
@@ -58,19 +35,6 @@ const TechScale = () => {
     <div className="min-h-screen bg-background">
         <Header />
         <main>
-          {/* Subtle Admin Access - Bottom Corner */}
-          <div className="fixed bottom-4 right-4 z-40">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setShowUnderwriting(true)}
-              className="text-xs opacity-20 hover:opacity-60 transition-opacity w-8 h-8 p-0"
-              title="Admin Access"
-            >
-              ⚙️
-            </Button>
-          </div>
-
           <TechScaleHero />
 
         {/* Why TechScale Section */}

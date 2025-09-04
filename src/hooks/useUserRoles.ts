@@ -48,65 +48,6 @@ export const useUserRoles = () => {
     return hasRole('admin') || hasRole('underwriter');
   };
 
-  const assignRole = async (targetUserId: string, role: AppRole): Promise<boolean> => {
-    if (!hasRole('admin')) {
-      toast.error('Only admins can assign roles');
-      return false;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: targetUserId,
-          role,
-          assigned_by: user?.id
-        });
-
-      if (error) {
-        if (error.code === '23505') { // Unique constraint violation
-          toast.error('User already has this role');
-        } else {
-          throw error;
-        }
-        return false;
-      }
-
-      toast.success(`Role ${role} assigned successfully`);
-      await fetchUserRoles(); // Refresh roles
-      return true;
-    } catch (error) {
-      console.error('Error assigning role:', error);
-      toast.error('Failed to assign role');
-      return false;
-    }
-  };
-
-  const removeRole = async (targetUserId: string, role: AppRole): Promise<boolean> => {
-    if (!hasRole('admin')) {
-      toast.error('Only admins can remove roles');
-      return false;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('role', role);
-
-      if (error) throw error;
-
-      toast.success(`Role ${role} removed successfully`);
-      await fetchUserRoles(); // Refresh roles
-      return true;
-    } catch (error) {
-      console.error('Error removing role:', error);
-      toast.error('Failed to remove role');
-      return false;
-    }
-  };
-
   useEffect(() => {
     fetchUserRoles();
   }, [user]);
@@ -115,9 +56,6 @@ export const useUserRoles = () => {
     roles,
     loading,
     hasRole,
-    isAuthorizedForUnderwriting,
-    assignRole,
-    removeRole,
-    refreshRoles: fetchUserRoles
+    isAuthorizedForUnderwriting
   };
 };

@@ -2,20 +2,17 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Bell, Settings } from 'lucide-react';
+import { ArrowLeft, Plus, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ApplicationDashboard from '@/components/applications/ApplicationDashboard';
 import TechScaleLogo from '@/components/techscale/TechScaleLogo';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
-import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
-import { useUserRoles } from '@/hooks/useUserRoles';
 import { useNotifications } from '@/hooks/useNotifications';
 
 const MyApplications = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { isAuthorizedForUnderwriting } = useUserRoles();
   const { unreadCount } = useNotifications();
   const [activeTab, setActiveTab] = useState("applications");
 
@@ -79,17 +76,6 @@ const MyApplications = () => {
                 </Button>
               </div>
               
-              {isAuthorizedForUnderwriting && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/?view=underwriting')}
-                  className="text-muted-foreground"
-                >
-                  Admin Dashboard
-                </Button>
-              )}
-              
               <Button
                 variant="ghost"
                 size="sm"
@@ -112,7 +98,7 @@ const MyApplications = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="notifications" className="relative">
               Notifications
@@ -122,10 +108,6 @@ const MyApplications = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Settings className="h-4 w-4 mr-1" />
-              Settings
-            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="applications">
@@ -134,10 +116,6 @@ const MyApplications = () => {
           
           <TabsContent value="notifications">
             <NotificationCenter />
-          </TabsContent>
-          
-          <TabsContent value="settings">
-            <NotificationPreferences />
           </TabsContent>
         </Tabs>
       </main>
