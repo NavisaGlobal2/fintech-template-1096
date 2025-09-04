@@ -23,11 +23,13 @@ export type Database = {
           file_url: string
           id: string
           mime_type: string | null
+          reviewer_notes: string | null
           session_id: string | null
           uploaded_at: string | null
           user_id: string | null
           verification_status: string | null
           verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           application_id?: string | null
@@ -37,11 +39,13 @@ export type Database = {
           file_url: string
           id?: string
           mime_type?: string | null
+          reviewer_notes?: string | null
           session_id?: string | null
           uploaded_at?: string | null
           user_id?: string | null
           verification_status?: string | null
           verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           application_id?: string | null
@@ -51,11 +55,13 @@ export type Database = {
           file_url?: string
           id?: string
           mime_type?: string | null
+          reviewer_notes?: string | null
           session_id?: string | null
           uploaded_at?: string | null
           user_id?: string | null
           verification_status?: string | null
           verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
           {
@@ -160,6 +166,205 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      document_review_audit: {
+        Row: {
+          action: string
+          created_at: string | null
+          document_id: string
+          id: string
+          new_status: string
+          notes: string | null
+          previous_status: string | null
+          reviewer_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          document_id: string
+          id?: string
+          new_status: string
+          notes?: string | null
+          previous_status?: string | null
+          reviewer_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          document_id?: string
+          id?: string
+          new_status?: string
+          notes?: string | null
+          previous_status?: string | null
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_review_audit_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "application_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lender_products: {
+        Row: {
+          application_url: string | null
+          category: Database["public"]["Enums"]["lender_category"]
+          co_signer_required: boolean | null
+          created_at: string
+          created_by: string | null
+          eligibility_criteria: Json | null
+          eligible_countries: string[] | null
+          eligible_employment_types: string[] | null
+          features: string[] | null
+          grace_period_months: number | null
+          id: string
+          lender_id: string
+          max_amount: number
+          max_apr: number
+          max_term_months: number
+          min_amount: number
+          min_apr: number
+          min_credit_score: number | null
+          min_income: number | null
+          min_term_months: number
+          product_name: string
+          status: Database["public"]["Enums"]["product_status"]
+          terms_and_conditions: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          application_url?: string | null
+          category: Database["public"]["Enums"]["lender_category"]
+          co_signer_required?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          eligibility_criteria?: Json | null
+          eligible_countries?: string[] | null
+          eligible_employment_types?: string[] | null
+          features?: string[] | null
+          grace_period_months?: number | null
+          id?: string
+          lender_id: string
+          max_amount: number
+          max_apr: number
+          max_term_months: number
+          min_amount: number
+          min_apr: number
+          min_credit_score?: number | null
+          min_income?: number | null
+          min_term_months: number
+          product_name: string
+          status?: Database["public"]["Enums"]["product_status"]
+          terms_and_conditions?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          application_url?: string | null
+          category?: Database["public"]["Enums"]["lender_category"]
+          co_signer_required?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          eligibility_criteria?: Json | null
+          eligible_countries?: string[] | null
+          eligible_employment_types?: string[] | null
+          features?: string[] | null
+          grace_period_months?: number | null
+          id?: string
+          lender_id?: string
+          max_amount?: number
+          max_apr?: number
+          max_term_months?: number
+          min_amount?: number
+          min_apr?: number
+          min_credit_score?: number | null
+          min_income?: number | null
+          min_term_months?: number
+          product_name?: string
+          status?: Database["public"]["Enums"]["product_status"]
+          terms_and_conditions?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lender_products_lender_id_fkey"
+            columns: ["lender_id"]
+            isOneToOne: false
+            referencedRelation: "lenders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lenders: {
+        Row: {
+          address: Json | null
+          contact_email: string | null
+          contact_phone: string | null
+          countries_served: string[] | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          logo_url: string | null
+          min_credit_score: number | null
+          name: string
+          processing_time_days: number | null
+          slug: string
+          special_offers: string | null
+          specialties: Database["public"]["Enums"]["lender_category"][] | null
+          status: Database["public"]["Enums"]["lender_status"]
+          updated_at: string
+          updated_by: string | null
+          website_url: string | null
+        }
+        Insert: {
+          address?: Json | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          countries_served?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          min_credit_score?: number | null
+          name: string
+          processing_time_days?: number | null
+          slug: string
+          special_offers?: string | null
+          specialties?: Database["public"]["Enums"]["lender_category"][] | null
+          status?: Database["public"]["Enums"]["lender_status"]
+          updated_at?: string
+          updated_by?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          address?: Json | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          countries_served?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          min_credit_score?: number | null
+          name?: string
+          processing_time_days?: number | null
+          slug?: string
+          special_offers?: string | null
+          specialties?: Database["public"]["Enums"]["lender_category"][] | null
+          status?: Database["public"]["Enums"]["lender_status"]
+          updated_at?: string
+          updated_by?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
       }
       loan_applications: {
         Row: {
@@ -306,13 +511,17 @@ export type Database = {
           accepted_by: string | null
           application_id: string
           apr_rate: number | null
-          assessment_id: string
+          assessment_id: string | null
           created_at: string
+          created_by_underwriter: string | null
           declined_at: string | null
           grace_period_months: number | null
           id: string
+          is_manual_offer: boolean | null
           isa_percentage: number | null
+          lender_product_id: string | null
           loan_amount: number
+          manual_assessment_notes: string | null
           offer_type: string
           offer_valid_until: string
           repayment_schedule: Json
@@ -327,13 +536,17 @@ export type Database = {
           accepted_by?: string | null
           application_id: string
           apr_rate?: number | null
-          assessment_id: string
+          assessment_id?: string | null
           created_at?: string
+          created_by_underwriter?: string | null
           declined_at?: string | null
           grace_period_months?: number | null
           id?: string
+          is_manual_offer?: boolean | null
           isa_percentage?: number | null
+          lender_product_id?: string | null
           loan_amount: number
+          manual_assessment_notes?: string | null
           offer_type: string
           offer_valid_until: string
           repayment_schedule?: Json
@@ -348,13 +561,17 @@ export type Database = {
           accepted_by?: string | null
           application_id?: string
           apr_rate?: number | null
-          assessment_id?: string
+          assessment_id?: string | null
           created_at?: string
+          created_by_underwriter?: string | null
           declined_at?: string | null
           grace_period_months?: number | null
           id?: string
+          is_manual_offer?: boolean | null
           isa_percentage?: number | null
+          lender_product_id?: string | null
           loan_amount?: number
+          manual_assessment_notes?: string | null
           offer_type?: string
           offer_valid_until?: string
           repayment_schedule?: Json
@@ -376,6 +593,13 @@ export type Database = {
             columns: ["assessment_id"]
             isOneToOne: false
             referencedRelation: "underwriting_assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_offers_lender_product_id_fkey"
+            columns: ["lender_product_id"]
+            isOneToOne: false
+            referencedRelation: "lender_products"
             referencedColumns: ["id"]
           },
         ]
@@ -432,6 +656,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       payment_methods: {
         Row: {
@@ -709,6 +966,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notification_preferences: {
+        Row: {
+          application_updates: boolean
+          created_at: string
+          document_updates: boolean
+          email_notifications: boolean
+          id: string
+          in_app_notifications: boolean
+          marketing_emails: boolean
+          offer_notifications: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_updates?: boolean
+          created_at?: string
+          document_updates?: boolean
+          email_notifications?: boolean
+          id?: string
+          in_app_notifications?: boolean
+          marketing_emails?: boolean
+          offer_notifications?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_updates?: boolean
+          created_at?: string
+          document_updates?: boolean
+          email_notifications?: boolean
+          id?: string
+          in_app_notifications?: boolean
+          marketing_emails?: boolean
+          offer_notifications?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_role_audit_log: {
         Row: {
           action: string
@@ -787,9 +1083,25 @@ export type Database = {
         Args: { temp_session_id: string; user_id: string }
         Returns: undefined
       }
+      update_document_verification_status: {
+        Args: {
+          doc_id: string
+          new_status: string
+          reviewer_notes_param?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "underwriter" | "user"
+      lender_category:
+        | "education_loans"
+        | "career_development"
+        | "upskilling"
+        | "professional_training"
+        | "certification_programs"
+      lender_status: "active" | "inactive" | "pending_approval"
+      product_status: "active" | "inactive" | "draft"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -918,6 +1230,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "underwriter", "user"],
+      lender_category: [
+        "education_loans",
+        "career_development",
+        "upskilling",
+        "professional_training",
+        "certification_programs",
+      ],
+      lender_status: ["active", "inactive", "pending_approval"],
+      product_status: ["active", "inactive", "draft"],
     },
   },
 } as const
