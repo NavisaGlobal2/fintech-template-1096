@@ -1,63 +1,46 @@
-import React, { forwardRef } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+import React from 'react';
 import { 
-  Building, 
-  Calendar, 
-  DollarSign, 
-  FileText,
-  Gavel,
-  Shield,
-  AlertTriangle,
-  CheckCircle,
-  User
-} from 'lucide-react';
+  EDUCATION_LOAN_TEMPLATE, 
+  getContractTemplate, 
+  generateContractSections,
+  populateTemplateVariables,
+  type ContractTemplate 
+} from './ContractTemplates';
 
 interface LegalContractProps {
-  contract: {
+  offer: {
     id: string;
-    contractType: 'loan' | 'isa' | 'hybrid';
-    loanAmount: number;
-    aprRate?: number;
-    isaPercentage?: number;
-    repaymentTermMonths: number;
-    gracePeriodMonths: number;
-    repaymentSchedule: any;
-    termsAndConditions: any;
-    offerValidUntil: string;
-    createdAt: string;
+    offer_type: string;
+    loan_amount: number;
+    apr_rate?: number;
+    isa_percentage?: number;
+    repayment_term_months: number;
+    grace_period_months: number;
+    repayment_schedule: any;
+    terms_and_conditions: any;
+    status: string;
+    offer_valid_until: string;
+    created_at: string;
   };
-  borrower: {
-    fullName: string;
+  borrowerInfo?: {
+    name: string;
     email: string;
+    address?: string;
+  };
+  lenderInfo?: {
+    name: string;
     address: string;
-    dateOfBirth?: string;
-    nationalId?: string;
-  };
-  lender: {
-    companyName: string;
-    registeredAddress: string;
-    registrationNumber: string;
-    contactEmail: string;
-    phoneNumber: string;
-  };
-  signatureData?: {
-    borrowerSignature?: string;
-    signedDate?: string;
-    ipAddress?: string;
-    userAgent?: string;
+    registration: string;
   };
   className?: string;
 }
 
-export const LegalContract = forwardRef<HTMLDivElement, LegalContractProps>(({
-  contract,
-  borrower,
-  lender,
-  signatureData,
+export const LegalContract: React.FC<LegalContractProps> = ({
+  offer,
+  borrowerInfo,
+  lenderInfo,
   className = ""
-}, ref) => {
+}) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
@@ -65,328 +48,175 @@ export const LegalContract = forwardRef<HTMLDivElement, LegalContractProps>(({
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString('en-GB', {
       day: 'numeric',
-      month: 'long',
+      month: 'long', 
       year: 'numeric'
     });
   };
 
-  const getContractTitle = (type: string) => {
-    switch (type) {
-      case 'loan': return 'LOAN AGREEMENT';
-      case 'isa': return 'INCOME SHARE AGREEMENT';
-      case 'hybrid': return 'HYBRID FINANCING AGREEMENT';
-      default: return 'FINANCING AGREEMENT';
-    }
+  // Calculate derived values from offer
+  const loanAmount = offer.loan_amount;
+  const processingFeePercent = 1.5;
+  const processingFee = Math.round(loanAmount * (processingFeePercent / 100));
+  const netDisbursement = loanAmount - processingFee;
+  const monthlyRate = (offer.apr_rate || 3.9) / 12;
+  const totalInterest = offer.repayment_schedule?.totalInterest || Math.round(loanAmount * monthlyRate * offer.repayment_term_months / 100);
+  const totalRepayable = loanAmount + totalInterest;
+  const totalCostOfCredit = processingFee + totalInterest;
+  const monthlyPayment = Math.round(totalRepayable / offer.repayment_term_months);
+
+  const contractData = {
+    loanAmount: formatCurrency(loanAmount).replace('£', ''),
+    loanAmountWords: 'Twenty Six Thousand Pounds Sterling',
+    processingFeePercent: processingFeePercent.toString(),
+    processingFee: processingFee.toString(),
+    netDisbursement: netDisbursement.toString(),
+    interestRate: (offer.apr_rate || 3.9).toString(),
+    loanTerm: offer.repayment_term_months.toString(),
+    loanTermWords: 'Sixty',
+    firstPaymentDate: formatDate(new Date(Date.now() + (offer.grace_period_months || 0) * 30 * 24 * 60 * 60 * 1000)),
+    numberOfInstallments: offer.repayment_term_months.toString(),
+    installmentAmount: monthlyPayment.toString(),
+    principalPerInstallment: Math.round(loanAmount / offer.repayment_term_months).toString(),
+    interestPerInstallment: Math.round(totalInterest / offer.repayment_term_months).toString(),
+    totalRepayable: totalRepayable.toString(),
+    totalInterest: totalInterest.toString(),
+    totalCostOfCredit: totalCostOfCredit.toString(),
+    borrowerName: borrowerInfo?.name || 'Joseph Ifeanyichukwu Nkemakosi',
+    guarantorName: '[Guarantor\'s Full Name]',
+    agreementDate: formatDate(new Date()),
+    bankName: 'Tide Bank',
+    sortCode: '04-06-05',
+    accountNumber: '22106965'
   };
 
-  const contractNumber = `TSF-${contract.id.slice(0, 8).toUpperCase()}`;
-  const executionDate = new Date().toLocaleDateString('en-GB');
+  const template = getContractTemplate('education_loan');
+  const populatedSections = generateContractSections(template, contractData);
 
   return (
-    <div 
-      ref={ref}
-      className={`bg-white text-black font-serif leading-relaxed ${className}`}
-      id="legal-contract-document"
-    >
-      {/* Contract Header */}
-      <div className="text-center border-b-2 border-black pb-6 mb-8">
-        <div className="flex justify-between items-start mb-4">
-          <div className="text-left">
-            <Building className="h-8 w-8 text-gray-600 mb-2" />
-            <p className="text-sm font-sans">{lender.companyName}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-sans">Contract No: {contractNumber}</p>
-            <p className="text-sm font-sans">Date: {executionDate}</p>
+    <div id="legal-contract" className={`bg-white text-black max-w-4xl mx-auto ${className}`}>
+      {/* Cover Page */}
+      <div className="text-center mb-8 p-8 border-b-2 border-black">
+        <div className="mb-6">
+          <p className="text-sm text-gray-600 mb-4">Confidential</p>
+          <div className="w-full border-t border-black mb-8"></div>
+        </div>
+        
+        <div className="space-y-8">
+          <h1 className="text-4xl font-bold tracking-wide">
+            EDUCATION LOAN AGREEMENT
+          </h1>
+          
+          <div className="text-2xl font-semibold space-y-4">
+            <p className="text-3xl">BETWEEN</p>
+            
+            <div className="space-y-6 my-8">
+              <p className="text-2xl font-bold">TECHSKILLUK LIMITED</p>
+              <p className="text-2xl">AND</p>
+              <p className="text-xl">{contractData.borrowerName}</p>
+            </div>
           </div>
         </div>
         
-        <h1 className="text-3xl font-bold tracking-wide mb-2">
-          {getContractTitle(contract.contractType)}
-        </h1>
-        <p className="text-lg text-gray-700">
-          Principal Amount: {formatCurrency(contract.loanAmount)}
-        </p>
+        <div className="w-full border-t border-black mt-8"></div>
+        <p className="text-sm text-right mt-4">Page 1 of 10</p>
       </div>
 
-      {/* Parties Section */}
+      {/* Agreement Header */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-          1. PARTIES TO THIS AGREEMENT
-        </h2>
+        <p className="text-lg mb-4">
+          This Education Loan Agreement (the "Agreement") is made on {contractData.agreementDate}.
+        </p>
         
-        <div className="ml-4 space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">1.1 Lender:</h3>
-            <div className="ml-6 space-y-1">
-              <p><strong>{lender.companyName}</strong></p>
-              <p>Registered Address: {lender.registeredAddress}</p>
-              <p>Company Registration Number: {lender.registrationNumber}</p>
-              <p>Email: {lender.contactEmail}</p>
-              <p>Phone: {lender.phoneNumber}</p>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2">1.2 Borrower:</h3>
-            <div className="ml-6 space-y-1">
-              <p><strong>{borrower.fullName}</strong></p>
-              <p>Address: {borrower.address}</p>
-              <p>Email: {borrower.email}</p>
-              {borrower.dateOfBirth && <p>Date of Birth: {formatDate(borrower.dateOfBirth)}</p>}
-              {borrower.nationalId && <p>National ID: {borrower.nationalId}</p>}
-            </div>
-          </div>
+        <div className="mb-6">
+          <p className="font-semibold text-lg mb-2">BETWEEN</p>
+          <p className="mb-2">
+            TechSkillUK Ltd, a company incorporated in England and Wales with its registered office at 20 
+            Wenlock Road, London, N1 7GU (the "Lender", which expression shall include its successors and 
+            assigns);
+          </p>
+          <p className="mb-2">AND</p>
+          <p className="mb-2">
+            Mr. {contractData.borrowerName}, of 135 Great Horton Road, Bradford, BD7 1QG, United 
+            Kingdom (the "Borrower");
+          </p>
+          <p className="mb-2">AND</p>
+          <p className="mb-4">
+            {contractData.guarantorName}, of [Guarantor's Address] (the "Guarantor").
+          </p>
+          <p>The Borrower, Guarantor, and Lender are collectively referred to as the "Parties".</p>
         </div>
       </div>
 
       {/* Recitals */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-          2. RECITALS
-        </h2>
-        
-        <div className="ml-4 space-y-3">
-          <p><strong>WHEREAS,</strong> the Borrower has applied for financial assistance to support educational or career development purposes;</p>
-          <p><strong>WHEREAS,</strong> the Lender has agreed to provide financing subject to the terms and conditions set forth herein;</p>
-          <p><strong>WHEREAS,</strong> both parties desire to enter into this Agreement to formalize their respective rights and obligations;</p>
-          <p><strong>NOW, THEREFORE,</strong> in consideration of the mutual covenants contained herein, the parties agree as follows:</p>
-        </div>
+        <h2 className="text-xl font-bold mb-4">RECITALS</h2>
+        {template.recitals.map((recital, index) => (
+          <p key={index} className="mb-3">
+            <span className="font-semibold">{recital.letter}.</span> {populateTemplateVariables(recital.content, contractData)}
+          </p>
+        ))}
       </div>
 
-      {/* Loan Terms */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-          3. LOAN TERMS AND CONDITIONS
-        </h2>
-        
-        <div className="ml-4 space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">3.1 Principal Amount:</h3>
-            <p className="ml-6">The Lender agrees to advance to the Borrower the sum of <strong>{formatCurrency(contract.loanAmount)}</strong> (the "Principal Amount").</p>
-          </div>
-
-          {contract.aprRate && (
-            <div>
-              <h3 className="font-semibold mb-2">3.2 Interest Rate:</h3>
-              <p className="ml-6">The loan shall bear interest at an annual percentage rate (APR) of <strong>{contract.aprRate}%</strong>.</p>
-            </div>
-          )}
-
-          {contract.isaPercentage && (
-            <div>
-              <h3 className="font-semibold mb-2">3.3 Income Share Percentage:</h3>
-              <p className="ml-6">The Borrower agrees to pay <strong>{contract.isaPercentage}%</strong> of their gross monthly income as defined in this Agreement.</p>
-            </div>
-          )}
-
-          <div>
-            <h3 className="font-semibold mb-2">3.4 Repayment Term:</h3>
-            <p className="ml-6">The repayment term shall be <strong>{contract.repaymentTermMonths} months</strong> from the first payment date.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2">3.5 Grace Period:</h3>
-            <p className="ml-6">A grace period of <strong>{contract.gracePeriodMonths} months</strong> is granted before the first payment becomes due.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Repayment Schedule */}
-      {contract.repaymentSchedule && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-            4. REPAYMENT SCHEDULE
+      {/* Contract Sections */}
+      {populatedSections.map((section, sectionIndex) => (
+        <div key={sectionIndex} className="mb-8">
+          <h2 className="text-xl font-bold mb-4">
+            {section.number}. {section.title}
           </h2>
           
-          <div className="ml-4 space-y-4">
-            {contract.repaymentSchedule.monthlyPayment && (
+          {section.subsections.map((subsection, subsectionIndex) => (
+            <div key={subsectionIndex} className="mb-4">
+              <h3 className="font-semibold mb-2">
+                {subsection.number} {subsection.title}
+              </h3>
+              
               <div>
-                <h3 className="font-semibold mb-2">4.1 Monthly Payment:</h3>
-                <p className="ml-6">The Borrower shall pay <strong>{formatCurrency(contract.repaymentSchedule.monthlyPayment)}</strong> per month.</p>
-              </div>
-            )}
-
-            {contract.repaymentSchedule.firstPaymentDate && (
-              <div>
-                <h3 className="font-semibold mb-2">4.2 First Payment Date:</h3>
-                <p className="ml-6">The first payment is due on <strong>{formatDate(contract.repaymentSchedule.firstPaymentDate)}</strong>.</p>
-              </div>
-            )}
-
-            {contract.repaymentSchedule.totalRepayment && (
-              <div>
-                <h3 className="font-semibold mb-2">4.3 Total Repayment:</h3>
-                <p className="ml-6">The total amount to be repaid is <strong>{formatCurrency(contract.repaymentSchedule.totalRepayment)}</strong>.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Borrower Representations */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-          5. BORROWER REPRESENTATIONS AND WARRANTIES
-        </h2>
-        
-        <div className="ml-4 space-y-2">
-          <p>5.1 The Borrower represents and warrants that:</p>
-          <ul className="ml-8 list-disc space-y-1">
-            <li>They have the legal capacity to enter into this Agreement;</li>
-            <li>All information provided in the loan application is true and accurate;</li>
-            <li>They are not in default under any other loan or credit agreement;</li>
-            <li>They will use the loan proceeds only for the stated educational or career purposes;</li>
-            <li>They will promptly notify the Lender of any material change in financial circumstances.</li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Events of Default */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-          6. EVENTS OF DEFAULT
-        </h2>
-        
-        <div className="ml-4 space-y-2">
-          <p>6.1 The following shall constitute events of default:</p>
-          <ul className="ml-8 list-disc space-y-1">
-            <li>Failure to make any payment when due and such failure continues for thirty (30) days;</li>
-            <li>Breach of any representation, warranty, or covenant contained herein;</li>
-            <li>Filing for bankruptcy or insolvency proceedings;</li>
-            <li>Material adverse change in the Borrower's financial condition;</li>
-            <li>Providing false or misleading information to the Lender.</li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Remedies */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-          7. REMEDIES
-        </h2>
-        
-        <div className="ml-4 space-y-2">
-          <p>7.1 Upon the occurrence of an Event of Default, the Lender may:</p>
-          <ul className="ml-8 list-disc space-y-1">
-            <li>Declare the entire unpaid balance immediately due and payable;</li>
-            <li>Pursue collection through legal proceedings;</li>
-            <li>Report delinquency to credit reporting agencies;</li>
-            <li>Exercise any other rights available at law or in equity.</li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Miscellaneous Provisions */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-          8. MISCELLANEOUS PROVISIONS
-        </h2>
-        
-        <div className="ml-4 space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">8.1 Governing Law:</h3>
-            <p className="ml-6">This Agreement shall be governed by the laws of England and Wales.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2">8.2 Amendment:</h3>
-            <p className="ml-6">This Agreement may only be amended in writing signed by both parties.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2">8.3 Severability:</h3>
-            <p className="ml-6">If any provision is deemed invalid, the remainder of this Agreement shall remain in full force and effect.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2">8.4 Electronic Signature:</h3>
-            <p className="ml-6">Electronic signatures shall have the same legal effect as handwritten signatures.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Signature Section */}
-      <div className="mt-12 pt-8 border-t-2 border-black">
-        <h2 className="text-xl font-bold mb-6 text-center">
-          SIGNATURE PAGE
-        </h2>
-
-        <p className="text-center mb-8 text-gray-700">
-          By signing below, the parties acknowledge they have read, understood, and agree to be bound by all terms of this Agreement.
-        </p>
-
-        <div className="grid grid-cols-2 gap-12 mt-8">
-          {/* Lender Signature */}
-          <div>
-            <h3 className="font-semibold mb-4 text-center">LENDER</h3>
-            <div className="text-center space-y-4">
-              <div className="h-16 border-b border-black flex items-end justify-center pb-2">
-                <span className="text-sm text-gray-600">Digital Signature on File</span>
-              </div>
-              <div>
-                <p className="font-medium">{lender.companyName}</p>
-                <p className="text-sm">By: Authorized Representative</p>
-                <p className="text-sm">Date: {executionDate}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Borrower Signature */}
-          <div>
-            <h3 className="font-semibold mb-4 text-center">BORROWER</h3>
-            <div className="text-center space-y-4">
-              {signatureData?.borrowerSignature ? (
-                <div className="h-16 border border-gray-300 flex items-center justify-center">
-                  <img 
-                    src={`data:image/png;base64,${signatureData.borrowerSignature}`} 
-                    alt="Borrower Signature" 
-                    className="max-h-full"
-                  />
-                </div>
-              ) : (
-                <div className="h-16 border-b border-black flex items-end justify-center pb-2">
-                  <span className="text-sm text-gray-400">Signature Required</span>
-                </div>
-              )}
-              <div>
-                <p className="font-medium">{borrower.fullName}</p>
-                <p className="text-sm">Borrower</p>
-                {signatureData?.signedDate && (
-                  <p className="text-sm">Date: {formatDate(signatureData.signedDate)}</p>
+                <p className="mb-2">{subsection.content}</p>
+                {subsection.isList && subsection.listItems && (
+                  <ul className="list-none ml-4 space-y-1">
+                    {subsection.listItems.map((item, itemIndex) => (
+                      <li key={itemIndex} className="mb-1">• {item}</li>
+                    ))}
+                  </ul>
                 )}
               </div>
             </div>
-          </div>
+          ))}
         </div>
+      ))}
 
-        {/* Electronic Signature Notice */}
-        <div className="mt-8 p-4 bg-gray-100 border border-gray-300 rounded">
-          <p className="text-xs text-center text-gray-700">
-            <strong>ELECTRONIC SIGNATURE DISCLOSURE:</strong> This document has been electronically signed in accordance with 
-            applicable electronic signature laws. The parties acknowledge that electronic signatures are legally binding and 
-            have the same force and effect as handwritten signatures.
-          </p>
-          {signatureData?.ipAddress && (
-            <p className="text-xs text-center text-gray-600 mt-2">
-              Signed from IP: {signatureData.ipAddress} | 
-              User Agent: {signatureData.userAgent?.substring(0, 50)}...
-            </p>
-          )}
-        </div>
+      {/* Signature Blocks */}
+      <div className="mt-12 space-y-8">
+        {template.signatureBlocks.map((block, index) => (
+          <div key={index} className="border-t pt-6">
+            <h3 className="font-semibold mb-4">{block.title}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {block.fields.map((field, fieldIndex) => (
+                <div key={fieldIndex} className="mb-4">
+                  <div className="border-b border-gray-400 pb-1 mb-2 h-8"></div>
+                  <p className="text-sm text-gray-600">{field}: _____________________</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Document Footer */}
-      <div className="mt-8 pt-4 border-t border-gray-300 text-center text-xs text-gray-600">
-        <p>Contract ID: {contract.id}</p>
-        <p>Generated: {formatDate(contract.createdAt)}</p>
-        <p className="mt-2">{lender.companyName} - Confidential and Proprietary</p>
+      {/* Footer */}
+      <div className="mt-12 pt-8 border-t text-center text-sm text-gray-600">
+        <div className="flex justify-between items-center">
+          <div className="text-left">
+            <p>Document generated electronically on {formatDate(new Date())}</p>
+            <p>TechSkillUK Ltd - Empowering Your Future</p>
+          </div>
+          <div className="w-16 h-16 bg-yellow-400 flex items-center justify-center">
+            <span className="text-black font-bold text-2xl">S</span>
+          </div>
+        </div>
       </div>
     </div>
   );
-});
-
-LegalContract.displayName = 'LegalContract';
+};

@@ -1,10 +1,22 @@
-// Contract template definitions for different loan types
+// Professional Education Loan Agreement Template based on TechSkillUK standard
 
 export interface ContractTemplate {
   title: string;
-  recitals: string[];
+  coverPage: {
+    title: string;
+    parties: {
+      lender: string;
+      borrower: string;
+      guarantor?: string;
+    };
+    agreementDate: string;
+  };
+  recitals: Array<{
+    letter: string;
+    content: string;
+  }>;
   sections: ContractSection[];
-  specialClauses?: string[];
+  signatureBlocks: SignatureBlock[];
 }
 
 export interface ContractSection {
@@ -21,194 +33,295 @@ export interface ContractSubsection {
   listItems?: string[];
 }
 
-export const LOAN_CONTRACT_TEMPLATE: ContractTemplate = {
-  title: "LOAN AGREEMENT",
+export interface SignatureBlock {
+  type: 'lender' | 'borrower' | 'guarantor' | 'witness';
+  title: string;
+  fields: string[];
+}
+
+export const EDUCATION_LOAN_TEMPLATE: ContractTemplate = {
+  title: "EDUCATION LOAN AGREEMENT",
+  coverPage: {
+    title: "EDUCATION LOAN AGREEMENT",
+    parties: {
+      lender: "TECHSKILLUK LIMITED",
+      borrower: "[BORROWER_NAME]",
+      guarantor: "[GUARANTOR_NAME]"
+    },
+    agreementDate: "[AGREEMENT_DATE]"
+  },
   recitals: [
-    "the Borrower has applied for a loan to finance educational or career development expenses;",
-    "the Lender has agreed to provide financing subject to the terms and conditions herein;",
-    "both parties desire to memorialize their agreement in writing;"
+    {
+      letter: "A",
+      content: "The Borrower has requested a loan from the Lender for education-related expenses, including tuition fees, certifications, training, equipment, accommodation, and other related educational costs."
+    },
+    {
+      letter: "B", 
+      content: "The Lender has agreed to lend the Borrower the sum of £[LOAN_AMOUNT] subject to the Borrower's compliance with the terms of this Agreement."
+    },
+    {
+      letter: "C",
+      content: "The Guarantor has agreed to guarantee repayment of the Borrower's obligations to the Lender."
+    },
+    {
+      letter: "D",
+      content: "The Parties wish to record the terms and conditions of their agreement in writing."
+    }
   ],
   sections: [
     {
-      number: "3",
+      number: "1",
       title: "LOAN TERMS",
       subsections: [
         {
-          number: "3.1",
-          title: "Principal Amount",
-          content: "The Lender agrees to lend to the Borrower the principal sum outlined in Schedule A (the \"Loan Amount\")."
+          number: "1.1",
+          title: "Principal Loan Amount",
+          content: "£[LOAN_AMOUNT] ([LOAN_AMOUNT_WORDS])."
         },
         {
-          number: "3.2", 
+          number: "1.2",
+          title: "Processing Fee",
+          content: "A fee of [PROCESSING_FEE_PERCENT]% of the principal (£[PROCESSING_FEE]) shall be charged. The Loan disbursement to the Borrower will therefore be £[NET_DISBURSEMENT]."
+        },
+        {
+          number: "1.3",
           title: "Interest Rate",
-          content: "The Loan shall bear interest at the annual percentage rate (APR) specified in Schedule A, calculated on the outstanding principal balance."
+          content: "Interest shall accrue on the full loan amount (£[LOAN_AMOUNT]) at the rate of [INTEREST_RATE] per cent ([INTEREST_RATE]%) per month on the reducing balance."
         },
         {
-          number: "3.3",
-          title: "Repayment Term", 
-          content: "The Loan shall be repaid in monthly installments over the term specified in Schedule A."
+          number: "1.4",
+          title: "Loan Term",
+          content: "[LOAN_TERM] ([LOAN_TERM_WORDS]) months commencing on [FIRST_PAYMENT_DATE]."
+        },
+        {
+          number: "1.5",
+          title: "Repayments",
+          content: "The Borrower shall repay the loan in [NUMBER_OF_INSTALLMENTS] instalments of £[INSTALLMENT_AMOUNT] each, consisting of £[PRINCIPAL_PER_INSTALLMENT] principal and £[INTEREST_PER_INSTALLMENT] interest."
+        },
+        {
+          number: "1.6",
+          title: "Total Repayable",
+          content: "£[TOTAL_REPAYABLE] comprising £[LOAN_AMOUNT] principal and £[TOTAL_INTEREST] interest, in addition to the £[PROCESSING_FEE] processing fee. The Borrower's overall cost of credit is £[TOTAL_COST_OF_CREDIT]."
+        },
+        {
+          number: "1.7",
+          title: "Early Repayment",
+          content: "The Borrower may repay the loan early in whole or in part without penalty, provided all accrued interest and the processing fee are paid."
         }
       ]
     },
     {
-      number: "4",
-      title: "REPAYMENT OBLIGATIONS",
+      number: "2",
+      title: "REPAYMENT METHOD",
       subsections: [
         {
-          number: "4.1",
-          title: "Monthly Payments",
-          content: "Borrower shall make monthly payments of principal and interest as specified in Schedule A."
+          number: "2.1",
+          title: "Payment Method",
+          content: "Repayments shall be made by Direct Debit or bank transfer from the Borrower's nominated UK bank account."
         },
         {
-          number: "4.2",
-          title: "Payment Due Date",
-          content: "Payments are due on the same calendar day of each month, beginning on the date specified in Schedule A."
+          number: "2.2",
+          title: "Payment Details",
+          content: "All repayments shall be paid into the following account unless otherwise notified in writing by the Lender:",
+          isList: true,
+          listItems: [
+            "Account Name: TechSkillUK Ltd",
+            "Bank: [BANK_NAME]",
+            "Sort Code: [SORT_CODE]",
+            "Account Number: [ACCOUNT_NUMBER]"
+          ]
         },
         {
-          number: "4.3",
-          title: "Prepayment",
-          content: "Borrower may prepay the Loan in whole or in part at any time without penalty."
-        }
-      ]
-    }
-  ],
-  specialClauses: [
-    "This Agreement is subject to applicable consumer protection laws.",
-    "Interest calculations are performed on a simple interest basis.",
-    "Late payments may incur additional fees as specified in the loan terms."
-  ]
-};
-
-export const ISA_CONTRACT_TEMPLATE: ContractTemplate = {
-  title: "INCOME SHARE AGREEMENT",
-  recitals: [
-    "the Student seeks funding for educational purposes in exchange for a percentage of future income;",
-    "the Investor is willing to provide such funding under the terms of an Income Share Agreement;",
-    "both parties understand this is not a loan but an investment in the Student's future earning potential;"
-  ],
-  sections: [
-    {
-      number: "3", 
-      title: "FUNDING AND INCOME SHARE TERMS",
-      subsections: [
-        {
-          number: "3.1",
-          title: "Funding Amount",
-          content: "The Investor agrees to provide funding in the amount specified in Schedule A (the \"Funding Amount\")."
-        },
-        {
-          number: "3.2",
-          title: "Income Share Percentage", 
-          content: "In consideration for the Funding Amount, Student agrees to pay the Income Share Percentage of Adjusted Gross Income as specified in Schedule A."
-        },
-        {
-          number: "3.3",
-          title: "Payment Term",
-          content: "Income share payments shall continue for the Payment Term specified in Schedule A, subject to the Payment Cap."
-        },
-        {
-          number: "3.4",
-          title: "Payment Cap",
-          content: "Total payments under this Agreement shall not exceed the Payment Cap specified in Schedule A."
+          number: "2.3",
+          title: "Payment Receipt",
+          content: "Payments shall be deemed received only when cleared funds are credited to the Lender's account."
         }
       ]
     },
-    {
-      number: "4",
-      title: "INCOME REPORTING AND VERIFICATION",
-      subsections: [
-        {
-          number: "4.1",
-          title: "Income Reporting",
-          content: "Student shall provide annual income verification and authorize payroll deduction when available."
-        },
-        {
-          number: "4.2",
-          title: "Minimum Income Threshold",
-          content: "No payments are required if Student's income falls below the Minimum Income Threshold specified in Schedule A."
-        },
-        {
-          number: "4.3",
-          title: "Unemployment Forbearance",
-          content: "Payment obligations are suspended during periods of unemployment, but the Payment Term is extended accordingly."
-        }
-      ]
-    }
-  ],
-  specialClauses: [
-    "This Agreement is not a loan and does not accrue interest.",
-    "Income share payments are based on gross income before taxes and deductions.",
-    "Student may satisfy the obligation early by paying the remaining balance calculation."
-  ]
-};
-
-export const HYBRID_CONTRACT_TEMPLATE: ContractTemplate = {
-  title: "HYBRID FINANCING AGREEMENT", 
-  recitals: [
-    "the Borrower seeks financing combining traditional loan and income share elements;",
-    "the Lender is willing to provide such hybrid financing under the terms herein;",
-    "this Agreement combines fixed loan payments with income-contingent payments;"
-  ],
-  sections: [
     {
       number: "3",
-      title: "HYBRID FINANCING STRUCTURE",
+      title: "EVENTS OF DEFAULT",
       subsections: [
         {
-          number: "3.1", 
-          title: "Total Financing Amount",
-          content: "The total financing consists of two components as specified in Schedule A: the Loan Component and the ISA Component."
+          number: "3.1",
+          title: "Default Conditions",
+          content: "The Borrower shall be deemed in default if:",
+          isList: true,
+          listItems: [
+            "(a) any repayment is not made on the due date;",
+            "(b) the Borrower provides false or misleading information;", 
+            "(c) the Borrower becomes bankrupt or insolvent;",
+            "(d) the Borrower ceases or threatens to cease to carry on study or employment; or",
+            "(e) the Borrower is subject to enforcement action or judgment against their assets."
+          ]
         },
         {
           number: "3.2",
-          title: "Loan Component Terms",
-          content: "The Loan Component bears interest and requires fixed monthly payments as specified in Schedule A."
-        },
-        {
-          number: "3.3",
-          title: "ISA Component Terms", 
-          content: "The ISA Component requires income-contingent payments based on a percentage of income as specified in Schedule A."
+          title: "Consequences of Default",
+          content: "Upon default:",
+          isList: true,
+          listItems: [
+            "The full outstanding balance (including interest and charges) shall become immediately due and payable;",
+            "The Lender may enforce this Agreement directly against the Borrower and/or the Guarantor;",
+            "The Lender may report the default to UK credit reference agencies."
+          ]
         }
       ]
     },
     {
       number: "4",
-      title: "REPAYMENT OBLIGATIONS",
+      title: "GUARANTOR'S OBLIGATIONS",
       subsections: [
         {
           number: "4.1",
-          title: "Combined Payments",
-          content: "Borrower shall make both fixed loan payments and income-contingent ISA payments as specified in Schedule A."
+          title: "Guarantee",
+          content: "The Guarantor irrevocably and unconditionally guarantees to the Lender the due repayment of the Borrower's obligations."
         },
         {
           number: "4.2",
-          title: "Payment Coordination",
-          content: "Total monthly payments shall not exceed the Payment Cap specified in Schedule A."
+          title: "Joint and Several Liability",
+          content: "The Guarantor agrees to be jointly and severally liable with the Borrower. This means the Lender may pursue the Guarantor for repayment without first demanding payment from the Borrower."
         },
         {
           number: "4.3",
-          title: "Income Verification",
-          content: "Borrower shall provide income verification for ISA component calculations."
+          title: "Immediate Payment Obligation",
+          content: "The Guarantor undertakes to pay immediately upon demand any sum due from the Borrower which remains unpaid."
+        },
+        {
+          number: "4.4",
+          title: "Guarantor Requirements",
+          content: "The Guarantor shall, upon signing this Agreement, provide:",
+          isList: true,
+          listItems: [
+            "Full legal name and residential address;",
+            "Valid identification;",
+            "Bank account details (account number and sort code);",
+            "A recent three-month bank statement demonstrating financial capacity."
+          ]
+        },
+        {
+          number: "4.5",
+          title: "Continuing Guarantee",
+          content: "The Guarantor's obligations remain binding notwithstanding:",
+          isList: true,  
+          listItems: [
+            "Any extension of time or indulgence granted to the Borrower;",
+            "Any variation of the loan terms;",
+            "Any failure or delay by the Lender in enforcing repayment."
+          ]
+        },
+        {
+          number: "4.6",
+          title: "Discharge",
+          content: "This Guarantee is a continuing obligation and remains in force until the Borrower has discharged all obligations in full."
+        }
+      ]
+    },
+    {
+      number: "5",
+      title: "BORROWER'S DECLARATIONS",
+      subsections: [
+        {
+          number: "5.1",
+          title: "Representations and Warranties",
+          content: "The Borrower represents and warrants that:",
+          isList: true,
+          listItems: [
+            "He is over 18 years of age;",
+            "He resides in the United Kingdom;",
+            "All information provided is true and complete;",
+            "He understands the repayment obligations and consequences of default."
+          ]
+        }
+      ]
+    },
+    {
+      number: "6",
+      title: "CONFIDENTIALITY",
+      subsections: [
+        {
+          number: "6.1",
+          title: "Confidential Information",
+          content: "The Parties agree to keep confidential all information relating to this Agreement except where disclosure is required by law, regulation, or court order."
+        }
+      ]
+    },
+    {
+      number: "7",
+      title: "GOVERNING LAW AND JURISDICTION",
+      subsections: [
+        {
+          number: "7.1",
+          title: "Applicable Law",
+          content: "This Agreement is governed by and shall be construed in accordance with the laws of England and Wales. The courts of England and Wales shall have exclusive jurisdiction to resolve any dispute."
+        }
+      ]
+    },
+    {
+      number: "8", 
+      title: "NOTICES",
+      subsections: [
+        {
+          number: "8.1",
+          title: "Notice Requirements",
+          content: "All notices shall be in writing and delivered personally, sent by recorded delivery, or sent by email to the Parties at their last known addresses."
+        }
+      ]
+    },
+    {
+      number: "9",
+      title: "REPAYMENT SCHEDULE",
+      subsections: [
+        {
+          number: "9.1", 
+          title: "Installment Schedule",
+          content: "[REPAYMENT_SCHEDULE_TABLE]"
+        }
+      ]
+    },
+    {
+      number: "10",
+      title: "EXECUTION",
+      subsections: [
+        {
+          number: "10.1",
+          title: "Signature Authority",
+          content: "This Agreement shall be executed by all parties and witnessed as appropriate."
         }
       ]
     }
   ],
-  specialClauses: [
-    "The loan component is subject to standard loan terms and consumer protections.",
-    "The ISA component follows income share agreement principles and regulations.", 
-    "Combined payment obligations are subject to income-based payment caps."
+  signatureBlocks: [
+    {
+      type: 'lender',
+      title: 'Signed for and on behalf of TechSkillUK Ltd:',
+      fields: ['Signature', 'Name', 'Date']
+    },
+    {
+      type: 'borrower', 
+      title: 'Signed by the Borrower:',
+      fields: ['Signature', 'Name', 'Date']
+    },
+    {
+      type: 'guarantor',
+      title: 'Signed by the Guarantor:',
+      fields: ['Signature', 'Name', 'Address', 'Bank Account Number', 'Sort Code', 'Date']
+    },
+    {
+      type: 'witness',
+      title: "Witness to Guarantor's Signature:",
+      fields: ['Signature', 'Name', 'Date']
+    }
   ]
 };
 
+// Helper functions for contract template manipulation
 export const getContractTemplate = (contractType: string): ContractTemplate => {
   switch (contractType) {
-    case 'isa':
-      return ISA_CONTRACT_TEMPLATE;
-    case 'hybrid': 
-      return HYBRID_CONTRACT_TEMPLATE;
+    case 'education_loan':
     case 'loan':
     default:
-      return LOAN_CONTRACT_TEMPLATE;
+      return EDUCATION_LOAN_TEMPLATE;
   }
 };
 
@@ -216,16 +329,39 @@ export const generateContractSections = (
   template: ContractTemplate,
   contractData: any
 ): ContractSection[] => {
-  // This function can be enhanced to dynamically populate template sections
-  // with actual contract data, handling conditional clauses based on loan type
   return template.sections.map(section => ({
     ...section,
     subsections: section.subsections.map(subsection => ({
       ...subsection,
-      // Replace placeholder values with actual data
-      content: subsection.content
-        .replace(/Schedule A/g, 'the terms specified herein')
-        .replace(/\$\{(\w+)\}/g, (match, key) => contractData[key] || match)
+      content: populateTemplateVariables(subsection.content, contractData),
+      listItems: subsection.listItems?.map(item => populateTemplateVariables(item, contractData))
     }))
   }));
+};
+
+export const populateTemplateVariables = (content: string, data: any): string => {
+  return content
+    .replace(/\[LOAN_AMOUNT\]/g, data.loanAmount || '[LOAN_AMOUNT]')
+    .replace(/\[LOAN_AMOUNT_WORDS\]/g, data.loanAmountWords || '[LOAN_AMOUNT_WORDS]')
+    .replace(/\[PROCESSING_FEE_PERCENT\]/g, data.processingFeePercent || '1.5')
+    .replace(/\[PROCESSING_FEE\]/g, data.processingFee || '[PROCESSING_FEE]')
+    .replace(/\[NET_DISBURSEMENT\]/g, data.netDisbursement || '[NET_DISBURSEMENT]')
+    .replace(/\[INTEREST_RATE\]/g, data.interestRate || '[INTEREST_RATE]')
+    .replace(/\[LOAN_TERM\]/g, data.loanTerm || '[LOAN_TERM]')
+    .replace(/\[LOAN_TERM_WORDS\]/g, data.loanTermWords || '[LOAN_TERM_WORDS]')
+    .replace(/\[FIRST_PAYMENT_DATE\]/g, data.firstPaymentDate || '[FIRST_PAYMENT_DATE]')
+    .replace(/\[NUMBER_OF_INSTALLMENTS\]/g, data.numberOfInstallments || '[NUMBER_OF_INSTALLMENTS]')
+    .replace(/\[INSTALLMENT_AMOUNT\]/g, data.installmentAmount || '[INSTALLMENT_AMOUNT]')
+    .replace(/\[PRINCIPAL_PER_INSTALLMENT\]/g, data.principalPerInstallment || '[PRINCIPAL_PER_INSTALLMENT]')
+    .replace(/\[INTEREST_PER_INSTALLMENT\]/g, data.interestPerInstallment || '[INTEREST_PER_INSTALLMENT]')
+    .replace(/\[TOTAL_REPAYABLE\]/g, data.totalRepayable || '[TOTAL_REPAYABLE]')
+    .replace(/\[TOTAL_INTEREST\]/g, data.totalInterest || '[TOTAL_INTEREST]')
+    .replace(/\[TOTAL_COST_OF_CREDIT\]/g, data.totalCostOfCredit || '[TOTAL_COST_OF_CREDIT]')
+    .replace(/\[BANK_NAME\]/g, data.bankName || 'Tide Bank')
+    .replace(/\[SORT_CODE\]/g, data.sortCode || '04-06-05')
+    .replace(/\[ACCOUNT_NUMBER\]/g, data.accountNumber || '22106965')
+    .replace(/\[BORROWER_NAME\]/g, data.borrowerName || '[BORROWER_NAME]')
+    .replace(/\[GUARANTOR_NAME\]/g, data.guarantorName || '[GUARANTOR_NAME]')
+    .replace(/\[AGREEMENT_DATE\]/g, data.agreementDate || '[AGREEMENT_DATE]')
+    .replace(/\[REPAYMENT_SCHEDULE_TABLE\]/g, data.repaymentScheduleTable || '[REPAYMENT_SCHEDULE_TABLE]');
 };
