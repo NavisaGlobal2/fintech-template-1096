@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,8 @@ import {
   Maximize
 } from 'lucide-react';
 import { OfferDocument } from './OfferDocument';
+import { LegalContract } from '@/components/contracts/LegalContract';
+import { ContractSigningService } from '@/components/contracts/ContractSigningService';
 import { PDFGenerator } from '@/utils/pdfGenerator';
 import { toast } from 'sonner';
 
@@ -55,6 +57,8 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [showContractSigning, setShowContractSigning] = useState(false);
+  const documentRef = useRef<HTMLDivElement>(null);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GB', {

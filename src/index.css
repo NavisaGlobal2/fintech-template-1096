@@ -262,3 +262,153 @@
     @apply bg-accent/20 transition-all duration-300;
   }
 }
+
+/* Print styles for PDF generation */
+@media print {
+  body {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-page-break {
+    page-break-before: always;
+  }
+
+  .print-no-break {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure proper margins for legal documents */
+  #offer-document,
+  #legal-contract-document {
+    margin: 0;
+    padding: 25mm 20mm;
+    box-shadow: none;
+    border: none;
+    background: white;
+    font-family: 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #000;
+    max-width: none;
+  }
+
+  /* Legal document specific typography */
+  #legal-contract-document {
+    font-family: 'Times New Roman', serif;
+  }
+
+  #legal-contract-document h1 {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin: 25pt 0;
+    letter-spacing: 2pt;
+    text-transform: uppercase;
+  }
+
+  #legal-contract-document h2 {
+    font-size: 14pt;
+    font-weight: bold;
+    margin: 20pt 0 12pt 0;
+    border-bottom: 1.5pt solid #000;
+    padding-bottom: 4pt;
+    text-transform: uppercase;
+  }
+
+  #legal-contract-document h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin: 12pt 0 6pt 0;
+  }
+
+  #legal-contract-document p {
+    margin: 8pt 0;
+    text-align: justify;
+    text-indent: 0;
+  }
+
+  #legal-contract-document ul {
+    margin: 8pt 0;
+    padding-left: 25pt;
+  }
+
+  #legal-contract-document li {
+    margin: 4pt 0;
+  }
+
+  #legal-contract-document .signature-section {
+    margin-top: 50pt;
+    page-break-inside: avoid;
+  }
+
+  /* Contract specific elements */
+  #legal-contract-document .contract-header {
+    border-bottom: 2pt solid #000;
+    margin-bottom: 25pt;
+    page-break-after: avoid;
+  }
+
+  #legal-contract-document .section-number {
+    font-weight: bold;
+    margin-right: 8pt;
+  }
+
+  #legal-contract-document .subsection {
+    margin-left: 20pt;
+  }
+
+  #legal-contract-document .signature-block {
+    border: 1pt solid #000;
+    margin: 15pt 0;
+    padding: 15pt;
+    page-break-inside: avoid;
+  }
+
+  #legal-contract-document .signature-line {
+    border-bottom: 1pt solid #000;
+    height: 50pt;
+    margin: 15pt 0;
+  }
+
+  /* Prevent widows and orphans */
+  #legal-contract-document p,
+  #legal-contract-document li {
+    orphans: 2;
+    widows: 2;
+  }
+
+  #legal-contract-document h1,
+  #legal-contract-document h2,
+  #legal-contract-document h3 {
+    orphans: 3;
+    widows: 3;
+    page-break-after: avoid;
+  }
+
+  /* Force page breaks where needed */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .no-page-break {
+    page-break-inside: avoid;
+  }
+
+  /* Hide interactive elements in print */
+  button,
+  .button,
+  .interactive,
+  nav,
+  .navigation,
+  .print-hidden {
+    display: none !important;
+  }
+}
