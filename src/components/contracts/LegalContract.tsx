@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { 
   EDUCATION_LOAN_TEMPLATE, 
   getContractTemplate, 
@@ -8,39 +8,42 @@ import {
 } from './ContractTemplates';
 
 interface LegalContractProps {
-  offer: {
+  contract: {
     id: string;
-    offer_type: string;
-    loan_amount: number;
-    apr_rate?: number;
-    isa_percentage?: number;
-    repayment_term_months: number;
-    grace_period_months: number;
-    repayment_schedule: any;
-    terms_and_conditions: any;
-    status: string;
-    offer_valid_until: string;
-    created_at: string;
+    contractType: string;
+    loanAmount: number;
+    aprRate?: number;
+    isaPercentage?: number;
+    repaymentTermMonths: number;
+    gracePeriodMonths: number;
+    repaymentSchedule: any;
+    termsAndConditions: any;
+    offerValidUntil: string;
+    createdAt: string;
   };
-  borrowerInfo?: {
-    name: string;
+  borrower: {
+    fullName: string;
     email: string;
-    address?: string;
-  };
-  lenderInfo?: {
-    name: string;
     address: string;
-    registration: string;
+    dateOfBirth?: string;
+    nationalId?: string;
+  };
+  lender: {
+    companyName: string;
+    registeredAddress: string;
+    registrationNumber: string;
+    contactEmail: string;
+    phoneNumber: string;
   };
   className?: string;
 }
 
-export const LegalContract: React.FC<LegalContractProps> = ({
-  offer,
-  borrowerInfo,
-  lenderInfo,
+export const LegalContract = forwardRef<HTMLDivElement, LegalContractProps>(({
+  contract,
+  borrower,
+  lender,
   className = ""
-}) => {
+}, ref) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
@@ -56,16 +59,16 @@ export const LegalContract: React.FC<LegalContractProps> = ({
     });
   };
 
-  // Calculate derived values from offer
-  const loanAmount = offer.loan_amount;
+  // Calculate derived values from contract
+  const loanAmount = contract.loanAmount;
   const processingFeePercent = 1.5;
   const processingFee = Math.round(loanAmount * (processingFeePercent / 100));
   const netDisbursement = loanAmount - processingFee;
-  const monthlyRate = (offer.apr_rate || 3.9) / 12;
-  const totalInterest = offer.repayment_schedule?.totalInterest || Math.round(loanAmount * monthlyRate * offer.repayment_term_months / 100);
+  const monthlyRate = (contract.aprRate || 3.9) / 12;
+  const totalInterest = contract.repaymentSchedule?.totalInterest || Math.round(loanAmount * monthlyRate * contract.repaymentTermMonths / 100);
   const totalRepayable = loanAmount + totalInterest;
   const totalCostOfCredit = processingFee + totalInterest;
-  const monthlyPayment = Math.round(totalRepayable / offer.repayment_term_months);
+  const monthlyPayment = Math.round(totalRepayable / contract.repaymentTermMonths);
 
   const contractData = {
     loanAmount: formatCurrency(loanAmount).replace('£', ''),
@@ -73,18 +76,18 @@ export const LegalContract: React.FC<LegalContractProps> = ({
     processingFeePercent: processingFeePercent.toString(),
     processingFee: processingFee.toString(),
     netDisbursement: netDisbursement.toString(),
-    interestRate: (offer.apr_rate || 3.9).toString(),
-    loanTerm: offer.repayment_term_months.toString(),
+    interestRate: (contract.aprRate || 3.9).toString(),
+    loanTerm: contract.repaymentTermMonths.toString(),
     loanTermWords: 'Sixty',
-    firstPaymentDate: formatDate(new Date(Date.now() + (offer.grace_period_months || 0) * 30 * 24 * 60 * 60 * 1000)),
-    numberOfInstallments: offer.repayment_term_months.toString(),
+    firstPaymentDate: formatDate(new Date(Date.now() + (contract.gracePeriodMonths || 0) * 30 * 24 * 60 * 60 * 1000)),
+    numberOfInstallments: contract.repaymentTermMonths.toString(),
     installmentAmount: monthlyPayment.toString(),
-    principalPerInstallment: Math.round(loanAmount / offer.repayment_term_months).toString(),
-    interestPerInstallment: Math.round(totalInterest / offer.repayment_term_months).toString(),
+    principalPerInstallment: Math.round(loanAmount / contract.repaymentTermMonths).toString(),
+    interestPerInstallment: Math.round(totalInterest / contract.repaymentTermMonths).toString(),
     totalRepayable: totalRepayable.toString(),
     totalInterest: totalInterest.toString(),
     totalCostOfCredit: totalCostOfCredit.toString(),
-    borrowerName: borrowerInfo?.name || 'Joseph Ifeanyichukwu Nkemakosi',
+    borrowerName: borrower.fullName || 'Joseph Ifeanyichukwu Nkemakosi',
     guarantorName: '[Guarantor\'s Full Name]',
     agreementDate: formatDate(new Date()),
     bankName: 'Tide Bank',
@@ -96,7 +99,7 @@ export const LegalContract: React.FC<LegalContractProps> = ({
   const populatedSections = generateContractSections(template, contractData);
 
   return (
-    <div id="legal-contract" className={`bg-white text-black max-w-4xl mx-auto ${className}`}>
+    <div ref={ref} id="legal-contract" className={`bg-white text-black max-w-4xl mx-auto ${className}`}>
       {/* Cover Page */}
       <div className="text-center mb-8 p-8 border-b-2 border-black">
         <div className="mb-6">
@@ -219,4 +222,4 @@ export const LegalContract: React.FC<LegalContractProps> = ({
       </div>
     </div>
   );
-};
+});
