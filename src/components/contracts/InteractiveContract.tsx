@@ -1,104 +1,170 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Edit2, Save, X, FileSignature, MapPin, User, Users, Upload, AlertCircle } from 'lucide-react';
 import { LegalContract } from './LegalContract';
 import ESignature from '../techscale/ESignature';
-import { Edit, Check, X } from 'lucide-react';
+import GuarantorDetailsForm from './GuarantorDetailsForm';
+import ManualContractUpload from './ManualContractUpload';
 import { toast } from 'sonner';
 
+interface GuarantorDetails {
+  name: string;
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  relationship: string;
+  occupation: string;
+  employer: string;
+  annualIncome: string;
+  dateOfBirth: string;
+  nationalId: string;
+}
+
 interface InteractiveContractProps {
-  contract: any;
-  borrower: any;
-  lender: any;
-  onBorrowerUpdate?: (updatedBorrower: any) => void;
+  contract: {
+    id: string;
+    contractType: string;
+    loanAmount: number;
+    aprRate?: number;
+    isaPercentage?: number;
+    repaymentTermMonths: number;
+    gracePeriodMonths: number;
+    repaymentSchedule: any;
+    termsAndConditions: any;
+    offerValidUntil: string;
+    createdAt: string;
+    requiresGuarantor?: boolean;
+  };
+  borrower: {
+    fullName: string;
+    email: string;
+    address: string;
+    dateOfBirth?: string;
+    nationalId?: string;
+  };
+  lender: {
+    companyName: string;
+    registrationNumber: string;
+    registeredAddress: string;
+    contactEmail: string;
+    phoneNumber: string;
+  };
+  guarantor?: GuarantorDetails;
+  onBorrowerUpdate?: (borrower: any) => void;
+  onGuarantorUpdate?: (guarantor: GuarantorDetails) => void;
   onSignatureComplete?: (signatureData: string) => void;
+  onManualUploadComplete?: (uploadData: any) => void;
   className?: string;
 }
 
 export interface InteractiveContractRef {
-  getUpdatedData: () => { borrower: any; signed: boolean; signatureData?: string };
+  getUpdatedData: () => {
+    borrower: any;
+    guarantor: GuarantorDetails | null;
+    isSigned: boolean;
+    signatureData: string | null;
+    isManuallyUploaded: boolean;
+    manualUploadData: any;
+  };
 }
 
-export const InteractiveContract = forwardRef<InteractiveContractRef, InteractiveContractProps>(({
-  contract,
-  borrower: initialBorrower,
-  lender,
-  onBorrowerUpdate,
-  onSignatureComplete,
-  className = ""
-}, ref) => {
-  const [borrower, setBorrower] = useState(initialBorrower);
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [showSignature, setShowSignature] = useState(false);
-  const [signatureData, setSignatureData] = useState<string>('');
-  const [isSigned, setIsSigned] = useState(false);
-  const [tempAddress, setTempAddress] = useState({
-    street: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'United Kingdom'
-  });
+const InteractiveContract = forwardRef<InteractiveContractRef, InteractiveContractProps>(
+  ({ contract, borrower, lender, guarantor, onBorrowerUpdate, onGuarantorUpdate, onSignatureComplete, onManualUploadComplete }, ref) => {
+    const [borrowerData, setBorrowerData] = useState(borrower);
+    const [guarantorData, setGuarantorData] = useState<GuarantorDetails | null>(guarantor || null);
+    const [editingAddress, setEditingAddress] = useState(false);
+    const [editingGuarantor, setEditingGuarantor] = useState(false);
+    const [showSignature, setShowSignature] = useState(false);
+    const [showManualUpload, setShowManualUpload] = useState(false);
+    const [signatureData, setSignatureData] = useState<string | null>(null);
+    const [manualUploadData, setManualUploadData] = useState<any>(null);
+    const [tempAddress, setTempAddress] = useState('');
 
-  useImperativeHandle(ref, () => ({
-    getUpdatedData: () => ({
-      borrower,
-      signed: isSigned,
-      signatureData
-    })
-  }));
+    const handleEditAddress = () => {
+      setTempAddress(borrowerData.address);
+      setEditingAddress(true);
+    };
 
-  const handleEditAddress = () => {
-    // Parse current address into components
-    const addressParts = borrower.address.split(',').map((part: string) => part.trim());
-    setTempAddress({
-      street: addressParts[0] || '',
-      city: addressParts[1] || '',
-      state: addressParts[2] || '',
-      postalCode: addressParts[3] || '',
-      country: addressParts[4] || 'United Kingdom'
-    });
-    setIsEditingAddress(true);
-  };
+    const handleSaveAddress = () => {
+      const updatedBorrower = { ...borrowerData, address: tempAddress };
+      setBorrowerData(updatedBorrower);
+      onBorrowerUpdate?.(updatedBorrower);
+      setEditingAddress(false);
+    };
 
-  const handleSaveAddress = () => {
-    const newAddress = `${tempAddress.street}, ${tempAddress.city}, ${tempAddress.state} ${tempAddress.postalCode}, ${tempAddress.country}`;
-    const updatedBorrower = { ...borrower, address: newAddress };
-    setBorrower(updatedBorrower);
-    onBorrowerUpdate?.(updatedBorrower);
-    setIsEditingAddress(false);
-    toast.success('Address updated successfully');
-  };
+    const handleCancelEdit = () => {
+      setEditingAddress(false);
+      setTempAddress('');
+    };
 
-  const handleCancelEdit = () => {
-    setIsEditingAddress(false);
-  };
+    useImperativeHandle(ref, () => ({
+      getUpdatedData: () => ({
+        borrower: borrowerData,
+        guarantor: guarantorData,
+        isSigned: !!signatureData,
+        signatureData,
+        isManuallyUploaded: !!manualUploadData,
+        manualUploadData
+      })
+    }));
 
-  const handleStartSigning = () => {
-    setShowSignature(true);
-  };
+    const handleStartSigning = () => {
+      if (contract.requiresGuarantor && !guarantorData) {
+        toast.error('Please provide guarantor details before signing');
+        setEditingGuarantor(true);
+        return;
+      }
+      setShowSignature(true);
+    };
 
-  const handleSignatureComplete = (signature: string) => {
-    setSignatureData(signature);
-    setIsSigned(true);
-    setShowSignature(false);
-    onSignatureComplete?.(signature);
-    toast.success('Contract signed successfully!');
-  };
+    const handleSignatureComplete = (signature: string) => {
+      setSignatureData(signature);
+      setShowSignature(false);
+      onSignatureComplete?.(signature);
+    };
 
-  const handleSignatureCancel = () => {
-    setShowSignature(false);
-  };
+    const handleSignatureCancel = () => {
+      setShowSignature(false);
+    };
 
-  return (
-    <>
-      <div className={`relative ${className}`}>
-        {/* Interactive Controls */}
-        <div className="sticky top-0 z-10 bg-white border-b p-4 mb-6 shadow-sm">
+    const handleManualUploadStart = () => {
+      if (contract.requiresGuarantor && !guarantorData) {
+        toast.error('Please provide guarantor details before uploading');
+        setEditingGuarantor(true);
+        return;
+      }
+      setShowManualUpload(true);
+    };
+
+    const handleManualUploadComplete = (uploadData: any) => {
+      setManualUploadData(uploadData);
+      setShowManualUpload(false);
+      onManualUploadComplete?.(uploadData);
+      toast.success('Contract uploaded successfully!');
+    };
+
+    const handleGuarantorSave = (guarantor: GuarantorDetails) => {
+      setGuarantorData(guarantor);
+      onGuarantorUpdate?.(guarantor);
+    };
+
+    return (
+      <div className="relative bg-white">
+        {/* Action Bar */}
+        <div className="sticky top-0 z-10 bg-white border-b shadow-sm p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
@@ -107,160 +173,222 @@ export const InteractiveContract = forwardRef<InteractiveContractRef, Interactiv
                 onClick={handleEditAddress}
                 className="flex items-center gap-2"
               >
-                <Edit className="h-4 w-4" />
+                <Edit2 className="h-4 w-4" />
                 Edit Address
               </Button>
-              
-              {isSigned ? (
-                <div className="flex items-center gap-2 text-green-600">
-                  <Check className="h-4 w-4" />
-                  <span className="text-sm font-medium">Contract Signed</span>
-                </div>
-              ) : (
+
+              {contract.requiresGuarantor && (
                 <Button
-                  onClick={handleStartSigning}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditingGuarantor(true)}
+                  className="flex items-center gap-2"
                 >
-                  <Edit className="h-4 w-4" />
-                  Sign Contract
+                  <Users className="h-4 w-4" />
+                  {guarantorData ? 'Edit Guarantor' : 'Add Guarantor'}
+                  {contract.requiresGuarantor && !guarantorData && (
+                    <Badge variant="destructive" className="ml-1">Required</Badge>
+                  )}
                 </Button>
               )}
             </div>
-            
-            <div className="text-sm text-muted-foreground">
-              Last updated: {new Date().toLocaleDateString('en-GB')}
+
+            <div className="flex items-center gap-2">
+              {!signatureData && !manualUploadData && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleManualUploadStart}
+                    className="flex items-center gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Upload Signed
+                  </Button>
+                  
+                  <Button
+                    onClick={handleStartSigning}
+                    className="flex items-center gap-2"
+                  >
+                    <FileSignature className="h-4 w-4" />
+                    Sign Digitally
+                  </Button>
+                </>
+              )}
+
+              {signatureData && (
+                <Badge variant="default" className="flex items-center gap-1 bg-green-600">
+                  <FileSignature className="h-3 w-3" />
+                  Digitally Signed
+                </Badge>
+              )}
+
+              {manualUploadData && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Upload className="h-3 w-3" />
+                  Manually Uploaded
+                </Badge>
+              )}
             </div>
           </div>
+
+          {/* Guarantor Requirement Alert */}
+          {contract.requiresGuarantor && !guarantorData && (
+            <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
+                <div className="text-sm text-amber-800">
+                  <p className="font-medium">Guarantor Required</p>
+                  <p>This loan requires a guarantor. Please provide guarantor details before signing the contract.</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Contract Document */}
-        <LegalContract
-          contract={contract}
-          borrower={borrower}
-          lender={lender}
-          className="border rounded-lg"
-        />
+        {/* Contract Display */}
+        <div className="flex-1 overflow-auto">
+          <LegalContract
+            contract={contract}
+            borrower={borrowerData}
+            lender={lender}
+            guarantor={guarantorData}
+            className="p-6"
+          />
+        </div>
 
-        {/* Signature Display */}
-        {isSigned && signatureData && (
-          <Card className="mt-6 border-green-200 bg-green-50">
-            <CardHeader>
-              <CardTitle className="text-green-800 flex items-center gap-2">
-                <Check className="h-5 w-5" />
-                Digitally Signed Contract
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-green-700">Digital Signature:</Label>
-                  <div className="mt-2 p-4 bg-white border border-green-200 rounded">
+        {/* Signature/Upload Confirmation */}
+        {signatureData && (
+          <div className="border-t bg-green-50 p-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-green-800 flex items-center gap-2">
+                  <FileSignature className="h-5 w-5" />
+                  Digital Signature Applied
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-green-700">
+                      Contract signed on {new Date().toLocaleDateString('en-GB')} at {new Date().toLocaleTimeString('en-GB')}
+                    </p>
+                    <p className="text-xs text-green-600">
+                      This contract is now legally binding and has been digitally signed.
+                    </p>
+                  </div>
+                  <div className="h-16 w-32 bg-white border rounded flex items-center justify-center">
                     <img 
-                      src={signatureData} 
+                      src={`data:image/png;base64,${signatureData}`} 
                       alt="Digital Signature" 
-                      className="max-h-20 border-b border-gray-300"
+                      className="max-h-12 max-w-28"
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <Label className="text-green-700">Signed by:</Label>
-                    <p className="font-medium">{borrower.fullName}</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {manualUploadData && (
+          <div className="border-t bg-blue-50 p-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-blue-800 flex items-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  Manually Signed Contract Uploaded
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-blue-700">
+                        Uploaded on {new Date(manualUploadData.uploadedAt).toLocaleDateString('en-GB')}
+                      </p>
+                      <p className="text-sm text-blue-600">
+                        File: {manualUploadData.fileName}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-green-700">Date & Time:</Label>
-                    <p className="font-medium">{new Date().toLocaleString('en-GB')}</p>
-                  </div>
+                  {manualUploadData.notes && (
+                    <div className="mt-2 p-2 bg-white rounded border">
+                      <p className="text-xs text-muted-foreground mb-1">Upload Notes:</p>
+                      <p className="text-sm">{manualUploadData.notes}</p>
+                    </div>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Address Edit Dialog */}
+        <Dialog open={editingAddress} onOpenChange={setEditingAddress}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Edit Address
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="address">Address</Label>
+                <Textarea
+                  id="address"
+                  value={tempAddress}
+                  onChange={(e) => setTempAddress(e.target.value)}
+                  rows={4}
+                  placeholder="Enter your full address"
+                />
               </div>
-            </CardContent>
-          </Card>
+
+              <div className="flex items-center justify-between">
+                <Button variant="outline" onClick={handleCancelEdit}>
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveAddress}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Address
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Guarantor Details Form */}
+        <GuarantorDetailsForm
+          isOpen={editingGuarantor}
+          onClose={() => setEditingGuarantor(false)}
+          onSave={handleGuarantorSave}
+          initialData={guarantorData || undefined}
+          isRequired={contract.requiresGuarantor}
+        />
+
+        {/* Manual Contract Upload */}
+        <ManualContractUpload
+          isOpen={showManualUpload}
+          onClose={() => setShowManualUpload(false)}
+          onComplete={handleManualUploadComplete}
+          contractId={contract.id}
+          contractType={contract.contractType}
+        />
+
+        {/* Digital Signature Modal */}
+        {showSignature && (
+          <ESignature
+            onComplete={handleSignatureComplete}
+            onCancel={handleSignatureCancel}
+          />
         )}
       </div>
-
-      {/* Address Editing Dialog */}
-      <Dialog open={isEditingAddress} onOpenChange={setIsEditingAddress}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Address</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="street">Street Address</Label>
-              <Input
-                id="street"
-                value={tempAddress.street}
-                onChange={(e) => setTempAddress({...tempAddress, street: e.target.value})}
-                placeholder="Enter street address"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  value={tempAddress.city}
-                  onChange={(e) => setTempAddress({...tempAddress, city: e.target.value})}
-                  placeholder="Enter city"
-                />
-              </div>
-              <div>
-                <Label htmlFor="state">State/County</Label>
-                <Input
-                  id="state"
-                  value={tempAddress.state}
-                  onChange={(e) => setTempAddress({...tempAddress, state: e.target.value})}
-                  placeholder="Enter state/county"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="postalCode">Postal Code</Label>
-                <Input
-                  id="postalCode"
-                  value={tempAddress.postalCode}
-                  onChange={(e) => setTempAddress({...tempAddress, postalCode: e.target.value})}
-                  placeholder="Enter postal code"
-                />
-              </div>
-              <div>
-                <Label htmlFor="country">Country</Label>
-                <Input
-                  id="country"
-                  value={tempAddress.country}
-                  onChange={(e) => setTempAddress({...tempAddress, country: e.target.value})}
-                  placeholder="Enter country"
-                />
-              </div>
-            </div>
-            
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleSaveAddress} className="flex-1">
-                <Check className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-              <Button variant="outline" onClick={handleCancelEdit} className="flex-1">
-                <X className="h-4 w-4 mr-2" />
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Signature Dialog */}
-      {showSignature && (
-        <ESignature
-          onComplete={handleSignatureComplete}
-          onCancel={handleSignatureCancel}
-        />
-      )}
-    </>
-  );
-});
+    );
+  }
+);
 
 InteractiveContract.displayName = 'InteractiveContract';
+
+export { InteractiveContract };
+export default InteractiveContract;

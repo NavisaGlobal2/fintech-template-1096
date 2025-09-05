@@ -8,6 +8,25 @@ import {
 } from './ContractTemplates';
 import { numberToWordsCapitalized, currencyToWords } from '../../utils/numberToWords';
 
+interface GuarantorDetails {
+  name: string;
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  relationship: string;
+  occupation: string;
+  employer: string;
+  annualIncome: string;
+  dateOfBirth: string;
+  nationalId: string;
+}
+
 interface LegalContractProps {
   contract: {
     id: string;
@@ -36,6 +55,7 @@ interface LegalContractProps {
     contactEmail: string;
     phoneNumber: string;
   };
+  guarantor?: GuarantorDetails | null;
   className?: string;
 }
 
@@ -43,6 +63,7 @@ export const LegalContract = forwardRef<HTMLDivElement, LegalContractProps>(({
   contract,
   borrower,
   lender,
+  guarantor,
   className = ""
 }, ref) => {
   const formatCurrency = (amount: number) => {
@@ -151,8 +172,11 @@ export const LegalContract = forwardRef<HTMLDivElement, LegalContractProps>(({
   };
 
   // Format addresses properly
-  const formatAddress = (address: string) => {
-    return address.replace(/,/g, ',\n').trim();
+  const formatAddress = (address: string | { street: string; city: string; state: string; postalCode: string; country: string }) => {
+    if (typeof address === 'string') {
+      return address.replace(/,/g, ',\n').trim();
+    }
+    return `${address.street}\n${address.city}${address.state ? ', ' + address.state : ''}\n${address.postalCode}\n${address.country}`;
   };
 
   const contractData = {
@@ -178,8 +202,11 @@ export const LegalContract = forwardRef<HTMLDivElement, LegalContractProps>(({
     lenderAddress: formatAddress(lender.registeredAddress),
     lenderEmail: lender.contactEmail,
     lenderPhone: lender.phoneNumber,
-    guarantorName: '[Guarantor\'s Full Name]',
-    guarantorAddress: '[Guarantor\'s Address]',
+    guarantorName: guarantor?.name || '[Guarantor\'s Full Name]',
+    guarantorAddress: guarantor ? formatAddress(guarantor.address) : '[Guarantor\'s Address]',
+    guarantorPhone: guarantor?.phone || '[Guarantor\'s Phone]',
+    guarantorEmail: guarantor?.email || '[Guarantor\'s Email]',
+    guarantorRelationship: guarantor?.relationship || '[Relationship to Borrower]',
     agreementDate: formatDate(new Date()),
     bankName: 'Tide Bank',
     sortCode: '04-06-05',

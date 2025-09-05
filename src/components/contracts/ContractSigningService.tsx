@@ -122,7 +122,7 @@ export const ContractSigningService: React.FC<ContractSigningServiceProps> = ({
       // Get the final contract data
       const contractState = interactiveContractRef.current?.getUpdatedData();
       
-      if (!contractState?.signed) {
+      if (!contractState?.isSigned) {
         toast.error('Please sign the contract before accepting the offer');
         return;
       }
