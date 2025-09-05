@@ -22,7 +22,8 @@ import {
 } from 'lucide-react';
 import { LegalContract } from '@/components/contracts/LegalContract';
 import { ContractSigningService } from '@/components/contracts/ContractSigningService';
-import { PDFGenerator } from '@/utils/pdfGenerator';
+import { DocumentDownloader } from '@/utils/documentDownloader';
+import { DownloadMenu } from '@/components/ui/download-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -74,7 +75,7 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   showActions = true
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [showContractSigning, setShowContractSigning] = useState(false);
   const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);
   const [lenderData, setLenderData] = useState<LenderData | null>(null);
@@ -167,9 +168,9 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
     return diffInHours <= 24 && diffInHours > 0;
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownload = async (format: 'png' | 'jpg' | 'pdf' | 'docx') => {
     try {
-      setDownloadingPDF(true);
+      setDownloading(true);
       const element = document.getElementById('legal-contract');
       
       if (!element) {
@@ -177,24 +178,33 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
         return;
       }
 
-      await PDFGenerator.generateOfferDocument(
-        element,
-        {
-          loanAmount: offer.loan_amount,
-          offerType: offer.offer_type,
-          offerId: offer.id
-        },
-        {
-          filename: `education-loan-agreement-${offer.id.slice(0, 8)}.pdf`
-        }
-      );
-
-      toast.success('Contract PDF downloaded successfully');
+      const filename = `education-loan-agreement-${offer.id.slice(0, 8)}`;
+      
+      switch (format) {
+        case 'png':
+          await DocumentDownloader.downloadAsPNG(element, { filename: `${filename}.png` });
+          toast.success('Contract PNG downloaded successfully');
+          break;
+        case 'jpg':
+          await DocumentDownloader.downloadAsJPG(element, { filename: `${filename}.jpg` });
+          toast.success('Contract JPG downloaded successfully');
+          break;
+        case 'pdf':
+          await DocumentDownloader.downloadAsPrintPDF(element, { filename });
+          toast.success('Print dialog opened');
+          break;
+        case 'docx':
+          await DocumentDownloader.downloadAsDOCX(contractData, { filename: `${filename}.docx` });
+          toast.success('Contract Word document downloaded successfully');
+          break;
+        default:
+          throw new Error('Unsupported format');
+      }
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Failed to generate PDF');
+      console.error(`Error generating ${format.toUpperCase()}:`, error);
+      toast.error(`Failed to generate ${format.toUpperCase()}`);
     } finally {
-      setDownloadingPDF(false);
+      setDownloading(false);
     }
   };
 
@@ -289,15 +299,11 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
                 <Maximize className="h-4 w-4 mr-2" />
                 {isFullscreen ? 'Exit' : 'Fullscreen'}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownloadPDF}
-                disabled={downloadingPDF}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {downloadingPDF ? 'Generating...' : 'Download PDF'}
-              </Button>
+              <DownloadMenu
+                onDownload={handleDownload}
+                disabled={downloading}
+                loading={downloading}
+              />
             </div>
           </div>
         </DialogHeader>
@@ -347,14 +353,11 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
                       </div>
                       {offer.status === 'pending' && !isExpired() && (
                         <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            onClick={handleDownloadPDF}
-                            disabled={downloadingPDF}
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            {downloadingPDF ? 'Generating...' : 'Download PDF'}
-                          </Button>
+                          <DownloadMenu
+                            onDownload={handleDownload}
+                            disabled={downloading}
+                            loading={downloading}
+                          />
                            <Button
                              onClick={handleStartSigning}
                              className="bg-green-600 hover:bg-green-700"
@@ -457,14 +460,11 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button
-              variant="outline"
-              onClick={handleDownloadPDF}
-              disabled={downloadingPDF}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download Agreement
-            </Button>
+            <DownloadMenu
+              onDownload={handleDownload}
+              disabled={downloading}
+              loading={downloading}
+            />
             <Button variant="destructive" onClick={onDecline}>
               <XCircle className="h-4 w-4 mr-2" />
               Decline Offer
