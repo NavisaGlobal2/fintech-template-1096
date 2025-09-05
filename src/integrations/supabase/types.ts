@@ -122,6 +122,7 @@ export type Database = {
           guarantor_id: string | null
           id: string
           ip_address: unknown | null
+          signature_completed: boolean | null
           signature_data: string | null
           signature_order: number | null
           signed_at: string | null
@@ -131,6 +132,7 @@ export type Database = {
           signer_type: string
           status: string
           user_agent: string | null
+          workflow_step: number | null
         }
         Insert: {
           contract_id?: string | null
@@ -139,6 +141,7 @@ export type Database = {
           guarantor_id?: string | null
           id?: string
           ip_address?: unknown | null
+          signature_completed?: boolean | null
           signature_data?: string | null
           signature_order?: number | null
           signed_at?: string | null
@@ -148,6 +151,7 @@ export type Database = {
           signer_type: string
           status?: string
           user_agent?: string | null
+          workflow_step?: number | null
         }
         Update: {
           contract_id?: string | null
@@ -156,6 +160,7 @@ export type Database = {
           guarantor_id?: string | null
           id?: string
           ip_address?: unknown | null
+          signature_completed?: boolean | null
           signature_data?: string | null
           signature_order?: number | null
           signed_at?: string | null
@@ -165,6 +170,7 @@ export type Database = {
           signer_type?: string
           status?: string
           user_agent?: string | null
+          workflow_step?: number | null
         }
         Relationships: [
           {
@@ -280,6 +286,109 @@ export type Database = {
             columns: ["guarantor_id"]
             isOneToOne: false
             referencedRelation: "loan_guarantors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guarantor_info_submissions: {
+        Row: {
+          additional_notes: string | null
+          created_at: string
+          guarantor_email: string
+          guarantor_name: string
+          guarantor_phone: string | null
+          guarantor_relationship: string
+          guarantor_request_id: string
+          id: string
+          submitted_at: string
+          submitted_by: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          created_at?: string
+          guarantor_email: string
+          guarantor_name: string
+          guarantor_phone?: string | null
+          guarantor_relationship: string
+          guarantor_request_id: string
+          id?: string
+          submitted_at?: string
+          submitted_by: string
+        }
+        Update: {
+          additional_notes?: string | null
+          created_at?: string
+          guarantor_email?: string
+          guarantor_name?: string
+          guarantor_phone?: string | null
+          guarantor_relationship?: string
+          guarantor_request_id?: string
+          id?: string
+          submitted_at?: string
+          submitted_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_guarantor_info_submissions_request"
+            columns: ["guarantor_request_id"]
+            isOneToOne: false
+            referencedRelation: "guarantor_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guarantor_requests: {
+        Row: {
+          created_at: string
+          guarantor_info_submitted_at: string | null
+          guarantor_invited_at: string | null
+          guarantor_requirements: Json
+          id: string
+          offer_id: string
+          request_expires_at: string
+          request_message: string | null
+          request_token: string
+          requested_by: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          guarantor_info_submitted_at?: string | null
+          guarantor_invited_at?: string | null
+          guarantor_requirements?: Json
+          id?: string
+          offer_id: string
+          request_expires_at?: string
+          request_message?: string | null
+          request_token?: string
+          requested_by: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          guarantor_info_submitted_at?: string | null
+          guarantor_invited_at?: string | null
+          guarantor_requirements?: Json
+          id?: string
+          offer_id?: string
+          request_expires_at?: string
+          request_message?: string | null
+          request_token?: string
+          requested_by?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_guarantor_requests_offer"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "loan_offers"
             referencedColumns: ["id"]
           },
         ]
@@ -524,6 +633,7 @@ export type Database = {
           executed_at: string | null
           id: string
           offer_id: string | null
+          signature_workflow_status: string | null
           signed_at: string | null
           status: string
           template_version: string | null
@@ -540,6 +650,7 @@ export type Database = {
           executed_at?: string | null
           id?: string
           offer_id?: string | null
+          signature_workflow_status?: string | null
           signed_at?: string | null
           status?: string
           template_version?: string | null
@@ -556,6 +667,7 @@ export type Database = {
           executed_at?: string | null
           id?: string
           offer_id?: string | null
+          signature_workflow_status?: string | null
           signed_at?: string | null
           status?: string
           template_version?: string | null
@@ -1217,6 +1329,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      initialize_contract_signatures: {
+        Args: {
+          borrower_email: string
+          borrower_id: string
+          borrower_name: string
+          contract_id_param: string
+          guarantor_email?: string
+          guarantor_id?: string
+          guarantor_name?: string
+        }
+        Returns: undefined
       }
       is_authorized_for_underwriting: {
         Args: { _user_id: string }
