@@ -10,28 +10,59 @@ export interface DocumentGenerationOptions {
 
 export class PDFGenerator {
   private static async captureElement(element: HTMLElement, options: DocumentGenerationOptions = {}) {
-    // Temporarily set print styles for better PDF rendering
+    // Apply print styles temporarily for optimal PDF rendering
     const originalStyles = element.style.cssText;
-    element.style.fontFamily = 'serif';
-    element.style.fontSize = '12px';
-    element.style.lineHeight = '1.6';
+    const originalClassList = element.className;
+    
+    // Force print-optimized styling
+    element.style.fontFamily = '"Times New Roman", serif';
+    element.style.fontSize = '11pt';
+    element.style.lineHeight = '1.4';
     element.style.color = '#000000';
     element.style.background = '#ffffff';
+    element.style.width = '210mm'; // A4 width
+    element.style.minHeight = '297mm'; // A4 height
+    element.style.padding = '15mm 20mm 20mm 25mm';
+    element.style.margin = '0';
+    element.style.boxSizing = 'border-box';
+    
+    // Add print class for CSS targeting
+    element.className += ' print-mode';
+    
+    // Apply print media styles programmatically
+    const printStyles = document.createElement('style');
+    printStyles.textContent = `
+      .print-mode * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    `;
+    document.head.appendChild(printStyles);
+
+    // Wait for fonts and styles to load
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     const canvas = await html2canvas(element, {
-      scale: options.quality || 3, // Higher quality for legal documents
+      scale: options.quality || 4, // Ultra-high quality for legal documents
       useCORS: true,
       allowTaint: false,
       backgroundColor: '#ffffff',
       scrollX: 0,
       scrollY: 0,
+      width: element.scrollWidth,
+      height: element.scrollHeight,
       windowWidth: element.scrollWidth,
       windowHeight: element.scrollHeight,
-      logging: false
+      logging: false,
+      foreignObjectRendering: true,
+      removeContainer: false
     });
 
-    // Restore original styles
+    // Restore original styles and classes
     element.style.cssText = originalStyles;
+    element.className = originalClassList;
+    document.head.removeChild(printStyles);
 
     return canvas;
   }
@@ -42,65 +73,122 @@ export class PDFGenerator {
   ): Promise<jsPDF> {
     const canvas = await this.captureElement(element, options);
     
-    const imgData = canvas.toDataURL('image/png', 1.0); // Full quality
+    const imgData = canvas.toDataURL('image/png', 1.0); // Maximum quality
+    
+    // Create PDF with proper A4 dimensions and metadata
     const pdf = new jsPDF({
       orientation: options.orientation || 'portrait',
       unit: 'mm',
-      format: options.format || 'a4',
-      compress: false // Don't compress for legal documents
+      format: 'a4',
+      compress: false, // No compression for legal documents
+      putOnlyUsedFonts: true,
+      floatPrecision: 16
     });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    // Add document metadata
+    pdf.setProperties({
+      title: 'Education Loan Agreement',
+      subject: 'Legal Contract Document',
+      author: 'TechSkillUK Ltd',
+      creator: 'TechSkillUK Loan Platform',
+      keywords: 'education loan, legal agreement, contract'
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm for A4
+    const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm for A4
     
     const imgWidth = canvas.width;
     const imgHeight = canvas.height;
     
-    // Calculate scaling to fit on pages with proper margins
-    const margin = 10; // 10mm margin
-    const availableWidth = pdfWidth - (2 * margin);
-    const availableHeight = pdfHeight - (2 * margin);
+    // Professional document margins
+    const topMargin = 15;
+    const bottomMargin = 20; 
+    const leftMargin = 25;
+    const rightMargin = 20;
     
-    const widthRatio = availableWidth / (imgWidth * 0.264583); // Convert pixels to mm
-    const heightRatio = availableHeight / (imgHeight * 0.264583);
-    const ratio = Math.min(widthRatio, heightRatio);
+    const availableWidth = pdfWidth - leftMargin - rightMargin;
+    const availableHeight = pdfHeight - topMargin - bottomMargin;
     
-    const finalWidth = (imgWidth * 0.264583) * ratio;
-    const finalHeight = (imgHeight * 0.264583) * ratio;
+    // Calculate optimal scaling maintaining aspect ratio
+    const pixelsToMm = 0.264583;
+    const imgWidthMm = imgWidth * pixelsToMm;
+    const imgHeightMm = imgHeight * pixelsToMm;
     
-    const imgX = (pdfWidth - finalWidth) / 2;
-    const imgY = margin;
+    const widthRatio = availableWidth / imgWidthMm;
+    const heightRatio = availableHeight / imgHeightMm;
+    const optimalRatio = Math.min(widthRatio, heightRatio, 1); // Don't scale up
+    
+    const finalWidth = imgWidthMm * optimalRatio;
+    const finalHeight = imgHeightMm * optimalRatio;
+    
+    // Center horizontally, start from top margin
+    const imgX = leftMargin + (availableWidth - finalWidth) / 2;
+    const imgY = topMargin;
 
-    // Handle multi-page documents
-    const pageHeight = pdfHeight - (2 * margin);
+    // Enhanced multi-page handling for legal documents
+    const usablePageHeight = availableHeight;
     let currentY = imgY;
     let remainingHeight = finalHeight;
     let sourceY = 0;
+    let pageNumber = 1;
 
     while (remainingHeight > 0) {
-      const currentPageHeight = Math.min(remainingHeight, pageHeight);
+      if (pageNumber > 1) {
+        pdf.addPage();
+        currentY = topMargin;
+      }
+      
+      const currentPageHeight = Math.min(remainingHeight, usablePageHeight);
       const sourceHeight = (currentPageHeight / finalHeight) * imgHeight;
       
-      // Create a temporary canvas for this page section
+      // Create high-quality page section
       const pageCanvas = document.createElement('canvas');
       pageCanvas.width = imgWidth;
-      pageCanvas.height = sourceHeight;
+      pageCanvas.height = Math.ceil(sourceHeight);
       const pageCtx = pageCanvas.getContext('2d');
       
       if (pageCtx) {
-        pageCtx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+        // Enable high-quality rendering
+        pageCtx.imageSmoothingEnabled = true;
+        pageCtx.imageSmoothingQuality = 'high';
+        
+        pageCtx.drawImage(
+          canvas, 
+          0, Math.floor(sourceY), 
+          imgWidth, Math.ceil(sourceHeight),
+          0, 0, 
+          imgWidth, Math.ceil(sourceHeight)
+        );
+        
         const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
         
-        if (sourceY > 0) {
-          pdf.addPage();
-        }
+        // Add image to PDF with precise positioning
+        pdf.addImage(
+          pageImgData, 
+          'PNG', 
+          imgX, 
+          currentY, 
+          finalWidth, 
+          currentPageHeight,
+          undefined, // alias
+          'FAST' // compression mode
+        );
         
-        pdf.addImage(pageImgData, 'PNG', imgX, currentY, finalWidth, currentPageHeight);
+        // Add page number footer (except first page)
+        if (pageNumber > 1) {
+          pdf.setFontSize(9);
+          pdf.setFont('times', 'normal');
+          pdf.text(
+            `Page ${pageNumber}`, 
+            pdfWidth - rightMargin - 15, 
+            pdfHeight - 10
+          );
+        }
       }
       
       sourceY += sourceHeight;
       remainingHeight -= currentPageHeight;
-      currentY = margin; // Reset Y for new pages
+      pageNumber++;
     }
     
     return pdf;
