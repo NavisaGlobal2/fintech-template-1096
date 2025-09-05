@@ -144,7 +144,7 @@ export const ContractSigningService: React.FC<ContractSigningServiceProps> = ({
           await DocumentDownloader.downloadAsDOCX(element, { filename: contractTitle });
           break;
         case 'printpdf':
-          DocumentDownloader.openPrintDialog(element);
+          await DocumentDownloader.downloadAsPrintPDF(element, { filename: contractTitle });
           break;
       }
       
@@ -191,7 +191,7 @@ export const ContractSigningService: React.FC<ContractSigningServiceProps> = ({
           type: 'contract_executed',
           data: {
             offer_id: offer.id,
-            contract_id: contractState?.contractId || offer.id,
+            contract_id: offer.id,
             loan_amount: offer.loan_amount,
             signed_at: new Date().toISOString()
           }
@@ -341,8 +341,7 @@ export const ContractSigningService: React.FC<ContractSigningServiceProps> = ({
                     </p>
                     <DownloadMenu
                       onDownload={handleDownloadDocument}
-                      isLoading={downloadingDocument}
-                      className="mx-auto"
+                      loading={downloadingDocument}
                     />
                   </div>
                   
