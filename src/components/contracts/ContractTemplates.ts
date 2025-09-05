@@ -361,7 +361,13 @@ export const populateTemplateVariables = (content: string, data: any): string =>
     .replace(/\[SORT_CODE\]/g, data.sortCode || '04-06-05')
     .replace(/\[ACCOUNT_NUMBER\]/g, data.accountNumber || '22106965')
     .replace(/\[BORROWER_NAME\]/g, data.borrowerName || '[BORROWER_NAME]')
+    .replace(/\[BORROWER_ADDRESS\]/g, data.borrowerAddress || '[BORROWER_ADDRESS]')
+    .replace(/\[LENDER_NAME\]/g, data.lenderName || '[LENDER_NAME]')
+    .replace(/\[LENDER_ADDRESS\]/g, data.lenderAddress || '[LENDER_ADDRESS]')
+    .replace(/\[LENDER_EMAIL\]/g, data.lenderEmail || '[LENDER_EMAIL]')
+    .replace(/\[LENDER_PHONE\]/g, data.lenderPhone || '[LENDER_PHONE]')
     .replace(/\[GUARANTOR_NAME\]/g, data.guarantorName || '[GUARANTOR_NAME]')
+    .replace(/\[GUARANTOR_ADDRESS\]/g, data.guarantorAddress || '[GUARANTOR_ADDRESS]')
     .replace(/\[AGREEMENT_DATE\]/g, data.agreementDate || '[AGREEMENT_DATE]')
     .replace(/\[REPAYMENT_SCHEDULE_TABLE\]/g, data.repaymentScheduleTable || '[REPAYMENT_SCHEDULE_TABLE]');
 };

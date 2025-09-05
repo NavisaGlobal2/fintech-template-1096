@@ -42,6 +42,7 @@ interface OfferDetailsModalProps {
     created_at: string;
     application_id?: string;
     user_id?: string;
+    lender_product_id?: string;
   };
   open: boolean;
   onClose: () => void;
@@ -52,6 +53,16 @@ interface OfferDetailsModalProps {
 
 interface ApplicationData {
   personal_info: any; // Using any to handle Supabase Json type
+}
+
+interface LenderData {
+  name: string;
+  slug: string;
+  contact_email: string | null;
+  contact_phone: string | null;
+  address: any;
+  website_url: string | null;
+  product_name: string;
 }
 
 export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
@@ -66,34 +77,67 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [showContractSigning, setShowContractSigning] = useState(false);
   const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);
+  const [lenderData, setLenderData] = useState<LenderData | null>(null);
   const [loadingData, setLoadingData] = useState(false);
   const documentRef = useRef<HTMLDivElement>(null);
 
-  // Fetch real application data when modal opens
+  // Fetch real application and lender data when modal opens
   useEffect(() => {
-    const fetchApplicationData = async () => {
+    const fetchData = async () => {
       if (!open || !offer.application_id) return;
       
       setLoadingData(true);
       try {
-        const { data, error } = await supabase
+        // Fetch application data
+        const { data: applicationData, error: appError } = await supabase
           .from('loan_applications')
           .select('personal_info')
           .eq('id', offer.application_id)
           .single();
 
-        if (error) throw error;
-        setApplicationData(data);
+        if (appError) throw appError;
+        setApplicationData(applicationData);
+
+        // Fetch lender data if lender_product_id is available
+        if (offer.lender_product_id) {
+          const { data: lenderData, error: lenderError } = await supabase
+            .from('lenders')
+            .select(`
+              name, 
+              slug, 
+              contact_email, 
+              contact_phone, 
+              address, 
+              website_url,
+              lender_products!inner(product_name)
+            `)
+            .eq('lender_products.id', offer.lender_product_id)
+            .single();
+
+          if (lenderError) {
+            console.error('Error fetching lender data:', lenderError);
+          } else {
+            setLenderData({
+              name: lenderData.name,
+              slug: lenderData.slug,
+              contact_email: lenderData.contact_email,
+              contact_phone: lenderData.contact_phone,
+              address: lenderData.address,
+              website_url: lenderData.website_url,
+              product_name: lenderData.lender_products[0]?.product_name || 'Education Loan'
+            });
+          }
+        }
       } catch (error) {
-        console.error('Error fetching application data:', error);
-        toast.error('Failed to load application data');
+        console.error('Error fetching data:', error);
+        toast.error('Failed to load contract data');
       } finally {
         setLoadingData(false);
       }
     };
 
-    fetchApplicationData();
-  }, [open, offer.application_id]);
+    fetchData();
+  }, [open, offer.application_id, offer.lender_product_id]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GB', {
@@ -197,16 +241,30 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
     };
   };
 
-  const lenderData = {
-    companyName: 'TechSkillUK Limited',
-    registeredAddress: '20 Wenlock Road, London, N1 7GU, United Kingdom',
-    registrationNumber: 'TSK123456',
-    contactEmail: 'loans@techskilluk.com',
-    phoneNumber: '+44 20 1234 5678'
+  const createLenderData = () => {
+    if (lenderData) {
+      return {
+        companyName: lenderData.name || 'TechSkillUK Limited',
+        registeredAddress: lenderData.address?.full_address || '20 Wenlock Road, London, N1 7GU, United Kingdom',
+        registrationNumber: 'Company Registration Number',
+        contactEmail: lenderData.contact_email || 'loans@techskilluk.com',
+        phoneNumber: lenderData.contact_phone || '+44 20 1234 5678'
+      };
+    }
+    
+    // Fallback to default data
+    return {
+      companyName: 'TechSkillUK Limited',
+      registeredAddress: '20 Wenlock Road, London, N1 7GU, United Kingdom',
+      registrationNumber: 'TSK123456',
+      contactEmail: 'loans@techskilluk.com',
+      phoneNumber: '+44 20 1234 5678'
+    };
   };
 
   const contractData = createContractData();
   const borrowerData = createBorrowerData();
+  const contractLenderData = createLenderData();
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -314,7 +372,7 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
                     <LegalContract
                       contract={contractData}
                       borrower={borrowerData}
-                      lender={lenderData}
+                      lender={contractLenderData}
                       className="border rounded-lg"
                     />
                   </div>
