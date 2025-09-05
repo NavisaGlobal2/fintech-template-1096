@@ -10,120 +10,78 @@ export interface DocumentGenerationOptions {
 
 export class PDFGenerator {
   private static async captureElement(element: HTMLElement, options: DocumentGenerationOptions = {}): Promise<HTMLCanvasElement> {
-    // Wait for any dynamic content to load
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Wait for fonts and layout to stabilize
+    await new Promise(resolve => setTimeout(resolve, 300));
     
-    // Create a temporary container for the element to isolate PDF styling
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '-9999px';
-    tempContainer.style.top = '0';
-    tempContainer.style.width = '210mm'; // A4 width
-    tempContainer.style.backgroundColor = '#ffffff';
-    tempContainer.style.fontFamily = '"Times New Roman", serif';
-    tempContainer.style.fontSize = '11pt';
-    tempContainer.style.lineHeight = '1.4';
-    tempContainer.style.color = '#000000';
-    tempContainer.style.padding = '15mm 20mm 20mm 25mm';
-    tempContainer.style.margin = '0';
-    tempContainer.style.boxSizing = 'border-box';
+    // Ensure the element is visible and properly rendered
+    const originalPosition = element.style.position;
+    const originalVisibility = element.style.visibility;
     
-    // Clone the element to avoid affecting the original
-    const clonedElement = element.cloneNode(true) as HTMLElement;
+    // Temporarily ensure element is visible for capture
+    element.style.visibility = 'visible';
+    element.style.position = 'relative';
     
-    // Apply PDF-specific styles recursively to the cloned element
-    const applyPDFStyles = (el: HTMLElement) => {
-      // Ensure proper print colors and formatting
-      el.style.color = '#000000';
-      el.style.backgroundColor = '#ffffff';
-      (el.style as any).webkitPrintColorAdjust = 'exact';
-      
-      // Handle specific element types
-      if (el.tagName === 'TABLE') {
-        el.style.borderCollapse = 'collapse';
-        el.style.width = '100%';
-        el.style.marginBottom = '1rem';
-      }
-      
-      if (el.tagName === 'TH' || el.tagName === 'TD') {
-        el.style.border = '1px solid #000000';
-        el.style.padding = '8px';
-        el.style.fontSize = '9pt';
-        el.style.verticalAlign = 'top';
-      }
-      
-      if (el.classList.contains('currency')) {
-        el.style.textAlign = 'right';
-        el.style.fontFamily = 'monospace';
-      }
-      
-      if (el.classList.contains('signature-block')) {
-        el.style.marginTop = '2rem';
-        el.style.pageBreakInside = 'avoid';
-        el.style.border = '1px solid #ccc';
-        el.style.padding = '1rem';
-      }
-      
-      if (el.classList.contains('contract-section')) {
-        el.style.marginBottom = '1.5rem';
-        el.style.pageBreakInside = 'avoid';
-      }
-      
-      if (el.classList.contains('page-break-after')) {
-        el.style.pageBreakAfter = 'always';
-      }
-      
-      if (el.classList.contains('no-page-break')) {
-        el.style.pageBreakInside = 'avoid';
-      }
-      
-      // Apply styles to all children
-      Array.from(el.children).forEach(child => {
-        if (child instanceof HTMLElement) {
-          applyPDFStyles(child);
-        }
-      });
-    };
-    
-    // Apply styles to the cloned element
-    applyPDFStyles(clonedElement);
-    
-    // Add the cloned element to the temporary container
-    tempContainer.appendChild(clonedElement);
-    document.body.appendChild(tempContainer);
-
     try {
-      // Wait for layout to settle
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Get the bounding box to ensure we capture the full element
+      const rect = element.getBoundingClientRect();
       
-      const canvas = await html2canvas(clonedElement, {
-        scale: options.quality || 3,
+      const canvas = await html2canvas(element, {
+        scale: options.quality || 2, // High quality but not excessive
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         scrollX: 0,
         scrollY: 0,
-        width: clonedElement.scrollWidth,
-        height: clonedElement.scrollHeight,
+        x: 0,
+        y: 0,
+        width: element.scrollWidth || rect.width,
+        height: element.scrollHeight || rect.height,
         logging: false,
         foreignObjectRendering: true,
-        imageTimeout: 0,
+        imageTimeout: 15000,
         removeContainer: false,
-        onclone: (clonedDoc) => {
-          // Ensure fonts are loaded in the cloned document
-          const fontLink = document.createElement('link');
-          fontLink.href = 'https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap';
-          fontLink.rel = 'stylesheet';
-          clonedDoc.head.appendChild(fontLink);
+        ignoreElements: (element) => {
+          // Skip elements that might interfere with PDF rendering
+          return element.classList?.contains('no-pdf') || 
+                 element.tagName === 'SCRIPT' ||
+                 element.tagName === 'NOSCRIPT';
+        },
+        onclone: async (clonedDoc, element) => {
+          // Ensure all fonts are loaded in the cloned document
+          const existingFonts = Array.from(document.fonts);
+          const fontPromises = existingFonts.map(font => font.load());
+          
+          try {
+            await Promise.all(fontPromises);
+          } catch (error) {
+            console.warn('Some fonts failed to load:', error);
+          }
+          
+          // Copy all stylesheets to the cloned document
+          const stylesheets = Array.from(document.styleSheets);
+          stylesheets.forEach(sheet => {
+            try {
+              const link = clonedDoc.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = (sheet as any).href || '';
+              if (link.href) {
+                clonedDoc.head.appendChild(link);
+              }
+            } catch (error) {
+              console.warn('Could not copy stylesheet:', error);
+            }
+          });
+          
+          // Wait for styles to apply
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
       });
       
       return canvas;
     } finally {
-      // Clean up the temporary container
-      if (document.body.contains(tempContainer)) {
-        document.body.removeChild(tempContainer);
-      }
+      // Restore original styles
+      element.style.position = originalPosition;
+      element.style.visibility = originalVisibility;
     }
   }
 
