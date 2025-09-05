@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -17,12 +17,13 @@ import {
   AlertTriangle,
   Download,
   FileText,
-  Maximize
+  Maximize,
+  PenTool
 } from 'lucide-react';
-import { OfferDocument } from './OfferDocument';
 import { LegalContract } from '@/components/contracts/LegalContract';
 import { ContractSigningService } from '@/components/contracts/ContractSigningService';
 import { PDFGenerator } from '@/utils/pdfGenerator';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface OfferDetailsModalProps {
@@ -39,12 +40,18 @@ interface OfferDetailsModalProps {
     status: string;
     offer_valid_until: string;
     created_at: string;
+    application_id?: string;
+    user_id?: string;
   };
   open: boolean;
   onClose: () => void;
   onAccept?: () => void;
   onDecline?: () => void;
   showActions?: boolean;
+}
+
+interface ApplicationData {
+  personal_info: any; // Using any to handle Supabase Json type
 }
 
 export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
@@ -58,7 +65,35 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [showContractSigning, setShowContractSigning] = useState(false);
+  const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);
+  const [loadingData, setLoadingData] = useState(false);
   const documentRef = useRef<HTMLDivElement>(null);
+
+  // Fetch real application data when modal opens
+  useEffect(() => {
+    const fetchApplicationData = async () => {
+      if (!open || !offer.application_id) return;
+      
+      setLoadingData(true);
+      try {
+        const { data, error } = await supabase
+          .from('loan_applications')
+          .select('personal_info')
+          .eq('id', offer.application_id)
+          .single();
+
+        if (error) throw error;
+        setApplicationData(data);
+      } catch (error) {
+        console.error('Error fetching application data:', error);
+        toast.error('Failed to load application data');
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchApplicationData();
+  }, [open, offer.application_id]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GB', {
@@ -91,10 +126,10 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const handleDownloadPDF = async () => {
     try {
       setDownloadingPDF(true);
-      const element = document.getElementById('offer-document');
+      const element = document.getElementById('legal-contract');
       
       if (!element) {
-        toast.error('Document not found');
+        toast.error('Contract document not found');
         return;
       }
 
@@ -106,11 +141,11 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
           offerId: offer.id
         },
         {
-          filename: `loan-offer-${offer.offer_type}-${offer.id.slice(0, 8)}.pdf`
+          filename: `education-loan-agreement-${offer.id.slice(0, 8)}.pdf`
         }
       );
 
-      toast.success('PDF downloaded successfully');
+      toast.success('Contract PDF downloaded successfully');
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF');
@@ -118,6 +153,60 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
       setDownloadingPDF(false);
     }
   };
+
+  const handleStartSigning = () => {
+    setShowContractSigning(true);
+  };
+
+  // Create contract data from offer and application
+  const createContractData = () => {
+    if (!applicationData) return null;
+
+    const personalInfo = applicationData.personal_info;
+    const fullName = `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim();
+    const address = personalInfo.address;
+    const fullAddress = `${address.street || ''}, ${address.city || ''}, ${address.state || ''} ${address.postalCode || ''}, ${address.country || ''}`.replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '');
+
+    return {
+      id: offer.id,
+      contractType: 'education_loan',
+      loanAmount: offer.loan_amount,
+      aprRate: offer.apr_rate || 3.9,
+      isaPercentage: offer.isa_percentage,
+      repaymentTermMonths: offer.repayment_term_months,
+      gracePeriodMonths: offer.grace_period_months || 0,
+      repaymentSchedule: offer.repayment_schedule,
+      termsAndConditions: offer.terms_and_conditions,
+      offerValidUntil: offer.offer_valid_until,
+      createdAt: offer.created_at
+    };
+  };
+
+  const createBorrowerData = () => {
+    if (!applicationData) return null;
+
+    const personalInfo = applicationData.personal_info;
+    const address = personalInfo.address;
+    const fullAddress = `${address.street || ''}, ${address.city || ''}, ${address.state || ''} ${address.postalCode || ''}, ${address.country || ''}`.replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '');
+
+    return {
+      fullName: `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim() || 'Loan Applicant',
+      email: personalInfo.email || 'applicant@email.com',
+      address: fullAddress || 'Address not provided',
+      dateOfBirth: personalInfo.dateOfBirth
+    };
+  };
+
+  const lenderData = {
+    companyName: 'TechSkillUK Limited',
+    registeredAddress: '20 Wenlock Road, London, N1 7GU, United Kingdom',
+    registrationNumber: 'TSK123456',
+    contactEmail: 'loans@techskilluk.com',
+    phoneNumber: '+44 20 1234 5678'
+  };
+
+  const contractData = createContractData();
+  const borrowerData = createBorrowerData();
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -185,18 +274,57 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
               </TabsList>
 
               <TabsContent value="document" className="space-y-4">
-                <OfferDocument
-                  offer={offer}
-                  borrowerInfo={{
-                    name: 'Loan Applicant',
-                    email: 'applicant@email.com'
-                  }}
-                  lenderInfo={{
-                    name: 'TechScale Finance Ltd',
-                    address: 'London, United Kingdom',
-                    registration: 'TSF123456'
-                  }}
-                />
+                {loadingData ? (
+                  <div className="text-center py-8">
+                    <p>Loading contract data...</p>
+                  </div>
+                ) : contractData && borrowerData ? (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                      <div>
+                        <h3 className="font-semibold">Professional Education Loan Agreement</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Legally binding contract with TechSkillUK Limited
+                        </p>
+                      </div>
+                      {offer.status === 'pending' && !isExpired() && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={handleDownloadPDF}
+                            disabled={downloadingPDF}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            {downloadingPDF ? 'Generating...' : 'Download PDF'}
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              // For now, just call onAccept - we'll add proper signing later
+                              onAccept?.();
+                              toast.success('Offer accepted! Contract signing workflow will be implemented.');
+                            }}
+                            className="bg-primary hover:bg-primary/90"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Accept & Sign
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    <LegalContract
+                      contract={contractData}
+                      borrower={borrowerData}
+                      lender={lenderData}
+                      className="border rounded-lg"
+                    />
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      Contract data not available. Please ensure application data is complete.
+                    </p>
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="summary" className="space-y-4">

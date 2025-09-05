@@ -26,6 +26,7 @@ import { OfferComparison } from '@/components/offers/OfferComparison';
 interface LoanOffer {
   id: string;
   application_id: string;
+  user_id: string;
   offer_type: string;
   loan_amount: number;
   apr_rate?: number;
