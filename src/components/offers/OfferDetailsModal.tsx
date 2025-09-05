@@ -355,17 +355,13 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
                             <Download className="h-4 w-4 mr-2" />
                             {downloadingPDF ? 'Generating...' : 'Download PDF'}
                           </Button>
-                          <Button
-                            onClick={() => {
-                              // For now, just call onAccept - we'll add proper signing later
-                              onAccept?.();
-                              toast.success('Offer accepted! Contract signing workflow will be implemented.');
-                            }}
-                            className="bg-primary hover:bg-primary/90"
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Accept & Sign
-                          </Button>
+                           <Button
+                             onClick={handleStartSigning}
+                             className="bg-green-600 hover:bg-green-700"
+                           >
+                             <PenTool className="h-4 w-4 mr-2" />
+                             Sign & Accept Offer
+                           </Button>
                         </div>
                       )}
                     </div>
@@ -480,6 +476,22 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
           </DialogFooter>
         )}
       </DialogContent>
+        
+      {showContractSigning && contractData && borrowerData && contractLenderData && (
+        <ContractSigningService
+          offer={offer}
+          contractData={contractData}
+          borrowerData={borrowerData}
+          lenderData={contractLenderData}
+          open={showContractSigning}
+          onClose={() => setShowContractSigning(false)}
+          onComplete={() => {
+            setShowContractSigning(false);
+            onAccept?.();
+            onClose();
+          }}
+        />
+      )}
     </Dialog>
   );
 };

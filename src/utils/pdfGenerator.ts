@@ -9,62 +9,122 @@ export interface DocumentGenerationOptions {
 }
 
 export class PDFGenerator {
-  private static async captureElement(element: HTMLElement, options: DocumentGenerationOptions = {}) {
-    // Apply print styles temporarily for optimal PDF rendering
-    const originalStyles = element.style.cssText;
-    const originalClassList = element.className;
+  private static async captureElement(element: HTMLElement, options: DocumentGenerationOptions = {}): Promise<HTMLCanvasElement> {
+    // Wait for any dynamic content to load
+    await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Force print-optimized styling
-    element.style.fontFamily = '"Times New Roman", serif';
-    element.style.fontSize = '11pt';
-    element.style.lineHeight = '1.4';
-    element.style.color = '#000000';
-    element.style.background = '#ffffff';
-    element.style.width = '210mm'; // A4 width
-    element.style.minHeight = '297mm'; // A4 height
-    element.style.padding = '15mm 20mm 20mm 25mm';
-    element.style.margin = '0';
-    element.style.boxSizing = 'border-box';
+    // Create a temporary container for the element to isolate PDF styling
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = '210mm'; // A4 width
+    tempContainer.style.backgroundColor = '#ffffff';
+    tempContainer.style.fontFamily = '"Times New Roman", serif';
+    tempContainer.style.fontSize = '11pt';
+    tempContainer.style.lineHeight = '1.4';
+    tempContainer.style.color = '#000000';
+    tempContainer.style.padding = '15mm 20mm 20mm 25mm';
+    tempContainer.style.margin = '0';
+    tempContainer.style.boxSizing = 'border-box';
     
-    // Add print class for CSS targeting
-    element.className += ' print-mode';
+    // Clone the element to avoid affecting the original
+    const clonedElement = element.cloneNode(true) as HTMLElement;
     
-    // Apply print media styles programmatically
-    const printStyles = document.createElement('style');
-    printStyles.textContent = `
-      .print-mode * {
-        -webkit-print-color-adjust: exact !important;
-        color-adjust: exact !important;
-        print-color-adjust: exact !important;
+    // Apply PDF-specific styles recursively to the cloned element
+    const applyPDFStyles = (el: HTMLElement) => {
+      // Ensure proper print colors and formatting
+      el.style.color = '#000000';
+      el.style.backgroundColor = '#ffffff';
+      (el.style as any).webkitPrintColorAdjust = 'exact';
+      
+      // Handle specific element types
+      if (el.tagName === 'TABLE') {
+        el.style.borderCollapse = 'collapse';
+        el.style.width = '100%';
+        el.style.marginBottom = '1rem';
       }
-    `;
-    document.head.appendChild(printStyles);
+      
+      if (el.tagName === 'TH' || el.tagName === 'TD') {
+        el.style.border = '1px solid #000000';
+        el.style.padding = '8px';
+        el.style.fontSize = '9pt';
+        el.style.verticalAlign = 'top';
+      }
+      
+      if (el.classList.contains('currency')) {
+        el.style.textAlign = 'right';
+        el.style.fontFamily = 'monospace';
+      }
+      
+      if (el.classList.contains('signature-block')) {
+        el.style.marginTop = '2rem';
+        el.style.pageBreakInside = 'avoid';
+        el.style.border = '1px solid #ccc';
+        el.style.padding = '1rem';
+      }
+      
+      if (el.classList.contains('contract-section')) {
+        el.style.marginBottom = '1.5rem';
+        el.style.pageBreakInside = 'avoid';
+      }
+      
+      if (el.classList.contains('page-break-after')) {
+        el.style.pageBreakAfter = 'always';
+      }
+      
+      if (el.classList.contains('no-page-break')) {
+        el.style.pageBreakInside = 'avoid';
+      }
+      
+      // Apply styles to all children
+      Array.from(el.children).forEach(child => {
+        if (child instanceof HTMLElement) {
+          applyPDFStyles(child);
+        }
+      });
+    };
+    
+    // Apply styles to the cloned element
+    applyPDFStyles(clonedElement);
+    
+    // Add the cloned element to the temporary container
+    tempContainer.appendChild(clonedElement);
+    document.body.appendChild(tempContainer);
 
-    // Wait for fonts and styles to load
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const canvas = await html2canvas(element, {
-      scale: options.quality || 4, // Ultra-high quality for legal documents
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: '#ffffff',
-      scrollX: 0,
-      scrollY: 0,
-      width: element.scrollWidth,
-      height: element.scrollHeight,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
-      logging: false,
-      foreignObjectRendering: true,
-      removeContainer: false
-    });
-
-    // Restore original styles and classes
-    element.style.cssText = originalStyles;
-    element.className = originalClassList;
-    document.head.removeChild(printStyles);
-
-    return canvas;
+    try {
+      // Wait for layout to settle
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      const canvas = await html2canvas(clonedElement, {
+        scale: options.quality || 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
+        width: clonedElement.scrollWidth,
+        height: clonedElement.scrollHeight,
+        logging: false,
+        foreignObjectRendering: true,
+        imageTimeout: 0,
+        removeContainer: false,
+        onclone: (clonedDoc) => {
+          // Ensure fonts are loaded in the cloned document
+          const fontLink = document.createElement('link');
+          fontLink.href = 'https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap';
+          fontLink.rel = 'stylesheet';
+          clonedDoc.head.appendChild(fontLink);
+        }
+      });
+      
+      return canvas;
+    } finally {
+      // Clean up the temporary container
+      if (document.body.contains(tempContainer)) {
+        document.body.removeChild(tempContainer);
+      }
+    }
   }
 
   static async generateFromElement(
