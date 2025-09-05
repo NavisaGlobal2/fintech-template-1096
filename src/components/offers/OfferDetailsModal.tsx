@@ -168,7 +168,7 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
     return diffInHours <= 24 && diffInHours > 0;
   };
 
-  const handleDownload = async (format: 'png' | 'jpg' | 'pdf' | 'docx') => {
+  const handleDownload = async (format: 'png' | 'jpg' | 'pdf' | 'printpdf' | 'docx') => {
     try {
       setDownloading(true);
       const element = document.getElementById('legal-contract');
@@ -183,19 +183,18 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
       switch (format) {
         case 'png':
           await DocumentDownloader.downloadAsPNG(element, { filename: `${filename}.png` });
-          toast.success('Contract PNG downloaded successfully');
           break;
         case 'jpg':
           await DocumentDownloader.downloadAsJPG(element, { filename: `${filename}.jpg` });
-          toast.success('Contract JPG downloaded successfully');
+          break;
+        case 'printpdf':
+          await DocumentDownloader.downloadAsPrintPDF(element, { filename });
           break;
         case 'pdf':
-          await DocumentDownloader.downloadAsPrintPDF(element, { filename });
-          toast.success('Print dialog opened');
+          await DocumentDownloader.downloadAsPDF(element, { filename: `${filename}.pdf` });
           break;
         case 'docx':
           await DocumentDownloader.downloadAsDOCX(contractData, { filename: `${filename}.docx` });
-          toast.success('Contract Word document downloaded successfully');
           break;
         default:
           throw new Error('Unsupported format');

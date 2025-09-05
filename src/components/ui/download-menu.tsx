@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, Download, Image, FileText, Printer } from 'lucide-react';
 
 interface DownloadMenuProps {
-  onDownload: (format: 'png' | 'jpg' | 'pdf' | 'docx') => Promise<void>;
+  onDownload: (format: 'png' | 'jpg' | 'pdf' | 'printpdf' | 'docx') => Promise<void>;
   disabled?: boolean;
   loading?: boolean;
 }
@@ -73,13 +73,24 @@ export const DownloadMenu: React.FC<DownloadMenuProps> = ({
         <DropdownMenuSeparator />
         
         <DropdownMenuItem 
-          onClick={() => onDownload('pdf')}
+          onClick={() => onDownload('printpdf')}
           className="cursor-pointer"
         >
           <Printer className="h-4 w-4 mr-3" />
           <div className="flex-1">
             <div className="font-medium">Print to PDF</div>
-            <div className="text-xs text-muted-foreground">Use browser's print function</div>
+            <div className="text-xs text-muted-foreground">Browser print dialog (recommended)</div>
+          </div>
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem 
+          onClick={() => onDownload('pdf')}
+          className="cursor-pointer"
+        >
+          <FileText className="h-4 w-4 mr-3" />
+          <div className="flex-1">
+            <div className="font-medium">Enhanced PDF</div>
+            <div className="text-xs text-muted-foreground">Generated with pagination</div>
           </div>
         </DropdownMenuItem>
         

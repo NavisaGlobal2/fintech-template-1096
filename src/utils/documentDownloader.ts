@@ -1,10 +1,11 @@
 import html2canvas from 'html2canvas';
-import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType } from 'docx';
+import { toast } from 'sonner';
+import { PDFGenerator } from './pdfGenerator';
 
 export interface DownloadOptions {
   filename?: string;
   quality?: number;
-  format?: 'jpg' | 'png' | 'pdf' | 'docx';
+  format?: 'jpg' | 'png' | 'pdf' | 'printpdf' | 'docx';
   width?: number;
   height?: number;
 }
@@ -12,241 +13,392 @@ export interface DownloadOptions {
 export class DocumentDownloader {
   
   /**
-   * Download contract as high-quality JPG image
+   * Downloads the given HTML element as a high-quality JPG image
    */
   static async downloadAsJPG(element: HTMLElement, options: DownloadOptions = {}): Promise<void> {
     try {
+      toast.info('Generating JPG image...');
+      
       const canvas = await this.captureElementAsCanvas(element, { 
         ...options, 
         backgroundColor: '#ffffff',
-        scale: 2 // High quality
+        scale: 3 // Very high quality for documents
       });
       
       canvas.toBlob((blob) => {
         if (blob) {
-          this.downloadBlob(blob, options.filename || 'contract.jpg');
+          this.downloadBlob(blob, options.filename || 'document.jpg');
+          toast.success('JPG downloaded successfully!');
         }
-      }, 'image/jpeg', options.quality || 0.95);
+      }, 'image/jpeg', options.quality || 0.98);
     } catch (error) {
-      console.error('Error downloading as JPG:', error);
-      throw new Error('Failed to generate JPG');
+      console.error('JPG generation error:', error);
+      toast.error('Failed to generate JPG');
+      throw error;
     }
   }
 
   /**
-   * Download contract as high-quality PNG image
+   * Downloads the given HTML element as a high-quality PNG image
    */
   static async downloadAsPNG(element: HTMLElement, options: DownloadOptions = {}): Promise<void> {
     try {
+      toast.info('Generating PNG image...');
+      
       const canvas = await this.captureElementAsCanvas(element, { 
         ...options, 
         backgroundColor: '#ffffff',
-        scale: 2 // High quality
+        scale: 3 // Very high quality for documents
       });
       
       canvas.toBlob((blob) => {
         if (blob) {
-          this.downloadBlob(blob, options.filename || 'contract.png');
+          this.downloadBlob(blob, options.filename || 'document.png');
+          toast.success('PNG downloaded successfully!');
         }
       }, 'image/png', 1.0);
     } catch (error) {
-      console.error('Error downloading as PNG:', error);
-      throw new Error('Failed to generate PNG');
+      console.error('PNG generation error:', error);
+      toast.error('Failed to generate PNG');
+      throw error;
     }
   }
 
   /**
-   * Open browser print dialog for PDF generation
+   * Downloads the given HTML element as a PDF using enhanced PDF generator
+   */
+  static async downloadAsPDF(element: HTMLElement, options: DownloadOptions = {}): Promise<void> {
+    try {
+      toast.info('Generating professional PDF...');
+      
+      await PDFGenerator.downloadFromElement(element, {
+        filename: options.filename || 'document.pdf',
+        format: 'a4',
+        orientation: 'portrait',
+        quality: 3
+      });
+      
+      toast.success('PDF downloaded successfully!');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Failed to generate PDF');
+      throw error;
+    }
+  }
+
+  /**
+   * Opens browser print dialog for PDF generation
    */
   static async downloadAsPrintPDF(element: HTMLElement, options: DownloadOptions = {}): Promise<void> {
     try {
-      // Create a new window for printing
+      toast.info('Opening print dialog...');
+      
+      // Create a new window with the element content
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
-        throw new Error('Popup blocked. Please allow popups for this site.');
+        throw new Error('Could not open print window. Please allow popups.');
       }
 
-      // Clone the element and its styles
-      const clonedElement = element.cloneNode(true) as HTMLElement;
-      
+      // Get the element's HTML and styles
+      const elementHtml = element.outerHTML;
+      const styles = Array.from(document.styleSheets)
+        .map(styleSheet => {
+          try {
+            return Array.from(styleSheet.cssRules)
+              .map(rule => rule.cssText)
+              .join('\n');
+          } catch (e) {
+            return '';
+          }
+        })
+        .join('\n');
+
       // Create print-optimized HTML
-      const printHTML = `
+      const printHtml = `
         <!DOCTYPE html>
         <html>
         <head>
-          <title>${options.filename || 'Contract'}</title>
+          <title>${options.filename || 'Document'}</title>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-              font-family: "Times New Roman", serif; 
-              font-size: 11pt; 
-              line-height: 1.4; 
-              color: black;
-              background: white;
+            ${styles}
+            
+            @page {
+              size: A4;
+              margin: 20mm;
             }
-            .page-break-before { page-break-before: always; }
-            .page-break-after { page-break-after: always; }
-            .no-page-break { page-break-inside: avoid; }
-            table { page-break-inside: avoid; }
-            .repayment-schedule { page-break-inside: avoid; }
             
             @media print {
-              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-              .signature-section { page-break-before: always; }
-              .contract-section { page-break-inside: avoid; }
+              body {
+                font-family: 'Times New Roman', serif !important;
+                font-size: 12pt !important;
+                line-height: 1.6 !important;
+                color: #000 !important;
+                background: #fff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+              }
+              
+              .print-break {
+                page-break-before: always !important;
+              }
+              
+              .print-avoid-break {
+                page-break-inside: avoid !important;
+              }
+              
+              .no-print {
+                display: none !important;
+              }
+              
+              table {
+                page-break-inside: avoid;
+                width: 100% !important;
+              }
+              
+              h1, h2, h3, h4, h5, h6 {
+                page-break-after: avoid;
+                color: #000 !important;
+              }
+              
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+            }
+            
+            @media screen {
+              body {
+                max-width: 210mm;
+                margin: 0 auto;
+                padding: 20mm;
+                background: white;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                font-family: 'Times New Roman', serif;
+              }
             }
           </style>
         </head>
         <body>
-          ${clonedElement.outerHTML}
+          ${elementHtml}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 500);
+              
+              window.onafterprint = function() {
+                window.close();
+              };
+            };
+          </script>
         </body>
         </html>
       `;
 
-      printWindow.document.write(printHTML);
+      printWindow.document.write(printHtml);
       printWindow.document.close();
       
-      // Wait for content to load, then trigger print
-      printWindow.onload = () => {
-        setTimeout(() => {
-          printWindow.print();
-          printWindow.close();
-        }, 500);
-      };
+      toast.success('Print dialog opened. Choose "Save as PDF" to download.');
     } catch (error) {
-      console.error('Error opening print dialog:', error);
-      throw new Error('Failed to open print dialog');
+      console.error('Print PDF error:', error);
+      toast.error('Failed to open print dialog');
+      throw error;
     }
   }
 
   /**
-   * Download contract as Word document (DOCX)
+   * Generates and downloads a simplified DOCX file based on provided contract data
    */
   static async downloadAsDOCX(contractData: any, options: DownloadOptions = {}): Promise<void> {
     try {
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: [
-            // Title
-            new Paragraph({
-              text: "EDUCATION LOAN AGREEMENT",
-              heading: HeadingLevel.TITLE,
-              alignment: AlignmentType.CENTER,
-            }),
-            
-            new Paragraph({ text: "" }), // Empty line
-            
-            // Contract parties
-            new Paragraph({
-              text: "BETWEEN",
-              alignment: AlignmentType.CENTER,
-              spacing: { before: 400, after: 400 }
-            }),
-            
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: `${contractData.lenderName}`,
-                  bold: true
-                }),
-                new TextRun({
-                  text: " (The Lender)",
-                  break: 1
-                })
-              ]
-            }),
-            
-            new Paragraph({
-              text: "AND",
-              alignment: AlignmentType.CENTER,
-              spacing: { before: 400, after: 400 }
-            }),
-            
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: `${contractData.borrowerName}`,
-                  bold: true
-                }),
-                new TextRun({
-                  text: " (The Borrower)",
-                  break: 1
-                })
-              ]
-            }),
+      toast.info('Generating Word document...');
 
-            new Paragraph({ text: "" }), // Empty line
-            
-            // Key terms
-            new Paragraph({
-              text: "KEY LOAN TERMS",
-              heading: HeadingLevel.HEADING_1,
-            }),
-            
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Loan Amount: ", bold: true }),
-                new TextRun({ text: `£${contractData.loanAmount}` })
-              ]
-            }),
-            
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Interest Rate: ", bold: true }),
-                new TextRun({ text: `${contractData.interestRate}% APR` })
-              ]
-            }),
-            
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Loan Term: ", bold: true }),
-                new TextRun({ text: `${contractData.loanTerm} months` })
-              ]
-            }),
-            
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Monthly Payment: ", bold: true }),
-                new TextRun({ text: `£${contractData.installmentAmount}` })
-              ]
-            }),
-
-            new Paragraph({ text: "" }), // Empty line
-            
-            // Agreement date and signatures placeholder
-            new Paragraph({
-              text: "SIGNATURES",
-              heading: HeadingLevel.HEADING_1,
-            }),
-            
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Agreement Date: ", bold: true }),
-                new TextRun({ text: contractData.agreementDate })
-              ]
-            }),
-            
-            new Paragraph({ text: "" }),
-            new Paragraph({ text: "Borrower Signature: _________________________" }),
-            new Paragraph({ text: "" }),
-            new Paragraph({ text: "Lender Representative: _________________________" }),
-            new Paragraph({ text: "" }),
-            new Paragraph({ text: "Date: _________________________" }),
-          ]
-        }]
-      });
-
-      const buffer = await Packer.toBuffer(doc);
-      const blob = new Blob([buffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+      // Create a simple HTML-based approach for better browser compatibility
+      const docContent = this.generateDocxContent(contractData);
+      
+      // Create a blob with DOCX MIME type - browsers will handle it as HTML but Word can open it
+      const blob = new Blob([docContent], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       });
       
-      this.downloadBlob(blob, options.filename || 'contract.docx');
+      const filename = options.filename || `Loan-Agreement-${Date.now()}.doc`;
+      this.downloadBlob(blob, filename);
+      
+      toast.success('Word document downloaded successfully!');
     } catch (error) {
-      console.error('Error downloading as DOCX:', error);
-      throw new Error('Failed to generate Word document');
+      console.error('DOCX generation error:', error);
+      toast.error('Failed to generate Word document. Trying alternative format...');
+      
+      // Fallback to HTML format that can be opened in Word
+      try {
+        const htmlContent = this.generateHtmlContent(contractData);
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const filename = options.filename?.replace('.docx', '.html') || `Loan-Agreement-${Date.now()}.html`;
+        this.downloadBlob(blob, filename);
+        toast.success('Document downloaded as HTML (can be opened in Word)');
+      } catch (fallbackError) {
+        console.error('Fallback error:', fallbackError);
+        toast.error('Failed to generate document');
+        throw fallbackError;
+      }
     }
+  }
+
+  private static generateDocxContent(contractData: any): string {
+    return `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset="utf-8">
+        <title>Education Loan Agreement</title>
+        <!--[if gte mso 9]>
+        <xml>
+        <w:WordDocument>
+        <w:View>Print</w:View>
+        <w:Zoom>90</w:Zoom>
+        <w:DoNotPromptForConvert/>
+        <w:DoNotShowInsertionsAndDeletions/>
+        </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.6; }
+          h1 { text-align: center; font-size: 18pt; font-weight: bold; margin-bottom: 20pt; }
+          h2 { font-size: 14pt; font-weight: bold; margin-top: 20pt; margin-bottom: 10pt; }
+          .contract-info { margin-bottom: 20pt; }
+          .signature-section { margin-top: 40pt; page-break-before: always; }
+          .signature-line { border-bottom: 1px solid black; width: 200pt; display: inline-block; margin: 10pt 0; }
+          table { width: 100%; border-collapse: collapse; margin: 10pt 0; }
+          th, td { border: 1px solid black; padding: 8pt; text-align: left; }
+          th { background-color: #f0f0f0; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <h1>EDUCATION LOAN AGREEMENT</h1>
+        
+        <div class="contract-info">
+          <p><strong>Contract Reference:</strong> ${contractData.contractId || 'N/A'}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+
+        <h2>BORROWER INFORMATION</h2>
+        <p><strong>Name:</strong> ${contractData.borrower?.fullName || 'N/A'}</p>
+        <p><strong>Email:</strong> ${contractData.borrower?.email || 'N/A'}</p>
+        <p><strong>Phone:</strong> ${contractData.borrower?.phone || 'N/A'}</p>
+        <p><strong>Address:</strong> ${contractData.borrower?.address || 'N/A'}</p>
+
+        <h2>LOAN DETAILS</h2>
+        <table>
+          <tr><th>Loan Amount</th><td>$${contractData.loanAmount?.toLocaleString() || 'N/A'}</td></tr>
+          <tr><th>Interest Rate</th><td>${contractData.interestRate || 'N/A'}%</td></tr>
+          <tr><th>Term</th><td>${contractData.termMonths || 'N/A'} months</td></tr>
+          <tr><th>Monthly Payment</th><td>$${contractData.monthlyPayment?.toLocaleString() || 'N/A'}</td></tr>
+        </table>
+
+        <div class="signature-section">
+          <h2>EXECUTION OF AGREEMENT</h2>
+          
+          <p><strong>BORROWER SIGNATURE</strong></p>
+          <p>Signature: <span class="signature-line"></span></p>
+          <p>Date: <span class="signature-line"></span></p>
+          
+          <br><br>
+          
+          <p><strong>LENDER SIGNATURE</strong></p>
+          <p>Authorized Representative: <span class="signature-line"></span></p>
+          <p>Date: <span class="signature-line"></span></p>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  private static generateHtmlContent(contractData: any): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Education Loan Agreement</title>
+        <style>
+          body { 
+            font-family: 'Times New Roman', serif; 
+            font-size: 12pt; 
+            line-height: 1.6; 
+            max-width: 8.5in; 
+            margin: 0 auto; 
+            padding: 1in; 
+          }
+          h1 { text-align: center; font-size: 18pt; font-weight: bold; margin-bottom: 20pt; }
+          h2 { font-size: 14pt; font-weight: bold; margin-top: 20pt; margin-bottom: 10pt; }
+          .contract-info { margin-bottom: 20pt; }
+          .signature-section { margin-top: 40pt; }
+          .signature-line { border-bottom: 1px solid black; width: 3in; display: inline-block; margin: 10pt 0; }
+          table { width: 100%; border-collapse: collapse; margin: 10pt 0; }
+          th, td { border: 1px solid black; padding: 8pt; text-align: left; }
+          th { background-color: #f0f0f0; font-weight: bold; }
+          @media print {
+            body { margin: 0; padding: 1in; }
+            .signature-section { page-break-before: always; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>EDUCATION LOAN AGREEMENT</h1>
+        
+        <div class="contract-info">
+          <p><strong>Contract Reference:</strong> ${contractData.contractId || 'N/A'}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+
+        <h2>BORROWER INFORMATION</h2>
+        <p><strong>Name:</strong> ${contractData.borrower?.fullName || 'N/A'}</p>
+        <p><strong>Email:</strong> ${contractData.borrower?.email || 'N/A'}</p>
+        <p><strong>Phone:</strong> ${contractData.borrower?.phone || 'N/A'}</p>
+        <p><strong>Address:</strong> ${contractData.borrower?.address || 'N/A'}</p>
+
+        <h2>LOAN DETAILS</h2>
+        <table>
+          <tr><th>Loan Amount</th><td>$${contractData.loanAmount?.toLocaleString() || 'N/A'}</td></tr>
+          <tr><th>Interest Rate</th><td>${contractData.interestRate || 'N/A'}%</td></tr>
+          <tr><th>Term</th><td>${contractData.termMonths || 'N/A'} months</td></tr>
+          <tr><th>Monthly Payment</th><td>$${contractData.monthlyPayment?.toLocaleString() || 'N/A'}</td></tr>
+        </table>
+
+        <div class="signature-section">
+          <h2>EXECUTION OF AGREEMENT</h2>
+          
+          <p><strong>BORROWER SIGNATURE</strong></p>
+          <p>Signature: <span class="signature-line"></span></p>
+          <p>Date: <span class="signature-line"></span></p>
+          
+          <br><br>
+          
+          <p><strong>LENDER SIGNATURE</strong></p>
+          <p>Authorized Representative: <span class="signature-line"></span></p>
+          <p>Date: <span class="signature-line"></span></p>
+        </div>
+
+        <script>
+          // Instructions for the user
+          document.addEventListener('DOMContentLoaded', function() {
+            const instruction = document.createElement('div');
+            instruction.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #007bff; color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 1000;';
+            instruction.innerHTML = 'This document can be opened and edited in Microsoft Word or LibreOffice';
+            document.body.appendChild(instruction);
+            
+            setTimeout(() => {
+              if (instruction.parentNode) {
+                instruction.parentNode.removeChild(instruction);
+              }
+            }, 5000);
+          });
+        </script>
+      </body>
+      </html>
+    `;
   }
 
   /**
@@ -256,17 +408,19 @@ export class DocumentDownloader {
     // Ensure element is visible and properly rendered
     const originalDisplay = element.style.display;
     const originalVisibility = element.style.visibility;
+    const originalPosition = element.style.position;
     
     element.style.display = 'block';
     element.style.visibility = 'visible';
+    element.style.position = 'relative';
     
     // Wait for fonts and layout to settle
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 300));
     
     try {
       const canvas = await html2canvas(element, {
         backgroundColor: options.backgroundColor || '#ffffff',
-        scale: options.scale || 2,
+        scale: options.scale || 3,
         useCORS: true,
         allowTaint: false,
         logging: false,
@@ -274,16 +428,26 @@ export class DocumentDownloader {
         width: options.width || element.scrollWidth,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
+        windowWidth: 1200,
+        windowHeight: 800,
+        imageTimeout: 15000,
+        foreignObjectRendering: true,
         // Handle web fonts properly
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById(element.id);
-          if (clonedElement) {
-            // Ensure all styles are applied
-            clonedElement.style.transform = 'none';
-            clonedElement.style.webkitTransform = 'none';
-          }
+        onclone: async (clonedDoc) => {
+          // Load fonts in cloned document
+          const style = clonedDoc.createElement('style');
+          style.textContent = `
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            * { 
+              font-family: 'Inter', 'Times New Roman', serif !important; 
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+          
+          // Wait for fonts to load
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
       });
       
@@ -292,6 +456,7 @@ export class DocumentDownloader {
       // Restore original styles
       element.style.display = originalDisplay;
       element.style.visibility = originalVisibility;
+      element.style.position = originalPosition;
     }
   }
 
@@ -310,30 +475,36 @@ export class DocumentDownloader {
   }
 
   /**
-   * Get available download formats with their descriptions
+   * Returns available download formats with their metadata
    */
   static getAvailableFormats() {
     return [
       {
-        format: 'png' as const,
+        value: 'png',
         label: 'PNG Image',
-        description: 'High-quality image (recommended)',
+        description: 'High-quality image format (recommended)',
         icon: '🖼️'
       },
       {
-        format: 'jpg' as const,
+        value: 'jpg',
         label: 'JPG Image', 
         description: 'Compressed image format',
-        icon: '📸'
+        icon: '📷'
       },
       {
-        format: 'pdf' as const,
+        value: 'printpdf',
         label: 'Print to PDF',
-        description: 'Use browser\'s print function',
+        description: 'Professional PDF via browser print',
         icon: '🖨️'
       },
       {
-        format: 'docx' as const,
+        value: 'pdf',
+        label: 'Enhanced PDF',
+        description: 'Generated PDF with pagination',
+        icon: '📄'
+      },
+      {
+        value: 'docx',
         label: 'Word Document',
         description: 'Editable document format',
         icon: '📝'
