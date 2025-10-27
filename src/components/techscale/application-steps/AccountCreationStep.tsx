@@ -59,7 +59,7 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
       // Send initial submission notification
       await notifyApplicationSubmitted(
         userId,
-        applicationData.application_id || 'pending',
+        applicationData.id || 'pending',
         formData.lenderName,
         formData.loanTypeRequest?.amount || formData.programInfo?.totalCost
       );
@@ -70,7 +70,7 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
         
         if (sponsorMatch) {
           await assignSponsorToApplication(
-            applicationData.application_id || userId,
+            applicationData.id,
             userId,
             sponsorMatch
           );
@@ -244,12 +244,20 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
         submitted_at: new Date().toISOString()
       };
 
-      const { error: dbError } = await supabase
+      const { data: savedApplication, error: dbError } = await supabase
         .from('loan_applications')
-        .insert(applicationData);
+        .insert(applicationData)
+        .select()
+        .single();
 
       if (dbError) {
         console.error('Database error:', dbError);
+        toast.error('Application submission failed. Please contact support.');
+        return;
+      }
+
+      if (!savedApplication) {
+        console.error('No application data returned');
         toast.error('Application submission failed. Please contact support.');
         return;
       }
@@ -269,7 +277,7 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
       localStorage.removeItem('loanApplicationDraft');
 
       // Trigger automatic processing based on loan type
-      await processApplicationAutomatically(applicationData, userId, formData);
+      await processApplicationAutomatically(savedApplication, userId, formData);
 
       toast.success(useExistingAccount 
         ? 'Application submitted successfully! You will receive an email with next steps.' 
