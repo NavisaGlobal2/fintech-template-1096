@@ -12,6 +12,8 @@ import ESignature from '../ESignature';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { findBestSponsorMatch, assignSponsorToApplication } from '@/utils/sponsorMatcher';
+import { notifyApplicationSubmitted } from '@/utils/notifications';
 
 interface AccountCreationStepProps {
   form: UseFormReturn<FullLoanApplication>;
@@ -42,6 +44,91 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
                    declarations.termsAndConditions &&
                    declarations.signatureImage &&
                    (useExistingAccount || (password && confirmPassword && password === confirmPassword));
+
+  /**
+   * Automatically process application after submission based on loan type
+   */
+  const processApplicationAutomatically = async (
+    applicationData: any, 
+    userId: string, 
+    formData: FullLoanApplication
+  ) => {
+    try {
+      const loanType = formData.loanTypeRequest.type;
+
+      // Send initial submission notification
+      await notifyApplicationSubmitted(
+        userId,
+        applicationData.application_id || 'pending',
+        formData.lenderName,
+        formData.loanTypeRequest?.amount || formData.programInfo?.totalCost
+      );
+
+      // Handle sponsor-match type
+      if (loanType === 'sponsor-match') {
+        const sponsorMatch = await findBestSponsorMatch(formData);
+        
+        if (sponsorMatch) {
+          await assignSponsorToApplication(
+            applicationData.application_id || userId,
+            userId,
+            sponsorMatch
+          );
+
+          // Update application status
+          await supabase
+            .from('loan_applications')
+            .update({ 
+              status: 'sponsor_review',
+              reviewer_notes: `Automatically matched with sponsor: ${sponsorMatch.sponsorName}`
+            })
+            .eq('user_id', userId)
+            .eq('is_draft', false);
+
+          // Send sponsor match notification email
+          await supabase.functions.invoke('send-notification-email', {
+            body: {
+              userId,
+              type: 'sponsor_matched',
+              data: {
+                sponsorName: sponsorMatch.sponsorName,
+                matchScore: sponsorMatch.matchScore,
+                reason: sponsorMatch.reason,
+                expectedReviewTime: '3-5 business days'
+              }
+            }
+          });
+        }
+      } else {
+        // For study-abroad and career-microloan, trigger automatic underwriting
+        // This will be processed by the underwriting system
+        await supabase
+          .from('loan_applications')
+          .update({ 
+            status: 'under_review',
+            reviewer_notes: 'Application queued for automatic underwriting assessment'
+          })
+          .eq('user_id', userId)
+          .eq('is_draft', false);
+
+        // Notify about auto-processing
+        await supabase.functions.invoke('send-notification-email', {
+          body: {
+            userId,
+            type: 'application_processing',
+            data: {
+              loanType,
+              expectedProcessingTime: '24-48 hours',
+              nextSteps: 'Our underwriting system will assess your application automatically'
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error in automatic processing:', error);
+      // Don't block submission if automatic processing fails
+    }
+  };
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -181,9 +268,12 @@ const AccountCreationStep: React.FC<AccountCreationStepProps> = ({ form, onCompl
       // Clear localStorage
       localStorage.removeItem('loanApplicationDraft');
 
+      // Trigger automatic processing based on loan type
+      await processApplicationAutomatically(applicationData, userId, formData);
+
       toast.success(useExistingAccount 
-        ? 'Application submitted successfully!' 
-        : 'Account created and application submitted successfully!');
+        ? 'Application submitted successfully! You will receive an email with next steps.' 
+        : 'Account created and application submitted successfully! Check your email for updates.');
       onComplete(formData);
 
     } catch (error) {

@@ -9,13 +9,18 @@ const corsHeaders = {
 
 interface EmailRequest {
   userId: string;
-  type: 'application_submitted' | 'application_status_change' | 'offer_available' | 'document_verified' | 'document_rejected';
+  type: 'application_submitted' | 'application_status_change' | 'offer_available' | 'document_verified' | 'document_rejected' | 'sponsor_matched' | 'application_processing' | 'auto_assessed' | 'offer_generated';
   data: {
     applicationId?: string;
     newStatus?: string;
     offerId?: string;
     documentType?: string;
     lenderName?: string;
+    sponsorName?: string;
+    matchScore?: number;
+    loanType?: string;
+    expectedProcessingTime?: string;
+    expectedReviewTime?: string;
     [key: string]: any;
   };
 }
@@ -59,7 +64,11 @@ const handler = async (req: Request): Promise<Response> => {
     const shouldSend = (
       (type === 'application_submitted' && preferences.application_updates) ||
       (type === 'application_status_change' && preferences.application_updates) ||
+      (type === 'application_processing' && preferences.application_updates) ||
+      (type === 'sponsor_matched' && preferences.application_updates) ||
+      (type === 'auto_assessed' && preferences.application_updates) ||
       (type === 'offer_available' && preferences.offer_notifications) ||
+      (type === 'offer_generated' && preferences.offer_notifications) ||
       ((type === 'document_verified' || type === 'document_rejected') && preferences.document_updates)
     );
 
@@ -231,6 +240,95 @@ Reason: ${data.rejectionReason || 'Document quality or information needs improve
 Please upload a new version of this document to continue with your application.
 
 Upload documents: ${baseUrl}/my-applications
+
+Best regards,
+The TechScale Team`
+      };
+
+    case 'sponsor_matched':
+      return {
+        subject: '🤝 You\'ve Been Matched with a Sponsor - TechScale',
+        text: `Hi ${firstName},
+
+Excellent news! We've automatically matched you with a sponsor who aligns with your goals.
+
+Sponsor Details:
+- Sponsor: ${data.sponsorName}
+- Match Score: ${data.matchScore}% compatibility
+- Reason: ${data.reason}
+
+What Happens Next:
+1. Your sponsor will review your application within ${data.expectedReviewTime || '3-5 business days'}
+2. You'll receive updates as they review your profile
+3. If approved, you'll be contacted directly to discuss funding details
+
+You can track your application status at: ${baseUrl}/my-applications
+
+Best regards,
+The TechScale Team`
+      };
+
+    case 'application_processing':
+      return {
+        subject: '⚡ Your Application is Being Processed - TechScale',
+        text: `Hi ${firstName},
+
+Your ${data.loanType === 'study-abroad' ? 'Study Abroad Loan' : 'Career Microloan'} application is now being processed automatically.
+
+What's Happening:
+- Our AI-powered underwriting system is assessing your application
+- Expected processing time: ${data.expectedProcessingTime || '24-48 hours'}
+- You'll be notified immediately when assessment is complete
+
+Next Steps:
+${data.nextSteps || 'Sit tight! We\'ll email you as soon as we have results.'}
+
+Track your application: ${baseUrl}/my-applications
+
+Best regards,
+The TechScale Team`
+      };
+
+    case 'auto_assessed':
+      return {
+        subject: '✅ Your Application Has Been Assessed - TechScale',
+        text: `Hi ${firstName},
+
+Great news! Your application has been automatically assessed.
+
+Assessment Results:
+- Risk Score: ${data.riskScore || 'Calculated'}
+- Decision: ${data.decision || 'Processed'}
+- ${data.decision === 'approved' ? 'Congratulations! You\'re approved for financing.' : 'Your application needs manual review.'}
+
+${data.decision === 'approved' ? 
+  'A loan offer will be generated for you within the next few hours.' :
+  'Our underwriting team will review your application manually and get back to you within 2-3 business days.'}
+
+View details: ${baseUrl}/my-applications
+
+Best regards,
+The TechScale Team`
+      };
+
+    case 'offer_generated':
+      return {
+        subject: '🎉 Your Loan Offer is Ready - TechScale',
+        text: `Hi ${firstName},
+
+Fantastic news! Based on your application, we've generated a personalized loan offer for you.
+
+Offer Summary:
+- Loan Amount: ${data.loanAmount}
+- Interest Rate: ${data.aprRate || data.interestRate}%
+- Repayment Term: ${data.repaymentTerm}
+- Monthly Payment: ${data.monthlyPayment || 'See dashboard'}
+
+This offer is time-sensitive and expires on: ${data.validUntil}
+
+⚠️ Don't wait - Review and accept your offer now!
+
+View and accept offer: ${baseUrl}/my-applications
 
 Best regards,
 The TechScale Team`
