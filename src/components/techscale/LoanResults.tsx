@@ -140,6 +140,21 @@ const LoanResults: React.FC<LoanResultsProps> = ({ loans, userProfile }) => {
         </div>
       </div>
 
+      {/* Empty state */}
+      {loans.length === 0 && (
+        <Card className="cosmic-glass">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+            <AlertCircle className="h-12 w-12 text-muted-foreground" />
+            <div>
+              <h3 className="text-lg font-medium mb-2">No Loan Options Available</h3>
+              <p className="text-sm text-muted-foreground max-w-md">
+                There are currently no active lenders available. Please check back later or contact support for assistance.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Loan cards */}
       <div className="space-y-4">
         {sortedLoans.map((loan) => (
