@@ -121,7 +121,7 @@ export type Database = {
           dependency_signature_id: string | null
           guarantor_id: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           signature_completed: boolean | null
           signature_data: string | null
           signature_order: number | null
@@ -140,7 +140,7 @@ export type Database = {
           dependency_signature_id?: string | null
           guarantor_id?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           signature_completed?: boolean | null
           signature_data?: string | null
           signature_order?: number | null
@@ -159,7 +159,7 @@ export type Database = {
           dependency_signature_id?: string | null
           guarantor_id?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           signature_completed?: boolean | null
           signature_data?: string | null
           signature_order?: number | null
@@ -554,6 +554,7 @@ export type Database = {
       loan_applications: {
         Row: {
           application_data: Json | null
+          assigned_sponsor_id: string | null
           completed_steps: Json | null
           created_at: string | null
           declarations: Json | null
@@ -570,6 +571,9 @@ export type Database = {
           program_info: Json | null
           reviewed_at: string | null
           reviewer_notes: string | null
+          sponsor_assigned_at: string | null
+          sponsor_assignment_status: string | null
+          sponsor_reviewed_at: string | null
           status: string | null
           submitted_at: string | null
           updated_at: string | null
@@ -577,6 +581,7 @@ export type Database = {
         }
         Insert: {
           application_data?: Json | null
+          assigned_sponsor_id?: string | null
           completed_steps?: Json | null
           created_at?: string | null
           declarations?: Json | null
@@ -593,6 +598,9 @@ export type Database = {
           program_info?: Json | null
           reviewed_at?: string | null
           reviewer_notes?: string | null
+          sponsor_assigned_at?: string | null
+          sponsor_assignment_status?: string | null
+          sponsor_reviewed_at?: string | null
           status?: string | null
           submitted_at?: string | null
           updated_at?: string | null
@@ -600,6 +608,7 @@ export type Database = {
         }
         Update: {
           application_data?: Json | null
+          assigned_sponsor_id?: string | null
           completed_steps?: Json | null
           created_at?: string | null
           declarations?: Json | null
@@ -616,12 +625,23 @@ export type Database = {
           program_info?: Json | null
           reviewed_at?: string | null
           reviewer_notes?: string | null
+          sponsor_assigned_at?: string | null
+          sponsor_assignment_status?: string | null
+          sponsor_reviewed_at?: string | null
           status?: string | null
           submitted_at?: string | null
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "loan_applications_assigned_sponsor_id_fkey"
+            columns: ["assigned_sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       loan_contracts: {
         Row: {
@@ -1136,6 +1156,208 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsor_assignment_audit_log: {
+        Row: {
+          action: string
+          application_id: string | null
+          assignment_id: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          new_status: string | null
+          notes: string | null
+          performed_by: string | null
+          previous_status: string | null
+          sponsor_id: string | null
+        }
+        Insert: {
+          action: string
+          application_id?: string | null
+          assignment_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          new_status?: string | null
+          notes?: string | null
+          performed_by?: string | null
+          previous_status?: string | null
+          sponsor_id?: string | null
+        }
+        Update: {
+          action?: string
+          application_id?: string | null
+          assignment_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          new_status?: string | null
+          notes?: string | null
+          performed_by?: string | null
+          previous_status?: string | null
+          sponsor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsor_assignment_audit_log_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsor_assignment_audit_log_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "sponsor_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsor_assignment_audit_log_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sponsor_assignments: {
+        Row: {
+          application_id: string
+          assigned_at: string | null
+          assigned_by: string | null
+          assignment_method: string | null
+          assignment_reason: string | null
+          created_at: string | null
+          id: string
+          match_score: number | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          sponsor_id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_method?: string | null
+          assignment_reason?: string | null
+          created_at?: string | null
+          id?: string
+          match_score?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          sponsor_id: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_method?: string | null
+          assignment_reason?: string | null
+          created_at?: string | null
+          id?: string
+          match_score?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          sponsor_id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsor_assignments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsor_assignments_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sponsors: {
+        Row: {
+          career_focus: string[] | null
+          contact_email: string
+          contact_phone: string | null
+          countries_supported: string[] | null
+          created_at: string | null
+          created_by: string | null
+          current_capacity: number | null
+          description: string | null
+          expertise: string[] | null
+          funding_available: number
+          id: string
+          logo_url: string | null
+          max_capacity: number | null
+          max_funding_amount: number | null
+          min_funding_amount: number | null
+          preferred_fields_of_study: string[] | null
+          sponsor_name: string
+          status: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          career_focus?: string[] | null
+          contact_email: string
+          contact_phone?: string | null
+          countries_supported?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          current_capacity?: number | null
+          description?: string | null
+          expertise?: string[] | null
+          funding_available?: number
+          id?: string
+          logo_url?: string | null
+          max_capacity?: number | null
+          max_funding_amount?: number | null
+          min_funding_amount?: number | null
+          preferred_fields_of_study?: string[] | null
+          sponsor_name: string
+          status?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          career_focus?: string[] | null
+          contact_email?: string
+          contact_phone?: string | null
+          countries_supported?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          current_capacity?: number | null
+          description?: string | null
+          expertise?: string[] | null
+          funding_available?: number
+          id?: string
+          logo_url?: string | null
+          max_capacity?: number | null
+          max_funding_amount?: number | null
+          min_funding_amount?: number | null
+          preferred_fields_of_study?: string[] | null
+          sponsor_name?: string
+          status?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       underwriting_assessments: {
         Row: {
           affordability_score: number
@@ -1323,6 +1545,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decrement_sponsor_capacity: {
+        Args: { sponsor_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1346,10 +1572,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
-      is_techskill_domain: {
-        Args: { email: string }
-        Returns: boolean
-      }
+      is_techskill_domain: { Args: { email: string }; Returns: boolean }
       transfer_temp_documents_to_user: {
         Args: { temp_session_id: string; user_id: string }
         Returns: undefined
