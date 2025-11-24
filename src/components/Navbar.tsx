@@ -2,6 +2,7 @@ import React from 'react';
 import { Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import AuthButton from '@/components/auth/AuthButton';
 
 const Navbar = () => {
   const scrollToSection = (id: string) => {
@@ -33,6 +34,7 @@ const Navbar = () => {
               Apply Now
             </Button>
           </Link>
+          <AuthButton />
         </div>
       </div>
     </nav>
