@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,8 +9,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowLeft, Upload, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthModal from '@/components/auth/AuthModal';
+import { submitLoanApplication, type ApplicationFormData } from '@/utils/applicationSubmit';
+import { uploadMultipleDocuments } from '@/utils/documentUpload';
 
 const applicationSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters').max(100),
@@ -32,25 +36,118 @@ const applicationSchema = z.object({
 type ApplicationForm = z.infer<typeof applicationSchema>;
 
 const Apply = () => {
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ApplicationForm>({
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<{
+    proofOfAddress?: File;
+    governmentId?: File;
+    immigrationDoc?: File;
+  }>({});
+
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
   });
 
-  const onSubmit = (data: ApplicationForm) => {
-    console.log('Application submitted:', data);
-    toast.success('Application Submitted - We\'ll review your application and get back to you within 24-48 hours.');
+  // Check authentication
+  React.useEffect(() => {
+    if (!loading && !user) {
+      setShowAuthModal(true);
+    }
+  }, [loading, user]);
+
+  const handleFileChange = (type: 'proofOfAddress' | 'governmentId' | 'immigrationDoc') => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFiles(prev => ({ ...prev, [type]: file }));
+    }
   };
+
+  const onSubmit = async (data: ApplicationForm) => {
+    if (!user) {
+      toast.error('Please sign in to submit your application');
+      setShowAuthModal(true);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setUploadProgress(0);
+
+    try {
+      // Prepare documents for upload
+      const documentsToUpload: { file: File; type: string }[] = [];
+      if (selectedFiles.proofOfAddress) {
+        documentsToUpload.push({ file: selectedFiles.proofOfAddress, type: 'proof_of_address' });
+      }
+      if (selectedFiles.governmentId) {
+        documentsToUpload.push({ file: selectedFiles.governmentId, type: 'government_id' });
+      }
+      if (selectedFiles.immigrationDoc) {
+        documentsToUpload.push({ file: selectedFiles.immigrationDoc, type: 'immigration_document' });
+      }
+
+      // Upload documents
+      let uploadedDocuments: any[] = [];
+      if (documentsToUpload.length > 0) {
+        const uploadResult = await uploadMultipleDocuments(
+          documentsToUpload,
+          user.id,
+          setUploadProgress
+        );
+
+        if (!uploadResult.success) {
+          toast.error(uploadResult.error || 'Failed to upload documents');
+          setIsSubmitting(false);
+          return;
+        }
+
+        uploadedDocuments = uploadResult.documents || [];
+      }
+
+      // Submit application
+      const result = await submitLoanApplication(data as ApplicationFormData, user.id, uploadedDocuments);
+
+      if (!result.success) {
+        toast.error(result.error || 'Failed to submit application');
+        setIsSubmitting(false);
+        return;
+      }
+
+      toast.success('Application Submitted Successfully!', {
+        description: `Reference: ${result.applicationId?.slice(0, 8)}. We'll review your application within 24-48 hours.`,
+      });
+
+      // Redirect to applications page
+      setTimeout(() => {
+        navigate('/my-applications');
+      }, 2000);
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background py-12 px-6">
       <div className="max-w-3xl mx-auto">
-        {/* Back Link */}
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
           <ArrowLeft className="h-4 w-4" />
           Back to home
         </Link>
 
-        {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Loan Application
@@ -60,7 +157,6 @@ const Apply = () => {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
           {/* Applicant Information */}
           <section className="space-y-6">
@@ -114,6 +210,78 @@ const Apply = () => {
                   placeholder="Tell us how you plan to use the loan..."
                 />
                 {errors.loanPurpose && <p className="text-destructive text-sm mt-1">{errors.loanPurpose.message}</p>}
+              </div>
+            </div>
+          </section>
+
+          {/* Documents Upload */}
+          <section className="space-y-6">
+            <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">
+              Required Documents
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="proofOfAddress">Proof of Address (Optional)</Label>
+                <div className="mt-2">
+                  <label htmlFor="proofOfAddress" className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-[1rem] cursor-pointer hover:border-primary transition-colors">
+                    <div className="text-center">
+                      <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {selectedFiles.proofOfAddress ? selectedFiles.proofOfAddress.name : 'Click to upload (Max 5MB)'}
+                      </p>
+                    </div>
+                  </label>
+                  <input
+                    id="proofOfAddress"
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png,.webp"
+                    onChange={handleFileChange('proofOfAddress')}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="governmentId">Government ID (Optional)</Label>
+                <div className="mt-2">
+                  <label htmlFor="governmentId" className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-[1rem] cursor-pointer hover:border-primary transition-colors">
+                    <div className="text-center">
+                      <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {selectedFiles.governmentId ? selectedFiles.governmentId.name : 'Click to upload (Max 5MB)'}
+                      </p>
+                    </div>
+                  </label>
+                  <input
+                    id="governmentId"
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png,.webp"
+                    onChange={handleFileChange('governmentId')}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="immigrationDoc">Immigration Document (Optional)</Label>
+                <div className="mt-2">
+                  <label htmlFor="immigrationDoc" className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-[1rem] cursor-pointer hover:border-primary transition-colors">
+                    <div className="text-center">
+                      <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {selectedFiles.immigrationDoc ? selectedFiles.immigrationDoc.name : 'Click to upload (Max 5MB)'}
+                      </p>
+                    </div>
+                  </label>
+                  <input
+                    id="immigrationDoc"
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png,.webp"
+                    onChange={handleFileChange('immigrationDoc')}
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -245,14 +413,44 @@ const Apply = () => {
             </div>
           </section>
 
+          {/* Progress indicator */}
+          {isSubmitting && uploadProgress > 0 && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Uploading documents...</span>
+                <span>{Math.round(uploadProgress)}%</span>
+              </div>
+              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Submit */}
           <div className="pt-6">
-            <Button type="submit" size="lg" className="w-full rounded-full h-14 text-lg font-semibold">
-              Submit Application
+            <Button 
+              type="submit" 
+              size="lg" 
+              className="w-full rounded-full h-14 text-lg font-semibold"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Submitting Application...
+                </>
+              ) : (
+                'Submit Application'
+              )}
             </Button>
           </div>
         </form>
       </div>
+
+      <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
 };
