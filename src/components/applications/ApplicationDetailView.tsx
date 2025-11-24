@@ -503,9 +503,9 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
           The application you're looking for doesn't exist or you don't have access to it.
         </p>
         <Button asChild>
-          <Link to="/my-applications">
+          <Link to="/my-account">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Applications
+            Back to My Account
           </Link>
         </Button>
       </div>
