@@ -43,9 +43,9 @@
 
 @layer base {
   :root {
-    /* FINTURE-inspired soft pink/beige palette */
-    --background: 340 30% 96%; /* Soft pink-beige */
-    --foreground: 0 0% 10%; /* Almost black */
+    /* Sage Green Theme */
+    --background: 140 15% 95%; /* Soft sage green */
+    --foreground: 0 0% 10%; /* Dark gray */
 
     --card: 0 0% 100%; /* Pure white */
     --card-foreground: 0 0% 10%;
@@ -53,26 +53,31 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 10%;
 
-    --primary: 0 0% 10%; /* Black for buttons/primary elements */
+    --primary: 0 0% 10%; /* Dark for primary elements */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 340 20% 92%; /* Light pink-beige */
+    --secondary: 140 25% 85%; /* Sage light */
     --secondary-foreground: 0 0% 10%;
 
-    --muted: 340 15% 94%; /* Very light pink */
+    --muted: 140 20% 90%; /* Very light sage */
     --muted-foreground: 0 0% 40%; /* Medium grey */
 
-    --accent: 45 95% 65%; /* Warm yellow accent */
+    --accent: 140 20% 75%; /* Sage accent */
     --accent-foreground: 0 0% 10%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 85%; /* Light grey border */
+    --border: 140 10% 80%; /* Light sage border */
     --input: 0 0% 95%;
     --ring: 0 0% 10%;
 
-    --radius: 0.5rem;
+    --radius: 2rem; /* Very rounded */
+    
+    /* Custom sage colors */
+    --sage-light: 140 25% 85%;
+    --sage: 140 20% 75%;
+    --sage-dark: 140 20% 65%;
   }
 
   .dark-mode {
@@ -107,7 +112,8 @@
   }
 
   body {
-    @apply bg-background font-inter text-foreground antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     letter-spacing: -0.01em;
   }
   
@@ -127,6 +133,17 @@
   /* Subtle hover effects */
   .hover-lift {
     @apply transition-all duration-300 hover:shadow-md hover:-translate-y-0.5;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

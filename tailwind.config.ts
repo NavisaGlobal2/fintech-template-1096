@@ -24,11 +24,9 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				softPinkBeige: 'hsl(340, 30%, 96%)',
-				warmYellow: 'hsl(45, 95%, 65%)',
-				warmTan: 'hsl(35, 45%, 70%)',
-				deepNavy: 'hsl(220, 60%, 25%)',
-				brightGreen: 'hsl(160, 70%, 45%)',
+				sageLight: 'hsl(var(--sage-light))',
+				sage: 'hsl(var(--sage))',
+				sageDark: 'hsl(var(--sage-dark))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
