@@ -24,11 +24,11 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				warmBeige: 'hsl(28, 25%, 96%)',
-				softPeach: 'hsl(25, 45%, 88%)',
-				darkCharcoal: 'hsl(20, 10%, 20%)',
-				warmBrown: 'hsl(20, 35%, 45%)',
-				lightWarmGrey: 'hsl(28, 20%, 90%)',
+				softPinkBeige: 'hsl(340, 30%, 96%)',
+				warmYellow: 'hsl(45, 95%, 65%)',
+				warmTan: 'hsl(35, 45%, 70%)',
+				deepNavy: 'hsl(220, 60%, 25%)',
+				brightGreen: 'hsl(160, 70%, 45%)',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'

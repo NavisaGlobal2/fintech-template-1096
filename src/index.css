@@ -43,36 +43,36 @@
 
 @layer base {
   :root {
-    /* Warm, professional palette for dark mode */
-    --background: 28 25% 96%; /* Soft beige */
-    --foreground: 20 10% 20%; /* Dark charcoal */
+    /* FINTURE-inspired soft pink/beige palette */
+    --background: 340 30% 96%; /* Soft pink-beige */
+    --foreground: 0 0% 10%; /* Almost black */
 
-    --card: 0 0% 100%; /* Clean white */
-    --card-foreground: 20 10% 20%;
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 20 10% 20%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 20 35% 45%; /* Warm brown */
-    --primary-foreground: 28 25% 96%;
+    --primary: 0 0% 10%; /* Black for buttons/primary elements */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 28 20% 90%; /* Light warm grey */
-    --secondary-foreground: 20 10% 20%;
+    --secondary: 340 20% 92%; /* Light pink-beige */
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 28 20% 90%; /* Light warm grey */
-    --muted-foreground: 20 8% 50%; /* Medium grey */
+    --muted: 340 15% 94%; /* Very light pink */
+    --muted-foreground: 0 0% 40%; /* Medium grey */
 
-    --accent: 25 45% 88%; /* Soft peach accent */
-    --accent-foreground: 20 10% 20%;
+    --accent: 45 95% 65%; /* Warm yellow accent */
+    --accent-foreground: 0 0% 10%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 28 15% 85%; /* Light warm border */
-    --input: 28 15% 92%;
-    --ring: 20 35% 45%;
+    --border: 0 0% 85%; /* Light grey border */
+    --input: 0 0% 95%;
+    --ring: 0 0% 10%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
   .dark-mode {
