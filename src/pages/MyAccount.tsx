@@ -139,25 +139,25 @@ const MyAccount = () => {
   };
 
   const renderDashboard = () => (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Welcome Card with Gradient */}
       <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background">
         <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,transparent,black)]" />
-        <CardContent className="relative p-8">
-          <div className="flex items-start justify-between">
-            <div className="space-y-2">
+        <CardContent className="relative p-4 sm:p-6 md:p-8">
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+            <div className="space-y-1.5 sm:space-y-2">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">
                   Welcome back, {profile?.first_name || 'there'}!
                 </h2>
               </div>
-              <p className="text-muted-foreground">Here's your application overview and account status</p>
+              <p className="text-sm sm:text-base text-muted-foreground">Here's your application overview and account status</p>
             </div>
-            <Button asChild className="shadow-lg">
+            <Button asChild className="shadow-lg w-full sm:w-auto">
               <Link to="/apply">
                 <Plus className="h-4 w-4 mr-2" />
-                New Application
+                <span className="text-sm sm:text-base">New Application</span>
               </Link>
             </Button>
           </div>
@@ -165,35 +165,35 @@ const MyAccount = () => {
       </Card>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Total Applications - Featured Card */}
         <Card className="relative overflow-hidden border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg hover:-translate-y-1 duration-300 bg-gradient-to-br from-primary/5 to-background">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-start justify-between mb-3 sm:mb-4">
               <div className="space-y-1">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Applications</p>
                 <div className="flex items-baseline gap-2">
-                  <p className="text-4xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                  <p className="text-3xl sm:text-4xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
                     {recentApplications.length}
                   </p>
                   <span className="text-xs text-muted-foreground">all time</span>
                 </div>
               </div>
-              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
-                <TrendingUp className="h-7 w-7 text-white" />
+              <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg flex-shrink-0">
+                <TrendingUp className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
               </div>
             </div>
             
             {/* Mini breakdown */}
-            <div className="flex gap-3 text-xs">
+            <div className="flex flex-wrap gap-2 sm:gap-3 text-xs">
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-green-500" />
+                <div className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0" />
                 <span className="text-muted-foreground">
                   {recentApplications.filter(app => app.status === 'approved').length} approved
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-amber-500" />
+                <div className="h-2 w-2 rounded-full bg-amber-500 flex-shrink-0" />
                 <span className="text-muted-foreground">
                   {recentApplications.filter(app => app.status === 'under-review').length} pending
                 </span>
@@ -205,12 +205,12 @@ const MyAccount = () => {
 
         {/* Approved Applications */}
         <Card className="relative overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-green-500/20 bg-gradient-to-br from-green-500/5 to-background">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-3">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="space-y-1">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Approved</p>
                 <div className="flex items-baseline gap-2">
-                  <p className="text-4xl font-bold text-green-500">
+                  <p className="text-3xl sm:text-4xl font-bold text-green-500">
                     {recentApplications.filter(app => app.status === 'approved').length}
                   </p>
                   {recentApplications.filter(app => app.status === 'approved').length > 0 && (
@@ -218,13 +218,13 @@ const MyAccount = () => {
                   )}
                 </div>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                <CheckCircle2 className="h-6 w-6 text-green-500" />
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
               </div>
             </div>
             
             <div className="flex items-center gap-1.5 text-xs text-green-600">
-              <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+              <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
               <span className="font-medium">Ready to proceed</span>
             </div>
           </CardContent>
@@ -232,12 +232,12 @@ const MyAccount = () => {
 
         {/* Under Review Applications */}
         <Card className="relative overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-background">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-3">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="space-y-1">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Under Review</p>
                 <div className="flex items-baseline gap-2">
-                  <p className="text-4xl font-bold text-amber-500">
+                  <p className="text-3xl sm:text-4xl font-bold text-amber-500">
                     {recentApplications.filter(app => app.status === 'under-review').length}
                   </p>
                   {recentApplications.filter(app => app.status === 'under-review').length > 0 && (
@@ -245,13 +245,13 @@ const MyAccount = () => {
                   )}
                 </div>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-amber-500" />
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+                <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
               </div>
             </div>
             
             <div className="flex items-center gap-1.5 text-xs text-amber-600">
-              <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+              <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse flex-shrink-0" />
               <span className="font-medium">Processing application</span>
             </div>
           </CardContent>
@@ -259,17 +259,17 @@ const MyAccount = () => {
 
         {/* Profile Completion */}
         <Card className="relative overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-primary/20 bg-gradient-to-br from-primary/5 to-background">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-3">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="space-y-1">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Profile</p>
                 <div className="flex items-baseline gap-2">
-                  <p className="text-4xl font-bold text-primary">{profileCompletion()}%</p>
+                  <p className="text-3xl sm:text-4xl font-bold text-primary">{profileCompletion()}%</p>
                   <span className="text-xs text-muted-foreground">complete</span>
                 </div>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                <UserIcon className="h-6 w-6 text-primary" />
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                <UserIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
             </div>
             
@@ -470,20 +470,20 @@ const MyAccount = () => {
         <div className="flex-1 flex flex-col">
           {/* Header */}
           <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-            <div className="container mx-auto px-6 py-4">
-              <div className="flex items-center gap-4">
+            <div className="container mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <SidebarTrigger />
                 <Link to="/" className="flex items-center">
                   <TechScaleLogo />
                 </Link>
                 <div className="hidden md:block w-px h-6 bg-border ml-2" />
-                <h1 className="text-xl font-semibold text-foreground hidden md:block">My Account</h1>
+                <h1 className="text-base sm:text-lg md:text-xl font-semibold text-foreground hidden md:block">My Account</h1>
               </div>
             </div>
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 container mx-auto px-6 py-8">
+          <main className="flex-1 container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
             {activeSection === 'dashboard' && renderDashboard()}
             {activeSection === 'applications' && renderApplications()}
             {activeSection === 'profile' && renderProfile()}
