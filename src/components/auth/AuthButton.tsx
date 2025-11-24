@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, LogOut, FileText } from 'lucide-react';
+import { User, LogOut, UserCircle } from 'lucide-react';
 import AuthModal from './AuthModal';
 import { Link } from 'react-router-dom';
 
@@ -36,9 +36,9 @@ const AuthButton: React.FC = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link to="/my-applications" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            My Applications
+          <Link to="/my-account" className="flex items-center gap-2">
+            <UserCircle className="h-4 w-4" />
+            My Account
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={signOut} className="flex items-center gap-2">
