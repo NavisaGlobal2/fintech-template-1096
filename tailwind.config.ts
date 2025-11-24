@@ -1,8 +1,7 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
-	darkMode: ["class"],
+	darkMode: ["class", ".dark-mode"],
 	content: [
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
@@ -25,13 +24,11 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				cosmic: {
-					dark: '#404040', /* Medium grey for light mode */
-					darker: '#303030', /* Darker grey for light mode */
-					light: '#f0f0f0', /* Light grey for light mode */
-					accent: '#606060', /* Medium-dark grey accent */
-					muted: '#909090', /* Medium grey */
-				},
+				warmBeige: 'hsl(28, 25%, 96%)',
+				softPeach: 'hsl(25, 45%, 88%)',
+				darkCharcoal: 'hsl(20, 10%, 20%)',
+				warmBrown: 'hsl(20, 35%, 45%)',
+				lightWarmGrey: 'hsl(28, 20%, 90%)',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -85,26 +82,10 @@ export default {
 					from: { height: 'var(--radix-accordion-content-height)' },
 					to: { height: '0' }
 				},
-				'float': {
-					'0%, 100%': { transform: 'translateY(0)' },
-					'50%': { transform: 'translateY(-10px)' }
-				},
-				'pulse-slow': {
-					'0%, 100%': { opacity: '1' },
-					'50%': { opacity: '0.7' }
-				},
-				'gradient-shift': {
-					'0%': { backgroundPosition: '0% 50%' },
-					'50%': { backgroundPosition: '100% 50%' },
-					'100%': { backgroundPosition: '0% 50%' }
-				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'float': 'float 6s ease-in-out infinite',
-				'pulse-slow': 'pulse-slow 4s ease-in-out infinite',
-				'gradient-shift': 'gradient-shift 8s ease infinite'
 			},
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif']
