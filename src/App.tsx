@@ -6,10 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import TechScale from "./pages/TechScale";
+import Home from "./pages/Home";
+import Apply from "./pages/Apply";
 import NotFound from "./pages/NotFound";
-import MyApplications from "./pages/MyApplications";
-import ApplicationDetail from "./pages/ApplicationDetail";
 
 const queryClient = new QueryClient();
 
@@ -21,10 +20,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<TechScale />} />
-            <Route path="/my-applications" element={<MyApplications />} />
-            <Route path="/application/:id" element={<ApplicationDetail />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/" element={<Home />} />
+            <Route path="/apply" element={<Apply />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
