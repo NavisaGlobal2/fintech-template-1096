@@ -165,63 +165,120 @@ const MyAccount = () => {
       </Card>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="hover-scale">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Applications - Featured Card */}
+        <Card className="relative overflow-hidden border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg hover:-translate-y-1 duration-300 bg-gradient-to-br from-primary/5 to-background">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Applications</p>
-                <p className="text-3xl font-bold text-foreground">{recentApplications.length}</p>
+            <div className="flex items-start justify-between mb-4">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Applications</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-4xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                    {recentApplications.length}
+                  </p>
+                  <span className="text-xs text-muted-foreground">all time</span>
+                </div>
               </div>
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-primary" />
+              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
+                <TrendingUp className="h-7 w-7 text-white" />
+              </div>
+            </div>
+            
+            {/* Mini breakdown */}
+            <div className="flex gap-3 text-xs">
+              <div className="flex items-center gap-1.5">
+                <div className="h-2 w-2 rounded-full bg-green-500" />
+                <span className="text-muted-foreground">
+                  {recentApplications.filter(app => app.status === 'approved').length} approved
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-2 w-2 rounded-full bg-amber-500" />
+                <span className="text-muted-foreground">
+                  {recentApplications.filter(app => app.status === 'under-review').length} pending
+                </span>
               </div>
             </div>
           </CardContent>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/60 to-primary" />
         </Card>
 
-        <Card className="hover-scale">
+        {/* Approved Applications */}
+        <Card className="relative overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-green-500/20 bg-gradient-to-br from-green-500/5 to-background">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Approved</p>
-                <p className="text-3xl font-bold text-green-500">
-                  {recentApplications.filter(app => app.status === 'approved').length}
-                </p>
+            <div className="flex items-start justify-between mb-3">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Approved</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-4xl font-bold text-green-500">
+                    {recentApplications.filter(app => app.status === 'approved').length}
+                  </p>
+                  {recentApplications.filter(app => app.status === 'approved').length > 0 && (
+                    <span className="text-xs text-green-500/70 font-medium">active</span>
+                  )}
+                </div>
               </div>
-              <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
                 <CheckCircle2 className="h-6 w-6 text-green-500" />
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover-scale">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Under Review</p>
-                <p className="text-3xl font-bold text-amber-500">
-                  {recentApplications.filter(app => app.status === 'under-review').length}
-                </p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-amber-500" />
-              </div>
+            
+            <div className="flex items-center gap-1.5 text-xs text-green-600">
+              <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="font-medium">Ready to proceed</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover-scale">
+        {/* Under Review Applications */}
+        <Card className="relative overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-background">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Profile</p>
-                <p className="text-3xl font-bold text-primary">{profileCompletion()}%</p>
+            <div className="flex items-start justify-between mb-3">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Under Review</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-4xl font-bold text-amber-500">
+                    {recentApplications.filter(app => app.status === 'under-review').length}
+                  </p>
+                  {recentApplications.filter(app => app.status === 'under-review').length > 0 && (
+                    <span className="text-xs text-amber-500/70 font-medium">in progress</span>
+                  )}
+                </div>
               </div>
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <Clock className="h-6 w-6 text-amber-500" />
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1.5 text-xs text-amber-600">
+              <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="font-medium">Processing application</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Completion */}
+        <Card className="relative overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-3">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Profile</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-4xl font-bold text-primary">{profileCompletion()}%</p>
+                  <span className="text-xs text-muted-foreground">complete</span>
+                </div>
+              </div>
+              <div className="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                 <UserIcon className="h-6 w-6 text-primary" />
               </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="space-y-1.5">
+              <Progress value={profileCompletion()} className="h-1.5" />
+              <p className="text-xs text-muted-foreground">
+                {profileCompletion() === 100 ? 'All set!' : 'Complete your profile'}
+              </p>
             </div>
           </CardContent>
         </Card>
