@@ -30,13 +30,13 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section id="how" className="w-full py-24 px-6">
+    <section id="how" className="w-full py-12 sm:py-16 md:py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-5xl md:text-6xl font-bold text-center mb-16 text-foreground">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 sm:mb-12 md:mb-16 text-foreground px-2">
           How it works
         </h2>
         
-        <div className="space-y-24">
+        <div className="space-y-12 sm:space-y-16 md:space-y-24">
           {steps.map((step, index) => {
             const Icon = step.icon;
             const isLeft = step.imagePosition === "left";
@@ -44,16 +44,16 @@ const HowItWorks = () => {
             return (
               <div 
                 key={index}
-                className={`flex flex-col ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} gap-12 items-center`}
+                className={`flex flex-col ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} gap-6 sm:gap-8 md:gap-12 items-center`}
                 style={{
                   animation: `fadeIn 0.6s ease-out ${index * 200}ms backwards`
                 }}
               >
                 {/* Image Side */}
                 <div className="w-full md:w-1/2 relative">
-                  <div className="relative aspect-[4/3] rounded-[2rem] overflow-hidden group">
+                  <div className="relative aspect-[4/3] rounded-2xl sm:rounded-[2rem] overflow-hidden group">
                     {/* Step Number Badge */}
-                    <div className="absolute -top-6 -left-6 w-16 h-16 rounded-full bg-gradient-to-br from-sage to-sageDark flex items-center justify-center text-2xl font-bold text-white shadow-lg z-10">
+                    <div className="absolute -top-4 -left-4 sm:-top-6 sm:-left-6 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-sage to-sageDark flex items-center justify-center text-xl sm:text-2xl font-bold text-white shadow-lg z-10">
                       {step.number}
                     </div>
                     
@@ -70,16 +70,16 @@ const HowItWorks = () => {
                 </div>
 
                 {/* Content Side */}
-                <div className="w-full md:w-1/2 space-y-6">
-                  <div className="w-16 h-16 rounded-full bg-sageLight flex items-center justify-center group hover:scale-110 hover:rotate-6 transition-all duration-300">
-                    <Icon className="h-8 w-8 text-sageDark" />
+                <div className="w-full md:w-1/2 space-y-4 sm:space-y-6 px-2">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-sageLight flex items-center justify-center group hover:scale-110 hover:rotate-6 transition-all duration-300">
+                    <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-sageDark" />
                   </div>
                   
-                  <h3 className="text-4xl font-bold text-foreground">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
                     {step.title}
                   </h3>
                   
-                  <p className="text-xl text-muted-foreground leading-relaxed">
+                  <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed">
                     {step.description}
                   </p>
                 </div>
