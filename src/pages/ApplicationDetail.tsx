@@ -25,7 +25,7 @@ const ApplicationDetail = () => {
   }
 
   if (!id) {
-    navigate('/my-applications', { replace: true });
+    navigate('/my-account', { replace: true });
     return null;
   }
 
@@ -49,9 +49,9 @@ const ApplicationDetail = () => {
                 size="sm"
                 asChild
               >
-                <Link to="/my-applications">
+                <Link to="/my-account">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Back to Applications</span>
+                  <span className="hidden sm:inline">Back to My Account</span>
                   <span className="sm:hidden">Back</span>
                 </Link>
               </Button>

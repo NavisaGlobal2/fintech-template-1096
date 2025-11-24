@@ -164,7 +164,7 @@ What's Next:
 2. You'll receive email updates on your application status
 3. If approved, you'll see loan offers in your dashboard
 
-You can track your application progress anytime at: ${baseUrl}/my-applications
+You can track your application progress anytime at: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
@@ -207,7 +207,7 @@ Offer Details:
 
 This offer is time-sensitive and will expire soon. 
 
-View and accept your offer: ${baseUrl}/my-applications
+View and accept your offer: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
@@ -222,7 +222,7 @@ Your ${data.documentType} has been successfully verified.
 
 This brings you one step closer to completing your application. You can continue with the next steps in your dashboard.
 
-View your application: ${baseUrl}/my-applications
+View your application: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
@@ -239,7 +239,7 @@ Reason: ${data.rejectionReason || 'Document quality or information needs improve
 
 Please upload a new version of this document to continue with your application.
 
-Upload documents: ${baseUrl}/my-applications
+Upload documents: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
@@ -262,7 +262,7 @@ What Happens Next:
 2. You'll receive updates as they review your profile
 3. If approved, you'll be contacted directly to discuss funding details
 
-You can track your application status at: ${baseUrl}/my-applications
+You can track your application status at: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
@@ -283,7 +283,7 @@ What's Happening:
 Next Steps:
 ${data.nextSteps || 'Sit tight! We\'ll email you as soon as we have results.'}
 
-Track your application: ${baseUrl}/my-applications
+Track your application: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
@@ -305,7 +305,7 @@ ${data.decision === 'approved' ?
   'A loan offer will be generated for you within the next few hours.' :
   'Our underwriting team will review your application manually and get back to you within 2-3 business days.'}
 
-View details: ${baseUrl}/my-applications
+View details: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
@@ -328,7 +328,7 @@ This offer is time-sensitive and expires on: ${data.validUntil}
 
 ⚠️ Don't wait - Review and accept your offer now!
 
-View and accept offer: ${baseUrl}/my-applications
+View and accept offer: ${baseUrl}/my-account
 
 Best regards,
 The TechScale Team`
