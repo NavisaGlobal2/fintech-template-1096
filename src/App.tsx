@@ -10,6 +10,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Home from "./pages/Home";
 import Apply from "./pages/Apply";
 import MyAccount from "./pages/MyAccount";
+import ApplicationDetail from "./pages/ApplicationDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,11 @@ const App = () => (
             <Route path="/my-account" element={
               <ProtectedRoute>
                 <MyAccount />
+              </ProtectedRoute>
+            } />
+            <Route path="/application/:id" element={
+              <ProtectedRoute>
+                <ApplicationDetail />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

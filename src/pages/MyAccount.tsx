@@ -155,7 +155,7 @@ const MyAccount = () => {
               <p className="text-muted-foreground">Here's your application overview and account status</p>
             </div>
             <Button asChild className="shadow-lg">
-              <Link to="/#loan-matcher">
+              <Link to="/apply">
                 <Plus className="h-4 w-4 mr-2" />
                 New Application
               </Link>
@@ -289,7 +289,7 @@ const MyAccount = () => {
         profile={profile}
         hasApplications={recentApplications.length > 0}
         onEditProfile={handleOpenEditProfile}
-        onCreateApplication={() => navigate('/#loan-matcher')}
+        onCreateApplication={() => navigate('/apply')}
       />
     </div>
   );
@@ -301,12 +301,12 @@ const MyAccount = () => {
           <h2 className="text-2xl font-bold text-foreground">My Applications</h2>
           <p className="text-muted-foreground">Track and manage your loan applications</p>
         </div>
-        <Button asChild>
-          <Link to="/#loan-matcher">
-            <Plus className="h-4 w-4 mr-2" />
-            New Application
-          </Link>
-        </Button>
+              <Button asChild>
+                <Link to="/apply">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Application
+                </Link>
+              </Button>
       </div>
 
       {loadingData ? (
@@ -324,7 +324,7 @@ const MyAccount = () => {
               Start your journey by creating your first loan application
             </p>
             <Button asChild size="lg">
-              <Link to="/#loan-matcher">
+              <Link to="/apply">
                 <Plus className="h-4 w-4 mr-2" />
                 Start Your First Application
               </Link>
