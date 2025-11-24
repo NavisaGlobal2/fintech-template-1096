@@ -603,6 +603,63 @@ const ApplicationDetailView: React.FC<ApplicationDetailViewProps> = ({ applicati
       {/* Loan Request Summary */}
       <LoanRequestSummary application={application} />
 
+      {/* Enhanced Loan Details Card */}
+      <Card className="cosmic-card bg-gradient-to-br from-primary/5 to-background border-primary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-primary" />
+            Loan Request Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Loan Amount */}
+            <div className="p-4 rounded-lg bg-muted/50 border border-border">
+              <p className="text-sm text-muted-foreground mb-2">Requested Amount</p>
+              <p className="text-2xl font-bold text-primary">
+                {application.loanTypeRequest?.amount 
+                  ? new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(application.loanTypeRequest.amount))
+                  : 'Not specified'}
+              </p>
+            </div>
+            
+            {/* Loan Type */}
+            <div className="p-4 rounded-lg bg-muted/50 border border-border">
+              <p className="text-sm text-muted-foreground mb-2">Loan Type</p>
+              <p className="text-lg font-semibold">
+                {getLoanTypeDisplay(application.loanTypeRequest?.type || 'study-abroad')}
+              </p>
+            </div>
+            
+            {/* Repayment Preference */}
+            {application.loanTypeRequest?.repaymentPreference && (
+              <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                <p className="text-sm text-muted-foreground mb-2">Repayment Preference</p>
+                <p className="text-sm font-medium">
+                  {application.loanTypeRequest.repaymentPreference}
+                </p>
+              </div>
+            )}
+          </div>
+          
+          {/* Loan Purpose Full Description */}
+          {application.loanTypeRequest?.purpose && (
+            <>
+              <Separator className="my-4" />
+              <div>
+                <p className="text-sm font-medium mb-2 flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Purpose
+                </p>
+                <p className="text-sm text-muted-foreground p-4 rounded-lg bg-muted/30">
+                  {application.loanTypeRequest.purpose}
+                </p>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Application Summary Card */}
       <Card className="cosmic-card">
         <CardHeader>
