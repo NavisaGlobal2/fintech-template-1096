@@ -14,7 +14,7 @@ interface ProfileCompletionChecklistProps {
     email: string | null;
   } | null;
   hasApplications: boolean;
-  onEditProfile?: () => void;
+  onEditProfile?: (focusField?: 'first_name' | 'last_name' | 'phone') => void;
   onCreateApplication?: () => void;
 }
 
@@ -26,6 +26,7 @@ interface ChecklistItem {
   action?: {
     label: string;
     onClick: () => void;
+    focusField?: 'first_name' | 'last_name' | 'phone';
   };
 }
 
@@ -41,7 +42,11 @@ const ProfileCompletionChecklist: React.FC<ProfileCompletionChecklistProps> = ({
       label: 'Add your full name',
       isComplete: !!(profile?.first_name && profile?.last_name),
       icon: User,
-      action: onEditProfile ? { label: 'Add Name', onClick: onEditProfile } : undefined,
+      action: onEditProfile ? {
+        label: 'Add Name',
+        onClick: () => onEditProfile('first_name'),
+        focusField: 'first_name'
+      } : undefined,
     },
     {
       id: 'email',
@@ -54,7 +59,11 @@ const ProfileCompletionChecklist: React.FC<ProfileCompletionChecklistProps> = ({
       label: 'Add phone number',
       isComplete: !!profile?.phone,
       icon: Phone,
-      action: onEditProfile ? { label: 'Add Phone', onClick: onEditProfile } : undefined,
+      action: onEditProfile ? {
+        label: 'Add Phone',
+        onClick: () => onEditProfile('phone'),
+        focusField: 'phone'
+      } : undefined,
     },
     {
       id: 'application',

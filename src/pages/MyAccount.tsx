@@ -11,6 +11,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import ProfileCompletionChecklist from '@/components/ProfileCompletionChecklist';
+import ProfileEditDialog from '@/components/ProfileEditDialog';
 
 interface Application {
   id: string;
@@ -34,6 +35,8 @@ const MyAccount = () => {
   const [recentApplications, setRecentApplications] = useState<Application[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loadingData, setLoadingData] = useState(true);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [editProfileFocusField, setEditProfileFocusField] = useState<'first_name' | 'last_name' | 'phone' | undefined>(undefined);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +70,28 @@ const MyAccount = () => {
 
     fetchData();
   }, [user]);
+
+  const handleOpenEditProfile = (focusField?: 'first_name' | 'last_name' | 'phone') => {
+    setEditProfileFocusField(focusField);
+    setShowEditProfile(true);
+  };
+
+  const handleProfileUpdated = async () => {
+    // Refresh profile data
+    if (!user) return;
+    
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      setProfile(profileData);
+    } catch (error) {
+      console.error('Error refreshing profile:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -156,7 +181,7 @@ const MyAccount = () => {
                   <span>{user.email}</span>
                 </div>
                 <Separator className="my-3" />
-                <Button variant="outline" size="sm" className="w-full">
+                <Button variant="outline" size="sm" className="w-full" onClick={() => handleOpenEditProfile()}>
                   <Settings className="h-4 w-4 mr-2" />
                   Edit Profile
                 </Button>
@@ -167,10 +192,7 @@ const MyAccount = () => {
             <ProfileCompletionChecklist
               profile={profile}
               hasApplications={recentApplications.length > 0}
-              onEditProfile={() => {
-                // TODO: Implement edit profile modal/dialog
-                console.log('Edit profile clicked');
-              }}
+              onEditProfile={handleOpenEditProfile}
               onCreateApplication={() => {
                 navigate('/#loan-matcher');
               }}
@@ -341,6 +363,16 @@ const MyAccount = () => {
           </div>
         </div>
       </main>
+
+      {/* Profile Edit Dialog */}
+      <ProfileEditDialog
+        open={showEditProfile}
+        onOpenChange={setShowEditProfile}
+        profile={profile}
+        userId={user.id}
+        onProfileUpdated={handleProfileUpdated}
+        focusField={editProfileFocusField}
+      />
     </div>
   );
 };
