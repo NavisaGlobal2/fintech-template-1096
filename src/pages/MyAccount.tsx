@@ -10,6 +10,7 @@ import TechScaleLogo from '@/components/techscale/TechScaleLogo';
 import { useNotifications } from '@/hooks/useNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import ProfileCompletionChecklist from '@/components/ProfileCompletionChecklist';
 
 interface Application {
   id: string;
@@ -161,6 +162,19 @@ const MyAccount = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Profile Completion Checklist */}
+            <ProfileCompletionChecklist
+              profile={profile}
+              hasApplications={recentApplications.length > 0}
+              onEditProfile={() => {
+                // TODO: Implement edit profile modal/dialog
+                console.log('Edit profile clicked');
+              }}
+              onCreateApplication={() => {
+                navigate('/#loan-matcher');
+              }}
+            />
 
             {/* Quick Actions */}
             <Card>
