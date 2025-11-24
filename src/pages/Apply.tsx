@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { ArrowLeft, Loader2, User, FileText, Globe, Briefcase, Users, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, User, FileText, Globe, Briefcase, Users, CheckCircle, Save, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
@@ -75,12 +75,17 @@ const applicationSchema = z.object({
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
 
+const DRAFT_STORAGE_KEY = 'loan_application_draft';
+const AUTOSAVE_DELAY = 2000; // 2 seconds
+
 const Apply = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [hasSavedDraft, setHasSavedDraft] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<{
     proofOfAddress?: File;
     governmentId?: File;
@@ -89,9 +94,75 @@ const Apply = () => {
     guarantorId?: File;
   }>({});
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ApplicationForm>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
   });
+
+  const formValues = watch();
+
+  // Load saved draft from localStorage on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        
+        // Restore form values
+        Object.keys(parsed.formData).forEach((key) => {
+          setValue(key as any, parsed.formData[key]);
+        });
+        
+        setHasSavedDraft(true);
+        setLastSaved(new Date(parsed.savedAt));
+        toast.info('Draft restored from previous session', {
+          description: `Last saved: ${new Date(parsed.savedAt).toLocaleString()}`,
+        });
+      } catch (error) {
+        console.error('Failed to load draft:', error);
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      }
+    }
+  }, [setValue]);
+
+  // Auto-save form data to localStorage
+  const saveFormData = useCallback(() => {
+    const draftData = {
+      formData: formValues,
+      savedAt: new Date().toISOString(),
+    };
+    
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData));
+    setLastSaved(new Date());
+    setHasSavedDraft(true);
+  }, [formValues]);
+
+  // Debounced auto-save
+  useEffect(() => {
+    // Don't auto-save if form is empty or during submission
+    if (isSubmitting) return;
+    
+    const hasAnyData = Object.values(formValues).some(val => 
+      val !== undefined && val !== '' && val !== false
+    );
+    
+    if (!hasAnyData) return;
+
+    const timer = setTimeout(() => {
+      saveFormData();
+    }, AUTOSAVE_DELAY);
+
+    return () => clearTimeout(timer);
+  }, [formValues, isSubmitting, saveFormData]);
+
+  // Clear draft from localStorage
+  const clearDraft = () => {
+    localStorage.removeItem(DRAFT_STORAGE_KEY);
+    reset();
+    setSelectedFiles({});
+    setHasSavedDraft(false);
+    setLastSaved(null);
+    toast.success('Draft cleared');
+  };
 
   const loanPurpose = watch('loanPurpose');
   const characterCount = loanPurpose?.length || 0;
@@ -175,6 +246,11 @@ const Apply = () => {
         description: `Reference: ${result.applicationId?.slice(0, 8)}. We'll review your application within 24-48 hours.`,
       });
 
+      // Clear the saved draft
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      setHasSavedDraft(false);
+      setLastSaved(null);
+
       // Redirect to applications page
       setTimeout(() => {
         navigate('/my-applications');
@@ -215,7 +291,15 @@ const Apply = () => {
           <div className="mt-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-foreground">Progress</span>
-              <span className="text-sm font-medium text-sage">{progress}%</span>
+              <div className="flex items-center gap-4">
+                {lastSaved && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Save className="h-3 w-3" />
+                    Saved {lastSaved.toLocaleTimeString()}
+                  </span>
+                )}
+                <span className="text-sm font-medium text-sage">{progress}%</span>
+              </div>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <div 
@@ -223,6 +307,20 @@ const Apply = () => {
                 style={{ width: `${progress}%` }}
               />
             </div>
+            {hasSavedDraft && (
+              <div className="flex justify-end mt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearDraft}
+                  className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Clear Draft
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
