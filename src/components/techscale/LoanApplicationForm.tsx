@@ -17,6 +17,7 @@ import LoanTypeStep from './application-steps/LoanTypeStep';
 import AccountCreationStep from './application-steps/AccountCreationStep';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoanApplicationFormProps {
   loanOption: LoanOption;
@@ -29,18 +30,42 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   onBack,
   onComplete
 }) => {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<ApplicationStepId>('personal-kyc');
   const [isLoading, setIsLoading] = useState(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
 
+  // User-specific draft storage key
+  const getDraftStorageKey = () => user ? `loanApplicationDraft_${user.id}` : null;
+
   // Load draft from localStorage on mount
   const loadDraftFromStorage = () => {
-    const savedDraft = localStorage.getItem('loanApplicationDraft');
+    // Clear old non-user-specific drafts
+    const oldDraft = localStorage.getItem('loanApplicationDraft');
+    if (oldDraft) {
+      localStorage.removeItem('loanApplicationDraft');
+    }
+
+    if (!user) return null;
+
+    const draftKey = getDraftStorageKey();
+    if (!draftKey) return null;
+
+    const savedDraft = localStorage.getItem(draftKey);
     if (savedDraft) {
       try {
-        return JSON.parse(savedDraft);
+        const parsed = JSON.parse(savedDraft);
+        
+        // Verify the draft belongs to the current user
+        if (parsed.userId && parsed.userId !== user.id) {
+          localStorage.removeItem(draftKey);
+          return null;
+        }
+        
+        return parsed;
       } catch (error) {
         console.error('Error parsing draft from localStorage:', error);
+        localStorage.removeItem(draftKey);
       }
     }
     return null;
@@ -137,12 +162,21 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   // Save draft to localStorage whenever form changes
   const formData = form.watch();
   React.useEffect(() => {
+    if (!user) return;
+
+    const draftKey = getDraftStorageKey();
+    if (!draftKey) return;
+
     const timeoutId = setTimeout(() => {
-      localStorage.setItem('loanApplicationDraft', JSON.stringify(formData));
+      const draftData = {
+        ...formData,
+        userId: user.id
+      };
+      localStorage.setItem(draftKey, JSON.stringify(draftData));
     }, 1000); // Debounce saves
 
     return () => clearTimeout(timeoutId);
-  }, [formData]);
+  }, [formData, user]);
 
   const loanType = form.watch('loanTypeRequest.type');
   
@@ -218,8 +252,17 @@ const LoanApplicationForm: React.FC<LoanApplicationFormProps> = ({
   const progressPercentage = ((currentStepIndex + 1) / steps.length) * 100;
 
   const saveDraftToLocalStorage = () => {
+    if (!user) return;
+
+    const draftKey = getDraftStorageKey();
+    if (!draftKey) return;
+
     const formData = form.getValues();
-    localStorage.setItem('loanApplicationDraft', JSON.stringify(formData));
+    const draftData = {
+      ...formData,
+      userId: user.id
+    };
+    localStorage.setItem(draftKey, JSON.stringify(draftData));
     toast.success('Draft saved locally');
   };
 
