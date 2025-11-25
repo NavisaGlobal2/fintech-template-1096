@@ -97,13 +97,15 @@ const Apply = () => {
   const { user, loading } = useAuth();
   
   // User-specific draft storage key
-  const getDraftStorageKey = () => user ? `loan_application_draft_${user.id}` : null;
+  const getTempDraftKey = () => 'loan_application_temp_draft';
+  const getUserDraftKey = (userId: string) => `loan_application_draft_${userId}`;
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasSavedDraft, setHasSavedDraft] = useState(false);
+  const [pendingSubmission, setPendingSubmission] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<{
     proofOfAddress?: File;
     governmentId?: File;
@@ -118,7 +120,7 @@ const Apply = () => {
 
   const formValues = watch();
 
-  // Load saved draft from localStorage on mount
+  // Load saved draft from localStorage or sessionStorage on mount
   useEffect(() => {
     // Clear old non-user-specific drafts
     const oldDraft = localStorage.getItem('loan_application_draft');
@@ -126,55 +128,101 @@ const Apply = () => {
       localStorage.removeItem('loan_application_draft');
     }
 
-    if (!user) return;
-
-    const draftKey = getDraftStorageKey();
-    if (!draftKey) return;
-
-    const savedDraft = localStorage.getItem(draftKey);
-    if (savedDraft) {
-      try {
-        const parsed = JSON.parse(savedDraft);
-        
-        // Verify the draft belongs to the current user
-        if (parsed.userId && parsed.userId !== user.id) {
-          localStorage.removeItem(draftKey);
-          return;
-        }
-        
-        // Restore form values
-        if (parsed.formData) {
-          Object.keys(parsed.formData).forEach((key) => {
-            setValue(key as any, parsed.formData[key]);
-          });
+    if (user?.id) {
+      // For authenticated users, check for temp draft first
+      const tempDraft = sessionStorage.getItem(getTempDraftKey());
+      if (tempDraft) {
+        try {
+          const parsed = JSON.parse(tempDraft);
+          // Migrate to user-specific storage
+          const draftData = {
+            userId: user.id,
+            formData: parsed.formData || parsed,
+            savedAt: new Date().toISOString(),
+          };
+          localStorage.setItem(getUserDraftKey(user.id), JSON.stringify(draftData));
+          sessionStorage.removeItem(getTempDraftKey());
           
-          setHasSavedDraft(true);
-          setLastSaved(new Date(parsed.savedAt));
-          toast.info('Draft restored from previous session', {
-            description: `Last saved: ${new Date(parsed.savedAt).toLocaleString()}`,
+          const dataToRestore = parsed.formData || parsed;
+          Object.keys(dataToRestore).forEach((key) => {
+            setValue(key as any, dataToRestore[key]);
           });
+          setHasSavedDraft(true);
+          toast.success('Your application has been saved to your account!');
+        } catch (error) {
+          console.error('Error migrating temp draft:', error);
         }
-      } catch (error) {
-        console.error('Failed to load draft:', error);
-        localStorage.removeItem(draftKey);
+      } else {
+        // Load user-specific draft
+        const savedDraft = localStorage.getItem(getUserDraftKey(user.id));
+        if (savedDraft) {
+          try {
+            const parsed = JSON.parse(savedDraft);
+            
+            // Verify the draft belongs to the current user
+            if (parsed.userId && parsed.userId !== user.id) {
+              localStorage.removeItem(getUserDraftKey(user.id));
+              return;
+            }
+            
+            // Restore form values
+            if (parsed.formData) {
+              Object.keys(parsed.formData).forEach((key) => {
+                setValue(key as any, parsed.formData[key]);
+              });
+              
+              setHasSavedDraft(true);
+              setLastSaved(new Date(parsed.savedAt));
+              toast.info('Draft restored from previous session', {
+                description: `Last saved: ${new Date(parsed.savedAt).toLocaleString()}`,
+              });
+            }
+          } catch (error) {
+            console.error('Failed to load draft:', error);
+            localStorage.removeItem(getUserDraftKey(user.id));
+          }
+        }
+      }
+    } else {
+      // For anonymous users, load from sessionStorage
+      const tempDraft = sessionStorage.getItem(getTempDraftKey());
+      if (tempDraft) {
+        try {
+          const parsed = JSON.parse(tempDraft);
+          const dataToRestore = parsed.formData || parsed;
+          Object.keys(dataToRestore).forEach((key) => {
+            setValue(key as any, dataToRestore[key]);
+          });
+          setHasSavedDraft(true);
+          if (parsed.savedAt) {
+            setLastSaved(new Date(parsed.savedAt));
+          }
+        } catch (error) {
+          console.error('Failed to load temp draft:', error);
+          sessionStorage.removeItem(getTempDraftKey());
+        }
       }
     }
   }, [setValue, user]);
 
-  // Auto-save form data to localStorage
+  // Auto-save form data to localStorage or sessionStorage
   const saveFormData = useCallback(() => {
-    if (!user) return;
-    
-    const draftKey = getDraftStorageKey();
-    if (!draftKey) return;
-
-    const draftData = {
-      userId: user.id,
-      formData: formValues,
-      savedAt: new Date().toISOString(),
-    };
-    
-    localStorage.setItem(draftKey, JSON.stringify(draftData));
+    if (user?.id) {
+      // Authenticated users - save to localStorage
+      const draftData = {
+        userId: user.id,
+        formData: formValues,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(getUserDraftKey(user.id), JSON.stringify(draftData));
+    } else {
+      // Anonymous users - save to sessionStorage
+      const draftData = {
+        formData: formValues,
+        savedAt: new Date().toISOString(),
+      };
+      sessionStorage.setItem(getTempDraftKey(), JSON.stringify(draftData));
+    }
     setLastSaved(new Date());
     setHasSavedDraft(true);
   }, [formValues, user]);
@@ -197,11 +245,12 @@ const Apply = () => {
     return () => clearTimeout(timer);
   }, [formValues, isSubmitting, saveFormData]);
 
-  // Clear draft from localStorage
+  // Clear draft from localStorage or sessionStorage
   const clearDraft = () => {
-    const draftKey = getDraftStorageKey();
-    if (draftKey) {
-      localStorage.removeItem(draftKey);
+    if (user?.id) {
+      localStorage.removeItem(getUserDraftKey(user.id));
+    } else {
+      sessionStorage.removeItem(getTempDraftKey());
     }
     reset();
     setSelectedFiles({});
@@ -222,12 +271,16 @@ const Apply = () => {
   ).length;
   const progress = Math.round((filledFields / totalFields) * 100);
 
-  // Check authentication
+  // Handle auto-submit after authentication
   React.useEffect(() => {
-    if (!loading && !user) {
-      setShowAuthModal(true);
+    if (pendingSubmission && user) {
+      setPendingSubmission(false);
+      // Small delay to ensure auth state is fully set
+      setTimeout(() => {
+        handleSubmit(onSubmit)();
+      }, 300);
     }
-  }, [loading, user]);
+  }, [pendingSubmission, user]);
 
   const handleFileChange = (type: keyof typeof selectedFiles) => (file: File | undefined) => {
     setSelectedFiles(prev => ({ ...prev, [type]: file }));
@@ -236,8 +289,11 @@ const Apply = () => {
 
   const onSubmit = async (data: ApplicationForm) => {
     if (!user) {
-      toast.error('Please sign in to submit your application');
+      // Save current form data before showing auth modal
+      saveFormData();
+      toast.info('Create an account to save your application');
       setShowAuthModal(true);
+      setPendingSubmission(true);
       return;
     }
 
@@ -295,10 +351,10 @@ const Apply = () => {
       });
 
       // Clear the saved draft
-      const draftKey = getDraftStorageKey();
-      if (draftKey) {
-        localStorage.removeItem(draftKey);
+      if (user?.id) {
+        localStorage.removeItem(getUserDraftKey(user.id));
       }
+      sessionStorage.removeItem(getTempDraftKey());
       setHasSavedDraft(false);
       setLastSaved(null);
 
@@ -841,10 +897,13 @@ const Apply = () => {
           </div>
         </form>
 
-        <AuthModal 
-          open={showAuthModal} 
-          onOpenChange={setShowAuthModal} 
-        />
+      <AuthModal 
+        open={showAuthModal} 
+        onOpenChange={setShowAuthModal}
+        onSuccess={() => {
+          // Auth success will trigger the useEffect to auto-submit
+        }}
+      />
       </div>
     </div>
   );
