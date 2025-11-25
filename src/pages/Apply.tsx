@@ -17,6 +17,7 @@ import { submitLoanApplication, type ApplicationFormData } from '@/utils/applica
 import { uploadMultipleDocuments } from '@/utils/documentUpload';
 import { FileUploadCard } from '@/components/ui/file-upload-card';
 import { Card } from '@/components/ui/card';
+import ApplicationSubmittedPage from '@/components/ApplicationSubmittedPage';
 
 const applicationSchema = z.object({
   // Applicant Information
@@ -106,6 +107,8 @@ const Apply = () => {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasSavedDraft, setHasSavedDraft] = useState(false);
   const [pendingSubmission, setPendingSubmission] = useState(false);
+  const [showSubmittedPage, setShowSubmittedPage] = useState(false);
+  const [submittedApplicationId, setSubmittedApplicationId] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<{
     proofOfAddress?: File;
     governmentId?: File;
@@ -346,10 +349,6 @@ const Apply = () => {
         return;
       }
 
-      toast.success('Application Submitted Successfully! 🎉', {
-        description: `Reference: ${result.applicationId?.slice(0, 8)}. We'll review your application within 24-48 hours.`,
-      });
-
       // Clear the saved draft
       if (user?.id) {
         localStorage.removeItem(getUserDraftKey(user.id));
@@ -358,10 +357,9 @@ const Apply = () => {
       setHasSavedDraft(false);
       setLastSaved(null);
 
-      // Redirect to applications page
-      setTimeout(() => {
-        navigate('/my-account');
-      }, 2000);
+      // Show submitted page instead of navigating
+      setSubmittedApplicationId(result.applicationId || '');
+      setShowSubmittedPage(true);
     } catch (error) {
       console.error('Submission error:', error);
       toast.error('An unexpected error occurred. Please try again.');
@@ -375,6 +373,11 @@ const Apply = () => {
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Show submitted page after successful submission
+  if (showSubmittedPage && submittedApplicationId) {
+    return <ApplicationSubmittedPage applicationId={submittedApplicationId} />;
   }
 
   return (
