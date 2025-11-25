@@ -70,61 +70,12 @@ const applicationSchema = z.object({
   
   // Social Profiles
   socialProfiles: z.object({
-    facebook: z.string().optional().refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        // Accept facebook.com URLs or plain usernames
-        const fbRegex = /^(?:https?:\/\/)?(?:www\.)?(?:facebook\.com|fb\.com)\/[a-zA-Z0-9.]+\/?$|^[a-zA-Z0-9.]+$/;
-        return fbRegex.test(val.trim());
-      },
-      { message: 'Enter a valid Facebook username or URL (e.g., facebook.com/username)' }
-    ),
-    twitter: z.string().optional().refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        // Accept @username or plain username (3-15 alphanumeric + underscore)
-        const twitterRegex = /^@?[a-zA-Z0-9_]{1,15}$/;
-        return twitterRegex.test(val.trim());
-      },
-      { message: 'Enter a valid Twitter/X handle (e.g., @username or username)' }
-    ),
-    instagram: z.string().optional().refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        // Accept @username or plain username (alphanumeric, dots, underscores)
-        const instaRegex = /^@?[a-zA-Z0-9_.]{1,30}$/;
-        return instaRegex.test(val.trim());
-      },
-      { message: 'Enter a valid Instagram username (e.g., @username or username)' }
-    ),
-    linkedin: z.string().optional().refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        // Accept LinkedIn URLs or plain usernames
-        const linkedinRegex = /^(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$|^[a-zA-Z0-9-]+$/;
-        return linkedinRegex.test(val.trim());
-      },
-      { message: 'Enter a valid LinkedIn username or URL (e.g., linkedin.com/in/username)' }
-    ),
-    tiktok: z.string().optional().refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        // Accept @username or plain username (alphanumeric, dots, underscores)
-        const tiktokRegex = /^@?[a-zA-Z0-9_.]{2,24}$/;
-        return tiktokRegex.test(val.trim());
-      },
-      { message: 'Enter a valid TikTok username (e.g., @username or username)' }
-    ),
-    whatsapp: z.string().optional().refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        // Accept phone numbers with optional + and spaces/dashes
-        const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-        const cleanedPhone = val.trim().replace(/[\s-]/g, '');
-        return phoneRegex.test(cleanedPhone);
-      },
-      { message: 'Enter a valid phone number with country code (e.g., +44 7700 900000)' }
-    ),
+    facebook: z.string().optional(),
+    twitter: z.string().optional(),
+    instagram: z.string().optional(),
+    linkedin: z.string().optional(),
+    tiktok: z.string().optional(),
+    whatsapp: z.string().optional(),
   }).refine(
     (data) => {
       const filled = Object.values(data).filter(v => v && v.trim() !== '').length;
