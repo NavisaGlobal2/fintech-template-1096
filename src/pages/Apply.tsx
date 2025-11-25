@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { ArrowLeft, Loader2, User, FileText, Globe, Briefcase, Users, CheckCircle, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Loader2, User, FileText, Globe, Briefcase, Users, CheckCircle, Save, Trash2, Share2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
@@ -68,6 +68,22 @@ const applicationSchema = z.object({
     'other'
   ], { required_error: 'Please select guarantor employment status' }),
   
+  // Social Profiles
+  socialProfiles: z.object({
+    facebook: z.string().optional(),
+    twitter: z.string().optional(),
+    instagram: z.string().optional(),
+    linkedin: z.string().optional(),
+    tiktok: z.string().optional(),
+    whatsapp: z.string().optional(),
+  }).refine(
+    (data) => {
+      const filled = Object.values(data).filter(v => v && v.trim() !== '').length;
+      return filled >= 3;
+    },
+    { message: 'At least 3 social profiles must be provided' }
+  ),
+
   // Consent
   consentData: z.boolean().refine(val => val === true, 'You must consent to data processing'),
   consentGuarantor: z.boolean().refine(val => val === true, 'You must confirm guarantor agreement'),
@@ -169,6 +185,8 @@ const Apply = () => {
 
   // Calculate progress
   const totalFields = 17;
+  const socialProfiles = watch('socialProfiles') || {};
+  const filledSocialProfiles = Object.values(socialProfiles).filter(v => v && v.trim() !== '').length;
   const filledFields = Object.values(watch()).filter(val => 
     val !== undefined && val !== '' && val !== false
   ).length;
@@ -520,7 +538,98 @@ const Apply = () => {
             </div>
           </Card>
 
-          {/* Section 5: Guarantor Information */}
+          {/* Section 5: Social Profiles */}
+          <Card className="p-6 md:p-8 space-y-6 border-sage/20 hover-lift">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-full bg-sage/20 flex items-center justify-center">
+                <Share2 className="h-5 w-5 text-sage" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-foreground">Social Profiles</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Provide at least 3 social profiles for verification purposes
+                </p>
+              </div>
+            </div>
+
+            {/* Counter */}
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border">
+              <span className="text-sm font-medium text-foreground">Profiles provided:</span>
+              <span className={`text-lg font-bold ${filledSocialProfiles >= 3 ? 'text-sage' : 'text-amber-600'}`}>
+                {filledSocialProfiles} / 3 minimum
+              </span>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <Label htmlFor="facebook">Facebook</Label>
+                <Input 
+                  id="facebook" 
+                  {...register('socialProfiles.facebook')} 
+                  className="rounded-2xl h-12 mt-2"
+                  placeholder="@username or profile URL"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="twitter">Twitter/X</Label>
+                <Input 
+                  id="twitter" 
+                  {...register('socialProfiles.twitter')} 
+                  className="rounded-2xl h-12 mt-2"
+                  placeholder="@username"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="instagram">Instagram</Label>
+                <Input 
+                  id="instagram" 
+                  {...register('socialProfiles.instagram')} 
+                  className="rounded-2xl h-12 mt-2"
+                  placeholder="@username"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="linkedin">LinkedIn</Label>
+                <Input 
+                  id="linkedin" 
+                  {...register('socialProfiles.linkedin')} 
+                  className="rounded-2xl h-12 mt-2"
+                  placeholder="linkedin.com/in/username"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="tiktok">TikTok</Label>
+                <Input 
+                  id="tiktok" 
+                  {...register('socialProfiles.tiktok')} 
+                  className="rounded-2xl h-12 mt-2"
+                  placeholder="@username"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="whatsapp">WhatsApp</Label>
+                <Input 
+                  id="whatsapp" 
+                  {...register('socialProfiles.whatsapp')} 
+                  className="rounded-2xl h-12 mt-2"
+                  placeholder="+44 7700 900000"
+                />
+              </div>
+            </div>
+            
+            {errors.socialProfiles && (
+              <p className="text-destructive text-sm font-medium">
+                {errors.socialProfiles.message}
+              </p>
+            )}
+          </Card>
+
+          {/* Section 6: Guarantor Information */}
           <Card className="p-6 md:p-8 space-y-6 border-sage/20 hover-lift">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-full bg-sage/20 flex items-center justify-center">
@@ -608,7 +717,7 @@ const Apply = () => {
             </div>
           </Card>
 
-          {/* Section 6: Consent */}
+          {/* Section 7: Consent */}
           <Card className="p-6 md:p-8 space-y-6 border-sage/20 hover-lift">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-full bg-sage/20 flex items-center justify-center">

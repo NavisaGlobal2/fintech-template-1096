@@ -9,6 +9,14 @@ export interface ApplicationFormData {
   immigrationStatus: string;
   employmentStatus: string;
   employerName?: string;
+  socialProfiles?: {
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    linkedin?: string;
+    tiktok?: string;
+    whatsapp?: string;
+  };
   guarantorName: string;
   guarantorEmail: string;
   guarantorPhone: string;
@@ -94,6 +102,11 @@ export const submitLoanApplication = async (
       signatureDate: new Date().toISOString(),
     };
 
+    // Prepare application_data with social profiles
+    const applicationData = {
+      socialProfiles: formData.socialProfiles || {},
+    };
+
     // Insert loan application
     const { data: application, error: applicationError } = await supabase
       .from('loan_applications')
@@ -103,6 +116,7 @@ export const submitLoanApplication = async (
         financial_info: financialInfo,
         kyc_documents: kycDocuments,
         declarations,
+        application_data: applicationData,
         loan_type_requested: determineLoanType(loanAmountNumber),
         lender_name: 'Pending Match',
         loan_option_id: 'pending-' + Date.now(),

@@ -780,6 +780,7 @@ export type Database = {
       loan_offers: {
         Row: {
           acceptance_conditions: Json | null
+          acceptance_notes: string | null
           accepted_at: string | null
           accepted_by: string | null
           application_id: string
@@ -796,17 +797,27 @@ export type Database = {
           lender_product_id: string | null
           loan_amount: number
           manual_assessment_notes: string | null
+          offer_letter_generated_at: string | null
+          offer_letter_url: string | null
           offer_type: string
           offer_valid_until: string
           repayment_schedule: Json
           repayment_term_months: number
           requires_guarantor: boolean | null
+          share_token: string | null
+          share_token_expires_at: string | null
+          signature_data: string | null
+          signature_ip_address: unknown
+          signature_timestamp: string | null
+          signature_user_agent: string | null
           status: string
           terms_and_conditions: Json
           user_id: string
+          viewed_at: string | null
         }
         Insert: {
           acceptance_conditions?: Json | null
+          acceptance_notes?: string | null
           accepted_at?: string | null
           accepted_by?: string | null
           application_id: string
@@ -823,17 +834,27 @@ export type Database = {
           lender_product_id?: string | null
           loan_amount: number
           manual_assessment_notes?: string | null
+          offer_letter_generated_at?: string | null
+          offer_letter_url?: string | null
           offer_type: string
           offer_valid_until: string
           repayment_schedule?: Json
           repayment_term_months: number
           requires_guarantor?: boolean | null
+          share_token?: string | null
+          share_token_expires_at?: string | null
+          signature_data?: string | null
+          signature_ip_address?: unknown
+          signature_timestamp?: string | null
+          signature_user_agent?: string | null
           status?: string
           terms_and_conditions?: Json
           user_id: string
+          viewed_at?: string | null
         }
         Update: {
           acceptance_conditions?: Json | null
+          acceptance_notes?: string | null
           accepted_at?: string | null
           accepted_by?: string | null
           application_id?: string
@@ -850,14 +871,23 @@ export type Database = {
           lender_product_id?: string | null
           loan_amount?: number
           manual_assessment_notes?: string | null
+          offer_letter_generated_at?: string | null
+          offer_letter_url?: string | null
           offer_type?: string
           offer_valid_until?: string
           repayment_schedule?: Json
           repayment_term_months?: number
           requires_guarantor?: boolean | null
+          share_token?: string | null
+          share_token_expires_at?: string | null
+          signature_data?: string | null
+          signature_ip_address?: unknown
+          signature_timestamp?: string | null
+          signature_user_agent?: string | null
           status?: string
           terms_and_conditions?: Json
           user_id?: string
+          viewed_at?: string | null
         }
         Relationships: [
           {
@@ -968,6 +998,85 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      offer_acceptance_audit: {
+        Row: {
+          acceptance_notes: string | null
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown
+          offer_id: string
+          signature_data: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          acceptance_notes?: string | null
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          offer_id: string
+          signature_data?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          acceptance_notes?: string | null
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          offer_id?: string
+          signature_data?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_acceptance_audit_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "loan_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_letter_views: {
+        Row: {
+          access_method: string | null
+          id: string
+          ip_address: unknown
+          offer_id: string
+          user_agent: string | null
+          viewed_at: string
+        }
+        Insert: {
+          access_method?: string | null
+          id?: string
+          ip_address?: unknown
+          offer_id: string
+          user_agent?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          access_method?: string | null
+          id?: string
+          ip_address?: unknown
+          offer_id?: string
+          user_agent?: string | null
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_letter_views_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "loan_offers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_methods: {
         Row: {
