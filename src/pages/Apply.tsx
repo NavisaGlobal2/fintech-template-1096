@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { ArrowLeft, Loader2, User, FileText, Globe, Briefcase, Users, CheckCircle, Save, Trash2, Share2 } from 'lucide-react';
+import { ArrowLeft, Loader2, User, FileText, Globe, Briefcase, Users, CheckCircle, Save, Trash2, Share2, Facebook, Twitter, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
@@ -562,7 +562,10 @@ const Apply = () => {
             
             <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <Label htmlFor="facebook">Facebook</Label>
+                <Label htmlFor="facebook" className="flex items-center gap-2">
+                  <Facebook className="h-4 w-4 text-[#1877F2]" />
+                  Facebook
+                </Label>
                 <Input 
                   id="facebook" 
                   {...register('socialProfiles.facebook')} 
@@ -572,7 +575,10 @@ const Apply = () => {
               </div>
 
               <div>
-                <Label htmlFor="twitter">Twitter/X</Label>
+                <Label htmlFor="twitter" className="flex items-center gap-2">
+                  <Twitter className="h-4 w-4 text-[#1DA1F2]" />
+                  Twitter/X
+                </Label>
                 <Input 
                   id="twitter" 
                   {...register('socialProfiles.twitter')} 
@@ -582,7 +588,10 @@ const Apply = () => {
               </div>
 
               <div>
-                <Label htmlFor="instagram">Instagram</Label>
+                <Label htmlFor="instagram" className="flex items-center gap-2">
+                  <Instagram className="h-4 w-4 text-[#E4405F]" />
+                  Instagram
+                </Label>
                 <Input 
                   id="instagram" 
                   {...register('socialProfiles.instagram')} 
@@ -592,7 +601,10 @@ const Apply = () => {
               </div>
 
               <div>
-                <Label htmlFor="linkedin">LinkedIn</Label>
+                <Label htmlFor="linkedin" className="flex items-center gap-2">
+                  <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+                  LinkedIn
+                </Label>
                 <Input 
                   id="linkedin" 
                   {...register('socialProfiles.linkedin')} 
@@ -602,7 +614,10 @@ const Apply = () => {
               </div>
 
               <div>
-                <Label htmlFor="tiktok">TikTok</Label>
+                <Label htmlFor="tiktok" className="flex items-center gap-2">
+                  <Share2 className="h-4 w-4 text-foreground" />
+                  TikTok
+                </Label>
                 <Input 
                   id="tiktok" 
                   {...register('socialProfiles.tiktok')} 
@@ -612,7 +627,10 @@ const Apply = () => {
               </div>
 
               <div>
-                <Label htmlFor="whatsapp">WhatsApp</Label>
+                <Label htmlFor="whatsapp" className="flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-[#25D366]" />
+                  WhatsApp
+                </Label>
                 <Input 
                   id="whatsapp" 
                   {...register('socialProfiles.whatsapp')} 
