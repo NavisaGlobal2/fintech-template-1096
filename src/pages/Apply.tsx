@@ -70,12 +70,61 @@ const applicationSchema = z.object({
   
   // Social Profiles
   socialProfiles: z.object({
-    facebook: z.string().optional(),
-    twitter: z.string().optional(),
-    instagram: z.string().optional(),
-    linkedin: z.string().optional(),
-    tiktok: z.string().optional(),
-    whatsapp: z.string().optional(),
+    facebook: z.string().optional().refine(
+      (val) => {
+        if (!val || val.trim() === '') return true;
+        // Accept facebook.com URLs or plain usernames
+        const fbRegex = /^(?:https?:\/\/)?(?:www\.)?(?:facebook\.com|fb\.com)\/[a-zA-Z0-9.]+\/?$|^[a-zA-Z0-9.]+$/;
+        return fbRegex.test(val.trim());
+      },
+      { message: 'Enter a valid Facebook username or URL (e.g., facebook.com/username)' }
+    ),
+    twitter: z.string().optional().refine(
+      (val) => {
+        if (!val || val.trim() === '') return true;
+        // Accept @username or plain username (3-15 alphanumeric + underscore)
+        const twitterRegex = /^@?[a-zA-Z0-9_]{1,15}$/;
+        return twitterRegex.test(val.trim());
+      },
+      { message: 'Enter a valid Twitter/X handle (e.g., @username or username)' }
+    ),
+    instagram: z.string().optional().refine(
+      (val) => {
+        if (!val || val.trim() === '') return true;
+        // Accept @username or plain username (alphanumeric, dots, underscores)
+        const instaRegex = /^@?[a-zA-Z0-9_.]{1,30}$/;
+        return instaRegex.test(val.trim());
+      },
+      { message: 'Enter a valid Instagram username (e.g., @username or username)' }
+    ),
+    linkedin: z.string().optional().refine(
+      (val) => {
+        if (!val || val.trim() === '') return true;
+        // Accept LinkedIn URLs or plain usernames
+        const linkedinRegex = /^(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$|^[a-zA-Z0-9-]+$/;
+        return linkedinRegex.test(val.trim());
+      },
+      { message: 'Enter a valid LinkedIn username or URL (e.g., linkedin.com/in/username)' }
+    ),
+    tiktok: z.string().optional().refine(
+      (val) => {
+        if (!val || val.trim() === '') return true;
+        // Accept @username or plain username (alphanumeric, dots, underscores)
+        const tiktokRegex = /^@?[a-zA-Z0-9_.]{2,24}$/;
+        return tiktokRegex.test(val.trim());
+      },
+      { message: 'Enter a valid TikTok username (e.g., @username or username)' }
+    ),
+    whatsapp: z.string().optional().refine(
+      (val) => {
+        if (!val || val.trim() === '') return true;
+        // Accept phone numbers with optional + and spaces/dashes
+        const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+        const cleanedPhone = val.trim().replace(/[\s-]/g, '');
+        return phoneRegex.test(cleanedPhone);
+      },
+      { message: 'Enter a valid phone number with country code (e.g., +44 7700 900000)' }
+    ),
   }).refine(
     (data) => {
       const filled = Object.values(data).filter(v => v && v.trim() !== '').length;
@@ -570,8 +619,11 @@ const Apply = () => {
                   id="facebook" 
                   {...register('socialProfiles.facebook')} 
                   className="rounded-2xl h-12 mt-2"
-                  placeholder="@username or profile URL"
+                  placeholder="facebook.com/username or username"
                 />
+                {errors.socialProfiles?.facebook && (
+                  <p className="text-destructive text-sm mt-1.5">{errors.socialProfiles.facebook.message}</p>
+                )}
               </div>
 
               <div>
@@ -585,6 +637,9 @@ const Apply = () => {
                   className="rounded-2xl h-12 mt-2"
                   placeholder="@username"
                 />
+                {errors.socialProfiles?.twitter && (
+                  <p className="text-destructive text-sm mt-1.5">{errors.socialProfiles.twitter.message}</p>
+                )}
               </div>
 
               <div>
@@ -598,6 +653,9 @@ const Apply = () => {
                   className="rounded-2xl h-12 mt-2"
                   placeholder="@username"
                 />
+                {errors.socialProfiles?.instagram && (
+                  <p className="text-destructive text-sm mt-1.5">{errors.socialProfiles.instagram.message}</p>
+                )}
               </div>
 
               <div>
@@ -611,6 +669,9 @@ const Apply = () => {
                   className="rounded-2xl h-12 mt-2"
                   placeholder="linkedin.com/in/username"
                 />
+                {errors.socialProfiles?.linkedin && (
+                  <p className="text-destructive text-sm mt-1.5">{errors.socialProfiles.linkedin.message}</p>
+                )}
               </div>
 
               <div>
@@ -624,6 +685,9 @@ const Apply = () => {
                   className="rounded-2xl h-12 mt-2"
                   placeholder="@username"
                 />
+                {errors.socialProfiles?.tiktok && (
+                  <p className="text-destructive text-sm mt-1.5">{errors.socialProfiles.tiktok.message}</p>
+                )}
               </div>
 
               <div>
@@ -637,6 +701,9 @@ const Apply = () => {
                   className="rounded-2xl h-12 mt-2"
                   placeholder="+44 7700 900000"
                 />
+                {errors.socialProfiles?.whatsapp && (
+                  <p className="text-destructive text-sm mt-1.5">{errors.socialProfiles.whatsapp.message}</p>
+                )}
               </div>
             </div>
             
