@@ -12,9 +12,10 @@ import { Loader2 } from 'lucide-react';
 interface AuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,6 +32,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
     } else {
       toast.success('Signed in successfully!');
       onOpenChange(false);
+      onSuccess?.();
     }
     
     setIsLoading(false);
@@ -47,6 +49,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
     } else {
       toast.success('Account created! Please check your email for verification.');
       onOpenChange(false);
+      onSuccess?.();
     }
     
     setIsLoading(false);
