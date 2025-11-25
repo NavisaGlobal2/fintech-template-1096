@@ -91,11 +91,13 @@ const applicationSchema = z.object({
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
 
-const DRAFT_STORAGE_KEY = 'loan_application_draft';
 const AUTOSAVE_DELAY = 2000; // 2 seconds
 
 const Apply = () => {
   const { user, loading } = useAuth();
+  
+  // User-specific draft storage key
+  const getDraftStorageKey = () => user ? `loan_application_draft_${user.id}` : null;
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,39 +120,64 @@ const Apply = () => {
 
   // Load saved draft from localStorage on mount
   useEffect(() => {
-    const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+    // Clear old non-user-specific drafts
+    const oldDraft = localStorage.getItem('loan_application_draft');
+    if (oldDraft) {
+      localStorage.removeItem('loan_application_draft');
+    }
+
+    if (!user) return;
+
+    const draftKey = getDraftStorageKey();
+    if (!draftKey) return;
+
+    const savedDraft = localStorage.getItem(draftKey);
     if (savedDraft) {
       try {
         const parsed = JSON.parse(savedDraft);
         
-        // Restore form values
-        Object.keys(parsed.formData).forEach((key) => {
-          setValue(key as any, parsed.formData[key]);
-        });
+        // Verify the draft belongs to the current user
+        if (parsed.userId && parsed.userId !== user.id) {
+          localStorage.removeItem(draftKey);
+          return;
+        }
         
-        setHasSavedDraft(true);
-        setLastSaved(new Date(parsed.savedAt));
-        toast.info('Draft restored from previous session', {
-          description: `Last saved: ${new Date(parsed.savedAt).toLocaleString()}`,
-        });
+        // Restore form values
+        if (parsed.formData) {
+          Object.keys(parsed.formData).forEach((key) => {
+            setValue(key as any, parsed.formData[key]);
+          });
+          
+          setHasSavedDraft(true);
+          setLastSaved(new Date(parsed.savedAt));
+          toast.info('Draft restored from previous session', {
+            description: `Last saved: ${new Date(parsed.savedAt).toLocaleString()}`,
+          });
+        }
       } catch (error) {
         console.error('Failed to load draft:', error);
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        localStorage.removeItem(draftKey);
       }
     }
-  }, [setValue]);
+  }, [setValue, user]);
 
   // Auto-save form data to localStorage
   const saveFormData = useCallback(() => {
+    if (!user) return;
+    
+    const draftKey = getDraftStorageKey();
+    if (!draftKey) return;
+
     const draftData = {
+      userId: user.id,
       formData: formValues,
       savedAt: new Date().toISOString(),
     };
     
-    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData));
+    localStorage.setItem(draftKey, JSON.stringify(draftData));
     setLastSaved(new Date());
     setHasSavedDraft(true);
-  }, [formValues]);
+  }, [formValues, user]);
 
   // Debounced auto-save
   useEffect(() => {
@@ -172,7 +199,10 @@ const Apply = () => {
 
   // Clear draft from localStorage
   const clearDraft = () => {
-    localStorage.removeItem(DRAFT_STORAGE_KEY);
+    const draftKey = getDraftStorageKey();
+    if (draftKey) {
+      localStorage.removeItem(draftKey);
+    }
     reset();
     setSelectedFiles({});
     setHasSavedDraft(false);
@@ -265,7 +295,10 @@ const Apply = () => {
       });
 
       // Clear the saved draft
-      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      const draftKey = getDraftStorageKey();
+      if (draftKey) {
+        localStorage.removeItem(draftKey);
+      }
       setHasSavedDraft(false);
       setLastSaved(null);
 
