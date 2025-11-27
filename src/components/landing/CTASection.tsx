@@ -5,13 +5,14 @@ import { Shield } from 'lucide-react';
 
 const CTASection = () => {
   return (
-    <section className="w-full py-20 md:py-28 px-6 bg-sageLight/40">
+    <section className="w-full py-20 md:py-28 px-6 bg-brand-yellow-light">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
-          Ready for a<br />fresh start?
+          Your UK career<br />starts here
         </h2>
         <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-          Join thousands of newcomers who've taken the first step toward building their future in the UK.
+          <strong className="text-foreground">Join 2,500+ professionals</strong> from Nigeria, India, Brazil, China, and 80+ countries 
+          who've accelerated their careers. Your transformation begins with one application.
         </p>
         
         <Link to="/apply">

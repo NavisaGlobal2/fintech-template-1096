@@ -43,9 +43,9 @@
 
 @layer base {
   :root {
-    /* Sage Green Theme */
-    --background: 140 15% 95%; /* Soft sage green */
-    --foreground: 0 0% 10%; /* Dark gray */
+    /* Tech Skill UK Yellow Theme */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 0 0% 10%; /* Dark gray/black */
 
     --card: 0 0% 100%; /* Pure white */
     --card-foreground: 0 0% 10%;
@@ -53,57 +53,57 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 10%;
 
-    --primary: 0 0% 10%; /* Dark for buttons/primary elements */
-    --primary-foreground: 0 0% 100%;
+    --primary: 45 100% 51%; /* Tech Skill UK Yellow */
+    --primary-foreground: 0 0% 10%;
 
-    --secondary: 140 25% 85%; /* Sage light */
+    --secondary: 0 0% 96%; /* Light gray */
     --secondary-foreground: 0 0% 10%;
 
-    --muted: 140 20% 90%; /* Light sage */
-    --muted-foreground: 0 0% 40%; /* Medium grey */
+    --muted: 0 0% 96%; /* Light gray */
+    --muted-foreground: 0 0% 45%; /* Medium grey */
 
-    --accent: 140 20% 75%; /* Sage accent */
+    --accent: 45 100% 51%; /* Yellow accent */
     --accent-foreground: 0 0% 10%;
 
-    --sage-light: 140 25% 85%;
-    --sage: 140 20% 75%;
-    --sage-dark: 140 20% 65%;
+    --brand-yellow: 45 100% 51%;
+    --brand-yellow-light: 45 100% 96%;
+    --brand-yellow-dark: 45 100% 41%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 140 10% 85%;
-    --input: 140 10% 95%;
-    --ring: 0 0% 10%;
+    --border: 0 0% 90%;
+    --input: 0 0% 95%;
+    --ring: 45 100% 51%;
 
     --radius: 2rem;
   }
 
   .dark-mode {
-    --background: 20 10% 15%;
-    --foreground: 28 25% 96%;
+    --background: 0 0% 10%; /* Dark black */
+    --foreground: 0 0% 98%; /* Near white */
 
-    --card: 20 10% 18%;
-    --card-foreground: 28 25% 96%;
+    --card: 0 0% 15%; /* Dark gray card */
+    --card-foreground: 0 0% 98%;
 
-    --popover: 20 10% 18%;
-    --popover-foreground: 28 25% 96%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 28 30% 65%;
-    --primary-foreground: 20 10% 15%;
+    --primary: 45 100% 51%; /* Yellow stays bright in dark mode */
+    --primary-foreground: 0 0% 10%;
 
-    --secondary: 20 8% 22%;
-    --secondary-foreground: 28 25% 96%;
+    --secondary: 0 0% 20%; /* Darker gray */
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 20 8% 22%;
-    --muted-foreground: 28 15% 65%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 25 30% 35%;
-    --accent-foreground: 28 25% 96%;
+    --accent: 45 100% 51%;
+    --accent-foreground: 0 0% 10%;
 
-    --border: 20 8% 25%;
-    --input: 20 8% 25%;
-    --ring: 28 30% 65%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 45 100% 51%;
   }
 
   * {
