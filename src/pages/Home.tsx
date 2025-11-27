@@ -4,6 +4,7 @@ import NavbarStratex from '@/components/landing/NavbarStratex';
 import HeroStratex from '@/components/landing/HeroStratex';
 import StatsBar from '@/components/landing/StatsBar';
 import ComparisonSection from '@/components/landing/ComparisonSection';
+import SocialProfileSection from '@/components/landing/SocialProfileSection';
 import ServicesGrid from '@/components/landing/ServicesGrid';
 import ProcessSteps from '@/components/landing/ProcessSteps';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
@@ -29,6 +30,7 @@ const Home = () => {
         <HeroStratex />
         <StatsBar />
         <ComparisonSection />
+        <SocialProfileSection />
         <ServicesGrid />
         <ProcessSteps />
         <TestimonialsSection />

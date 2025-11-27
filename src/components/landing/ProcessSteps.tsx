@@ -6,20 +6,20 @@ const ProcessSteps = () => {
     {
       icon: FileText,
       number: '01',
-      title: 'Apply in 2 minutes',
-      description: 'No paperwork. No credit check.',
+      title: 'Connect your profile',
+      description: 'Link LinkedIn. Share your story.',
     },
     {
       icon: Search,
       number: '02',
-      title: 'Get matched',
-      description: 'We find your best match.',
+      title: 'We review your network',
+      description: 'Skills, connections, reputation.',
     },
     {
       icon: Banknote,
       number: '03',
-      title: 'Receive funds',
-      description: '24-48hrs. Funds in your account.',
+      title: 'Get funded',
+      description: '24-48hrs. No credit check.',
     },
   ];
 

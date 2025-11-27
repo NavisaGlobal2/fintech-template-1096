@@ -8,10 +8,10 @@ const CTASection = () => {
     <section className="w-full py-20 md:py-28 px-6 bg-brand-yellow-light">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
-          Your UK career<br />starts here
+          Let your network<br />speak for you
         </h2>
         <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-          2,500+ have already started. Join them.
+          Connect LinkedIn. Get funded in 24-48hrs.
         </p>
         
         <Link to="/apply">

@@ -37,7 +37,7 @@ const ServicesGrid = () => {
             How we help<br />newcomers thrive
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Trusted by professionals from 80+ countries.
+            Your professional profile unlocks opportunities.
           </p>
         </div>
 

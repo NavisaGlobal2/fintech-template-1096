@@ -19,13 +19,13 @@ const HeroStratex = () => {
       <div className="relative z-10 max-w-5xl mx-auto text-center">
         {/* Main headline */}
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 tracking-tighter leading-[0.9]">
-          Accelerate Your<br />
-          Career Today
+          Your Network<br />
+          Is Your Credit
         </h1>
         
         {/* Subheadline */}
         <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-          <strong className="text-foreground">2,500+ professionals. 80+ countries.</strong> No UK credit history needed.
+          <strong className="text-foreground">We use your LinkedIn & professional network</strong>—not UK credit history.
         </p>
         
         {/* CTAs */}
@@ -57,7 +57,7 @@ const HeroStratex = () => {
           </div>
           <div className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
-            <span>No Credit History Needed</span>
+            <span>Social Profile Based</span>
           </div>
         </div>
       </div>
