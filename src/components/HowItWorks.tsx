@@ -9,7 +9,8 @@ const HowItWorks = () => {
       title: "Verify your profile",
       description: "Use your social profiles and documents to show who you are",
       icon: CheckCircle,
-      image: "/step-verify-profile.jpg",
+      image: "/step-verify-profile-1024.webp",
+      srcSet: "/step-verify-profile-640.webp 640w, /step-verify-profile-1024.webp 1024w",
       imagePosition: "left"
     },
     {
@@ -17,7 +18,8 @@ const HowItWorks = () => {
       title: "Get matched to options",
       description: "We match you to fair loan options based on your situation",
       icon: FileCheck,
-      image: "/step-matched-options.jpg",
+      image: "/step-matched-options-1024.webp",
+      srcSet: "/step-matched-options-640.webp 640w, /step-matched-options-1024.webp 1024w",
       imagePosition: "right"
     },
     {
@@ -25,7 +27,8 @@ const HowItWorks = () => {
       title: "Access funds fast",
       description: "Once approved, funds arrive quickly so you can move forward",
       icon: Zap,
-      image: "/step-access-funds.jpg",
+      image: "/step-access-funds-1024.webp",
+      srcSet: "/step-access-funds-640.webp 640w, /step-access-funds-1024.webp 1024w",
       imagePosition: "left"
     }
   ];
@@ -61,6 +64,8 @@ const HowItWorks = () => {
                     {/* Image */}
                     <OptimizedImage
                       src={step.image} 
+                      srcSet={step.srcSet}
+                      sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1024px"
                       alt={step.title}
                       priority={index === 0}
                       className="transition-transform duration-500 group-hover:scale-105"

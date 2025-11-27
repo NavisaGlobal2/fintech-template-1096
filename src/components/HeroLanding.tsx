@@ -9,7 +9,9 @@ const HeroLanding = () => {
       {/* Background Image with Opacity */}
       <div className="absolute inset-0 opacity-10 z-0">
         <img 
-          src="/hero-diverse-professionals.jpg" 
+          src="/hero-diverse-professionals-1920.webp"
+          srcSet="/hero-diverse-professionals-640.webp 640w, /hero-diverse-professionals-1024.webp 1024w, /hero-diverse-professionals-1920.webp 1920w"
+          sizes="100vw"
           alt="Diverse professionals"
           loading="eager"
           className="w-full h-full object-cover"

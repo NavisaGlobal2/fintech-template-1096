@@ -7,6 +7,8 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   className?: string;
   priority?: boolean;
   aspectRatio?: string;
+  srcSet?: string;
+  sizes?: string;
 }
 
 export const OptimizedImage = ({
@@ -15,6 +17,8 @@ export const OptimizedImage = ({
   className,
   priority = false,
   aspectRatio,
+  srcSet,
+  sizes,
   ...props
 }: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -30,6 +34,8 @@ export const OptimizedImage = ({
       {/* Actual image */}
       <img
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
