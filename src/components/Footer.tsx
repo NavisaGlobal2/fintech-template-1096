@@ -74,7 +74,7 @@ const Footer = () => {
         </div>
         
         <div className="mt-12 md:mt-16 pt-6 md:pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center text-muted-foreground text-sm">
-          <div className="text-center md:text-left">© 2025 TechScale. All rights reserved.</div>
+          <div className="text-center md:text-left">© 2025 Tech Skill UK. All rights reserved.</div>
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-foreground transition-colors touch-manipulation">Privacy Policy</a>
             <a href="#" className="hover:text-foreground transition-colors touch-manipulation">Terms of Service</a>

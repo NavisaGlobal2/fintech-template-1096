@@ -59,7 +59,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange, onSuccess }) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Sign in to TechScale</DialogTitle>
+          <DialogTitle>Sign in to TechSkill Accelerate</DialogTitle>
         </DialogHeader>
         
         <Tabs defaultValue="signin" className="w-full">
