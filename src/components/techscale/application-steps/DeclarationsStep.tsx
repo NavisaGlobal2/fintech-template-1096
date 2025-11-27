@@ -68,7 +68,7 @@ const DeclarationsStep: React.FC<DeclarationsStepProps> = ({ form, onComplete })
                       Credit Check Authorization
                     </FormLabel>
                     <p className="text-xs text-muted-foreground">
-                      I authorize TechScale and its lending partners to perform credit checks and verify my financial information. 
+                      I authorize TechSkill Accelerate and its lending partners to perform credit checks and verify my financial information. 
                       This may include soft and hard credit inquiries to assess my creditworthiness.
                     </p>
                     <FormMessage />
@@ -96,7 +96,7 @@ const DeclarationsStep: React.FC<DeclarationsStepProps> = ({ form, onComplete })
                       Data Privacy & Processing Consent
                     </FormLabel>
                     <p className="text-xs text-muted-foreground">
-                      I consent to TechScale collecting, processing, and sharing my personal and financial data with verified lending partners 
+                      I consent to TechSkill Accelerate collecting, processing, and sharing my personal and financial data with verified lending partners 
                       for loan evaluation purposes. I understand my data will be handled in accordance with GDPR and privacy regulations.
                     </p>
                     <FormMessage />
@@ -124,7 +124,7 @@ const DeclarationsStep: React.FC<DeclarationsStepProps> = ({ form, onComplete })
                       Terms & Conditions Agreement
                     </FormLabel>
                     <p className="text-xs text-muted-foreground">
-                      I have read and agree to TechScale's{' '}
+                      I have read and agree to TechSkill Accelerate's{' '}
                       <a href="#" className="text-primary underline">Terms of Service</a>,{' '}
                       <a href="#" className="text-primary underline">Privacy Policy</a>, and{' '}
                       <a href="#" className="text-primary underline">Loan Agreement Terms</a>. 
@@ -236,7 +236,7 @@ const DeclarationsStep: React.FC<DeclarationsStepProps> = ({ form, onComplete })
                 <h4 className="font-medium text-blue-900">Secure & Encrypted</h4>
                 <p className="text-sm text-blue-700">
                   Your application and all uploaded documents are encrypted and securely stored. 
-                  Only authorized personnel from TechScale and your chosen lender will have access to your information.
+                  Only authorized personnel from TechSkill Accelerate and your chosen lender will have access to your information.
                 </p>
                 <p className="text-sm text-blue-700">
                   Once submitted, you'll receive a confirmation email with your application reference number and next steps.

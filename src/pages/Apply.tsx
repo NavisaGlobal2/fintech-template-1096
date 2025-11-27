@@ -862,7 +862,7 @@ const Apply = () => {
                   className="mt-1"
                 />
                 <Label htmlFor="consentData" className="cursor-pointer font-normal leading-relaxed">
-                  I agree to TechScale Accelerate processing my data to assess my loan application. <span className="text-destructive">*</span>
+                  I agree to TechSkill Accelerate processing my data to assess my loan application. <span className="text-destructive">*</span>
                 </Label>
               </div>
               {errors.consentData && <p className="text-destructive text-sm">{errors.consentData.message}</p>}

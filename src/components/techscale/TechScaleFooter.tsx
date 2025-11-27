@@ -35,8 +35,8 @@ const TechScaleFooter = ({ onShowGuide }: { onShowGuide?: () => void }) => {
         <Separator className="mb-8" />
         
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <p>TechScale Accelerate • Credit subject to status • UK only</p>
-          <p>&copy; 2024 TechScale. All rights reserved.</p>
+          <p>TechSkill Accelerate • Credit subject to status • UK only</p>
+          <p>&copy; 2024 Tech Skill UK. All rights reserved.</p>
         </div>
       </div>
     </footer>
