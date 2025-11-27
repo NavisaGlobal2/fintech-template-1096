@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle, FileCheck, Zap } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 const HowItWorks = () => {
   const steps = [
@@ -58,10 +59,11 @@ const HowItWorks = () => {
                     </div>
                     
                     {/* Image */}
-                    <img 
+                    <OptimizedImage
                       src={step.image} 
                       alt={step.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      priority={index === 0}
+                      className="transition-transform duration-500 group-hover:scale-105"
                     />
                     
                     {/* Gradient Overlay */}

@@ -7,10 +7,14 @@ const HeroLanding = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 pt-24 sm:pt-20 pb-12">
       {/* Background Image with Opacity */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center opacity-10 z-0"
-        style={{ backgroundImage: "url('/hero-diverse-professionals.jpg')" }}
-      />
+      <div className="absolute inset-0 opacity-10 z-0">
+        <img 
+          src="/hero-diverse-professionals.jpg" 
+          alt="Diverse professionals"
+          loading="eager"
+          className="w-full h-full object-cover"
+        />
+      </div>
       
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
