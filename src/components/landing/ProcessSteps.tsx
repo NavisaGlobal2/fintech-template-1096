@@ -7,19 +7,19 @@ const ProcessSteps = () => {
       icon: FileText,
       number: '01',
       title: 'Apply in 2 minutes',
-      description: 'Quick online form—no complicated paperwork or UK credit checks.',
+      description: 'No paperwork. No credit check.',
     },
     {
       icon: Search,
       number: '02',
       title: 'Get matched',
-      description: 'We review your story and match you with the best funding options.',
+      description: 'We find your best match.',
     },
     {
       icon: Banknote,
       number: '03',
       title: 'Receive funds',
-      description: 'Approved in 24-48hrs. Money in your account, ready to use.',
+      description: '24-48hrs. Funds in your account.',
     },
   ];
 
@@ -30,9 +30,6 @@ const ProcessSteps = () => {
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
             Simple process.<br />Fast results.
           </h2>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get the financial support you need in three straightforward steps.
-          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">

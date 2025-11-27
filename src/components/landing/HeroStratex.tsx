@@ -25,8 +25,7 @@ const HeroStratex = () => {
         
         {/* Subheadline */}
         <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-          Join <strong className="text-foreground">2,500+ professionals</strong> from around the world who've transformed their UK careers. 
-          £300–£2,500 funding to upskill, settle in, or level up—no UK credit history needed.
+          <strong className="text-foreground">2,500+ professionals. 80+ countries.</strong> No UK credit history needed.
         </p>
         
         {/* CTAs */}

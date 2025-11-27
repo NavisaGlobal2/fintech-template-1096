@@ -7,25 +7,25 @@ const ServicesGrid = () => {
       icon: GraduationCap,
       title: 'Skills & Training',
       amount: '£300–£2,500',
-      description: 'Certifications, courses, or learning materials to advance your career in the UK.',
+      description: 'Certifications & courses',
     },
     {
       icon: Home,
       title: 'Settlement Support',
       amount: '£300–£2,000',
-      description: 'Help with essentials like deposit, furniture, or initial living costs.',
+      description: 'Deposits & essentials',
     },
     {
       icon: Briefcase,
       title: 'Career Development',
       amount: '£500–£2,500',
-      description: 'Professional tools, equipment, or resources to level up your work.',
+      description: 'Tools & equipment',
     },
     {
       icon: Heart,
       title: 'Emergency Funds',
       amount: '£300–£1,500',
-      description: 'When life gets complicated—medical, family, or unexpected expenses.',
+      description: 'Unexpected expenses',
     },
   ];
 
@@ -37,8 +37,7 @@ const ServicesGrid = () => {
             How we help<br />newcomers thrive
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            <strong className="text-foreground">Real stories, real results.</strong> Flexible funding options designed for your unique journey in the UK, 
-            trusted by professionals from Nigeria, India, China, Brazil, and beyond.
+            Trusted by professionals from 80+ countries.
           </p>
         </div>
 
