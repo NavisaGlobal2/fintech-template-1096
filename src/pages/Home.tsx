@@ -9,6 +9,7 @@ import ProcessSteps from '@/components/landing/ProcessSteps';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import CTASection from '@/components/landing/CTASection';
 import FooterStratex from '@/components/landing/FooterStratex';
+import StickyApplyCTA from '@/components/landing/StickyApplyCTA';
 import AuthModal from '@/components/auth/AuthModal';
 
 const Home = () => {
@@ -34,6 +35,7 @@ const Home = () => {
         <CTASection />
       </main>
       <FooterStratex />
+      <StickyApplyCTA />
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
