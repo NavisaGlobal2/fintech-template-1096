@@ -3,16 +3,16 @@ import { X, Check } from 'lucide-react';
 
 const ComparisonSection = () => {
   const otherLenders = [
-    'Credit score obsessed',
-    'Hidden fees',
-    'Automated systems',
+    'Credit score only',
+    'No UK history? Rejected',
+    "Banks don't see you",
     'Weeks to decide',
   ];
 
   const techscale = [
-    'Your whole story matters',
-    'Clear, honest terms',
-    'Human support',
+    'Your LinkedIn is your application',
+    'Professional network matters',
+    'Community vouches for you',
     '24-48hr decisions',
   ];
 

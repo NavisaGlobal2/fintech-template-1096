@@ -4,28 +4,28 @@ import { Star } from 'lucide-react';
 const TestimonialsSection = () => {
   const testimonials = [
     {
-      quote: "Got my AWS cert. Landed £45k role in 3 months.",
-      name: 'Chukwu A.',
-      location: 'London',
-      flag: '🇳🇬',
-      rating: 5,
-      role: 'Cloud Engineer',
+      stars: 5,
+      quote: "My LinkedIn got me approved. No UK credit needed.",
+      author: "Priya M.",
+      location: "London",
+      flag: "🇮🇳",
+      role: "Cloud Engineer"
     },
     {
-      quote: "ACCA funded. 48hr approval. Now earning 3x.",
-      name: 'Priya M.',
-      location: 'Manchester',
-      flag: '🇮🇳',
-      rating: 5,
-      role: 'Senior Accountant',
+      stars: 5,
+      quote: "They looked at my network, not my bank history.",
+      author: "Carlos R.",
+      location: "Manchester",
+      flag: "🇧🇷",
+      role: "Full Stack Developer"
     },
     {
-      quote: "No credit history? No problem. Now leading teams.",
-      name: 'Rafael S.',
-      location: 'Birmingham',
-      flag: '🇧🇷',
-      rating: 5,
-      role: 'Team Lead',
+      stars: 5,
+      quote: "My profile spoke for me. Funded in 48hrs.",
+      author: "Amara K.",
+      location: "Bristol",
+      flag: "🇳🇬",
+      role: "Data Analyst"
     },
   ];
 
@@ -49,7 +49,7 @@ const TestimonialsSection = () => {
             >
               {/* Star rating */}
               <div className="flex gap-1 mb-6">
-                {[...Array(testimonial.rating)].map((_, i) => (
+                {[...Array(testimonial.stars)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-primary text-primary" />
                 ))}
               </div>
@@ -67,7 +67,7 @@ const TestimonialsSection = () => {
                   </div>
                   <div>
                     <div className="font-bold text-foreground">
-                      {testimonial.name}
+                      {testimonial.author}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {testimonial.location}
