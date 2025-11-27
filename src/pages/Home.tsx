@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
-import HeroLanding from '@/components/HeroLanding';
-import ProofPoints from '@/components/ProofPoints';
-import HowItWorks from '@/components/HowItWorks';
-import SocialProof from '@/components/SocialProof';
-import FooterLanding from '@/components/FooterLanding';
+import NavbarStratex from '@/components/landing/NavbarStratex';
+import HeroStratex from '@/components/landing/HeroStratex';
+import StatsBar from '@/components/landing/StatsBar';
+import ComparisonSection from '@/components/landing/ComparisonSection';
+import ServicesGrid from '@/components/landing/ServicesGrid';
+import ProcessSteps from '@/components/landing/ProcessSteps';
+import TestimonialsSection from '@/components/landing/TestimonialsSection';
+import CTASection from '@/components/landing/CTASection';
+import FooterStratex from '@/components/landing/FooterStratex';
 import AuthModal from '@/components/auth/AuthModal';
 
 const Home = () => {
@@ -20,14 +23,17 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <NavbarStratex />
       <main>
-        <HeroLanding />
-        <ProofPoints />
-        <HowItWorks />
-        <SocialProof />
+        <HeroStratex />
+        <StatsBar />
+        <ComparisonSection />
+        <ServicesGrid />
+        <ProcessSteps />
+        <TestimonialsSection />
+        <CTASection />
       </main>
-      <FooterLanding />
+      <FooterStratex />
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
