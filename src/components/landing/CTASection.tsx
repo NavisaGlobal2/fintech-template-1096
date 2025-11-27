@@ -20,9 +20,9 @@ const CTASection = () => {
           </Button>
         </Link>
         
-        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <Shield className="h-4 w-4" />
-          <span>Your information is secure • No impact on credit score • Free to apply</span>
+        <div className="flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm text-muted-foreground">
+          <Shield className="h-4 w-4 flex-shrink-0" />
+          <span className="text-center">Your information is secure • No impact on credit score • Free to apply</span>
         </div>
       </div>
     </section>
