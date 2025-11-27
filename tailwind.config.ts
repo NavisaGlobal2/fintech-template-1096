@@ -24,6 +24,12 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				brand: {
+					yellow: 'hsl(45, 100%, 51%)',
+					'yellow-light': 'hsl(45, 100%, 96%)',
+					'yellow-dark': 'hsl(45, 100%, 41%)',
+					black: 'hsl(0, 0%, 10%)',
+				},
 				sageLight: 'hsl(140, 25%, 85%)',
 				sage: 'hsl(140, 20%, 75%)',
 				sageDark: 'hsl(140, 20%, 65%)',

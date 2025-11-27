@@ -1,7 +1,7 @@
 import React from 'react';
-import { Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
+import TechSkillLogo from './TechSkillLogo';
 
 const FooterStratex = () => {
   return (
@@ -10,12 +10,12 @@ const FooterStratex = () => {
         <div className="grid md:grid-cols-3 gap-12 mb-12">
           {/* Logo & Tagline */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Zap className="h-6 w-6 text-primary" />
-              <span className="font-bold text-xl tracking-tight">TechScale</span>
+            <div className="mb-4">
+              <TechSkillLogo className="h-10" />
             </div>
             <p className="text-background/70 leading-relaxed">
-              Fair financial support for newcomers to the UK. We see your story, not just your credit file.
+              Accelerate Your Career Today. Fair financial support for newcomers to the UK. 
+              We see your story, not just your credit file.
             </p>
           </div>
 
@@ -55,7 +55,7 @@ const FooterStratex = () => {
         <Separator className="mb-8 bg-background/20" />
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-background/60">
-          <p>© 2024 TechScale Accelerate. All rights reserved.</p>
+          <p>© 2024 Tech Skill UK. All rights reserved.</p>
           <p>Credit subject to status • UK only • FCA Regulated</p>
         </div>
       </div>

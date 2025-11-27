@@ -19,9 +19,12 @@ const ComparisonSection = () => {
   return (
     <section className="w-full py-20 md:py-28 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground text-center mb-16 tracking-tight">
-          Why choose TechScale?
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground text-center mb-4 tracking-tight">
+          Why choose Tech Skill UK?
         </h2>
+        <p className="text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto">
+          Join thousands of newcomers who chose a lender that sees their potential, not just their credit score.
+        </p>
         
         <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           {/* Other Lenders */}
@@ -41,13 +44,13 @@ const ComparisonSection = () => {
             </div>
           </div>
 
-          {/* TechScale */}
+          {/* Tech Skill UK */}
           <div className="bg-primary/5 border-2 border-primary rounded-3xl p-8 md:p-10 relative overflow-hidden">
             <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
               Our Approach
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-8">
-              TechScale Accelerate
+              Tech Skill UK
             </h3>
             <div className="space-y-6">
               {techscale.map((item, index) => (

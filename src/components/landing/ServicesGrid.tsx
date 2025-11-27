@@ -30,14 +30,15 @@ const ServicesGrid = () => {
   ];
 
   return (
-    <section className="w-full py-20 md:py-28 px-6 bg-sageLight/30">
+    <section className="w-full py-20 md:py-28 px-6 bg-brand-yellow-light">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
             How we help<br />newcomers thrive
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Flexible funding options designed for your unique journey in the UK.
+            <strong className="text-foreground">Real stories, real results.</strong> Flexible funding options designed for your unique journey in the UK, 
+            trusted by professionals from Nigeria, India, China, Brazil, and beyond.
           </p>
         </div>
 

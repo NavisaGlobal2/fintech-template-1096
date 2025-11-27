@@ -14,19 +14,19 @@ const HeroStratex = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 pb-16 px-6 bg-background overflow-hidden">
       {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-sageLight/20 via-background to-background pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-yellow-light via-background to-background pointer-events-none" />
       
       <div className="relative z-10 max-w-5xl mx-auto text-center">
         {/* Main headline */}
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 tracking-tighter leading-[0.9]">
-          A little credit.<br />
-          A fresh start.
+          Accelerate Your<br />
+          Career Today
         </h1>
         
         {/* Subheadline */}
         <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-          Fair financial support for newcomers to the UK. £300–£2,500 to help with skills, 
-          settling in, or getting ahead—without a UK credit history.
+          Join <strong className="text-foreground">2,500+ professionals</strong> from around the world who've transformed their UK careers. 
+          £300–£2,500 funding to upskill, settle in, or level up—no UK credit history needed.
         </p>
         
         {/* CTAs */}

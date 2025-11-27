@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import AuthButton from '@/components/auth/AuthButton';
+import TechSkillLogo from './TechSkillLogo';
 
 const NavbarStratex = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -20,9 +20,8 @@ const NavbarStratex = () => {
       scrolled ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-sm' : 'bg-transparent'
     }`}>
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <Zap className="h-6 w-6 text-primary" />
-          <span className="font-bold text-xl tracking-tight text-foreground">TechScale</span>
+        <Link to="/" className="hover:opacity-80 transition-opacity">
+          <TechSkillLogo className="h-8" />
         </Link>
 
         <div className="flex items-center gap-3">

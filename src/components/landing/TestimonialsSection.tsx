@@ -4,25 +4,28 @@ import { Star } from 'lucide-react';
 const TestimonialsSection = () => {
   const testimonials = [
     {
-      quote: "TechScale helped me get my IT certification without asking about my credit history. Within 3 months, I landed a great job. Couldn't have done it without them.",
+      quote: "Tech Skill UK helped me get my AWS certification without asking about my credit history. Within 3 months, I landed a £45k role at a FinTech startup. My career completely transformed.",
       name: 'Amara K.',
-      location: 'London',
+      location: 'London • Software Engineer',
       flag: '🇳🇬',
       rating: 5,
+      role: 'From Nigeria to UK Tech',
     },
     {
-      quote: "I needed funds to cover my first month's rent and essentials. The team understood my situation as a newcomer and approved me in 2 days. Life-changing support.",
-      name: 'Wei L.',
-      location: 'Manchester',
-      flag: '🇨🇳',
+      quote: "I needed funds for my ACCA qualification. The team understood my journey as a newcomer and approved me in 48 hours. Now I'm a qualified accountant earning 3x my previous salary.",
+      name: 'Priya M.',
+      location: 'Manchester • Senior Accountant',
+      flag: '🇮🇳',
       rating: 5,
+      role: 'Professional Growth Story',
     },
     {
-      quote: "Real people who actually listen. No hidden fees, clear terms, and they guided me through everything. Finally, a lender that sees me as more than a credit score.",
+      quote: "Coming from Brazil with no UK credit history was tough. Tech Skill UK saw my potential, not just numbers. Got my project management cert, now leading teams at a major consultancy.",
       name: 'Carlos R.',
-      location: 'Birmingham',
+      location: 'Birmingham • Project Manager',
       flag: '🇧🇷',
       rating: 5,
+      role: 'Career Transformation',
     },
   ];
 
@@ -31,10 +34,11 @@ const TestimonialsSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
-            Stories from our<br />community
+            Real careers.<br />Real transformations.
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Real experiences from newcomers who found their fresh start with TechScale.
+            <strong className="text-foreground">Join 2,500+ professionals</strong> from over 80 countries who've 
+            accelerated their UK careers with Tech Skill UK. Your story could be next.
           </p>
         </div>
 
@@ -57,17 +61,22 @@ const TestimonialsSection = () => {
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3 pt-6 border-t border-border">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-                  {testimonial.flag}
+              <div className="pt-6 border-t border-border">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
+                    {testimonial.flag}
+                  </div>
+                  <div>
+                    <div className="font-bold text-foreground">
+                      {testimonial.name}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {testimonial.location}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-bold text-foreground">
-                    {testimonial.name}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {testimonial.location}
-                  </div>
+                <div className="text-xs text-primary font-semibold ml-15">
+                  {testimonial.role}
                 </div>
               </div>
             </div>
