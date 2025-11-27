@@ -13,6 +13,7 @@ import MyAccount from "./pages/MyAccount";
 import ApplicationDetail from "./pages/ApplicationDetail";
 import NotFound from "./pages/NotFound";
 import VerifyEmail from "./pages/VerifyEmail";
+import Install from "./pages/Install";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/apply" element={<Apply />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/my-account" element={
               <ProtectedRoute>
                 <MyAccount />

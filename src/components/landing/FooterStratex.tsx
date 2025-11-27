@@ -29,6 +29,9 @@ const FooterStratex = () => {
               <Link to="/apply" className="block text-background/70 hover:text-background transition-colors">
                 Apply Now
               </Link>
+              <Link to="/install" className="block text-background/70 hover:text-background transition-colors">
+                Install App
+              </Link>
               <a href="#" className="block text-background/70 hover:text-background transition-colors">
                 About Us
               </a>

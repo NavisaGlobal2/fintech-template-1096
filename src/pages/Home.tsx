@@ -12,6 +12,7 @@ import CTASection from '@/components/landing/CTASection';
 import FooterStratex from '@/components/landing/FooterStratex';
 import StickyApplyCTA from '@/components/landing/StickyApplyCTA';
 import AuthModal from '@/components/auth/AuthModal';
+import InstallPromptBanner from '@/components/InstallPromptBanner';
 
 const Home = () => {
   const location = useLocation();
@@ -38,6 +39,7 @@ const Home = () => {
       </main>
       <FooterStratex />
       <StickyApplyCTA />
+      <InstallPromptBanner />
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
