@@ -3,28 +3,25 @@ import { X, Check } from 'lucide-react';
 
 const ComparisonSection = () => {
   const otherLenders = [
-    'Credit score obsessed—won\'t help without UK history',
-    'Hidden fees and surprise charges',
-    'Impersonal automated systems',
-    'Lengthy approval process (weeks or months)',
+    'Credit score obsessed',
+    'Hidden fees',
+    'Automated systems',
+    'Weeks to decide',
   ];
 
   const techscale = [
-    'We see your whole story, not just a number',
-    'Transparent, clear terms—no hidden fees',
-    'Real human support when you need it',
-    'Fast 24-48hr decisions',
+    'Your whole story matters',
+    'Clear, honest terms',
+    'Human support',
+    '24-48hr decisions',
   ];
 
   return (
     <section className="w-full py-20 md:py-28 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground text-center mb-4 tracking-tight">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground text-center mb-16 tracking-tight">
           Why choose Tech Skill UK?
         </h2>
-        <p className="text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto">
-          Join thousands of newcomers who chose a lender that sees their potential, not just their credit score.
-        </p>
         
         <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           {/* Other Lenders */}

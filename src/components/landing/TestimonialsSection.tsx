@@ -4,28 +4,28 @@ import { Star } from 'lucide-react';
 const TestimonialsSection = () => {
   const testimonials = [
     {
-      quote: "Tech Skill UK helped me get my AWS certification without asking about my credit history. Within 3 months, I landed a £45k role at a FinTech startup. My career completely transformed.",
-      name: 'Amara K.',
-      location: 'London • Software Engineer',
+      quote: "Got my AWS cert. Landed £45k role in 3 months.",
+      name: 'Chukwu A.',
+      location: 'London',
       flag: '🇳🇬',
       rating: 5,
-      role: 'From Nigeria to UK Tech',
+      role: 'Cloud Engineer',
     },
     {
-      quote: "I needed funds for my ACCA qualification. The team understood my journey as a newcomer and approved me in 48 hours. Now I'm a qualified accountant earning 3x my previous salary.",
+      quote: "ACCA funded. 48hr approval. Now earning 3x.",
       name: 'Priya M.',
-      location: 'Manchester • Senior Accountant',
+      location: 'Manchester',
       flag: '🇮🇳',
       rating: 5,
-      role: 'Professional Growth Story',
+      role: 'Senior Accountant',
     },
     {
-      quote: "Coming from Brazil with no UK credit history was tough. Tech Skill UK saw my potential, not just numbers. Got my project management cert, now leading teams at a major consultancy.",
-      name: 'Carlos R.',
-      location: 'Birmingham • Project Manager',
+      quote: "No credit history? No problem. Now leading teams.",
+      name: 'Rafael S.',
+      location: 'Birmingham',
       flag: '🇧🇷',
       rating: 5,
-      role: 'Career Transformation',
+      role: 'Team Lead',
     },
   ];
 
@@ -37,8 +37,7 @@ const TestimonialsSection = () => {
             Real careers.<br />Real transformations.
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            <strong className="text-foreground">Join 2,500+ professionals</strong> from over 80 countries who've 
-            accelerated their UK careers with Tech Skill UK. Your story could be next.
+            2,500+ success stories. Yours could be next.
           </p>
         </div>
 

@@ -11,8 +11,7 @@ const CTASection = () => {
           Your UK career<br />starts here
         </h2>
         <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-          <strong className="text-foreground">Join 2,500+ professionals</strong> from Nigeria, India, Brazil, China, and 80+ countries 
-          who've accelerated their careers. Your transformation begins with one application.
+          2,500+ have already started. Join them.
         </p>
         
         <Link to="/apply">
